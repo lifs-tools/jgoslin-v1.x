@@ -253,6 +253,8 @@ class parser:
         
         
         
+def FA_pre_event(node):
+    print("new fatty acid")
         
 def HG_LPL_pre_event(node):
     print("headgroup: %s" % node.get_text())
@@ -269,21 +271,39 @@ def Carbon_pre_event(node):
 def DB_pre_event(node):
     print("DB length: %s" % node.get_text())
     
+    
+def Hydroxyl_pre_event(node):
+    print("Hydroxyl length: %s" % node.get_text())
+    
 
-G = []
-with open("grammer.txt") as infile:
-    for line in infile:
-        if line[0] == "#": continue
-        if len(line) < 2: continue
-        G.append(line.strip())
+events = {"Carbon_pre_event": Carbon_pre_event,
+          "DB_pre_event": DB_pre_event,
+          "Hydroxyl_pre_event": Hydroxyl_pre_event,
+          "FA_pre_event": FA_pre_event,
+          "HG_PL_pre_event": HG_PL_pre_event,
+          "HG_LPL_pre_event": HG_LPL_pre_event}
+
         
-        
-events = {"Carbon_pre_event": Carbon_pre_event, "DB_pre_event": DB_pre_event, "HG_PL_pre_event": HG_PL_pre_event, "HG_LPL_pre_event": HG_LPL_pre_event}
-        
+def unit_test():
+    G = []
+    with open("grammer.txt") as infile:
+        for line in infile:
+            if line[0] == "#": continue
+            if len(line) < 2: continue
+            G.append(line.strip())
+            
+    lipidnames = []
+    with open("../../../lipidnames.txt") as infile:
+        for line in infile:
+            lipidnames.append(line.strip())
+    
+    for lipidname in lipidnames:
+        print("testing  %s" % lipidname)
+        p = parser(G, events, "\"")
+        p.parse(lipidname)
+        p.raise_events()
+        if p.word_in_grammer: print()
+
       
-
-w = "LPA 6:1"
-p = parser(G, events, "\"")
-p.parse(w)
-print(p.word_in_grammer)
-p.raise_events()
+if __name__ == "__main__":
+    unit_test()
