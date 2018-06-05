@@ -274,6 +274,7 @@ G = []
 with open("grammer.txt") as infile:
     for line in infile:
         if line[0] == "#": continue
+        if len(line) < 2: continue
         G.append(line.strip())
         
         

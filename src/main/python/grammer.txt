@@ -1,7 +1,21 @@
 lipid = GL | PL | SL
-PL = HG_PL " " FA "-" FA | HG_LPL " " FA
-FA = Carbon ":" DB
-Carbon = "2" | "3" | "4" | "5" | "6" | "7"
-DB = "0" | "1" | "2" | "3" | "4"
-HG_PL = "PA" | "PE" | "BMP"
-HG_LPL = "LPA" | "LPE" | "LPG"
+
+FA = Carbon ":" DB | Carbon ":" DB ";" Hydrolyl
+Carbon = "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "11" | "12" | "13" | "14" | "15" | "16" | "17" | "18" | "19" | "20" | "21" | "22" | "23" | "24" | "25" | "26" | "27" | "28" | "29" | "30"
+DB = "0" | "1" | "2" | "3" | "4" | "5" | "6"
+Hydrolyl = "1" | "2" | "3" | "4" | "5" | "6"
+
+PL = LPL | CL | MLCL | DPL
+LPL = HG_LPL " " FA
+DPL = HG_PL " " FA dash FA | HG_PL " " FA slash FA
+CL = HG_CL " " FA dash FA dash FA dash FA | HG_CL " " FA slash FA slash FA slash FA
+MLCL = HG_MLCL " " FA dash FA dash FA | HG_MLCL " " FA slash FA slash FA
+
+HG_CL = "CL"
+HL_MLCL = "MLCL"
+HG_PL = "BMP" | "CDPDAG" | "DMPE" | "MMPE" | "PA" | "PC" | "PE" | "PEt" | "PG" | "PI" | "PIP" | "PIP2" | "PIP3" | "PS"
+HG_LPL = "LPA" | "LPC" | "LPE" | "LPG" | "LPI" | "LPS"
+
+
+slash = "/"
+dash = "-"
