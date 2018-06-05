@@ -93,12 +93,15 @@ class parser:
         self.T_to_NT = {}
         self.NT_to_NT = {}
         self.quote = _quote
-        self.wort_tree = None
+        self.parse_tree = None
         self.word_in_grammer = False
         self.events = _events
         self.NT_to_rule = {}
 
         for line in lines:
+            if line.find("#") > -1: line = line[:line.find("#")]
+            line = line.strip(" ")
+            if len(line) < 2: continue
             
             tokens_level_1 = [t.strip(" ") for t in split_string(line, "=", self.quote)]
             if tokens_level_1 == None or len(tokens_level_1) != 2: exit() # exception
@@ -216,7 +219,7 @@ class parser:
                 
     
     def raise_events(self):
-        if self.wort_tree != None: self.raise_events_recursive(self.wort_tree)
+        if self.parse_tree != None: self.raise_events_recursive(self.parse_tree)
         
         
     
@@ -245,10 +248,10 @@ class parser:
         self.word_in_grammer = (0) in dp[-1][0]
         
         if self.word_in_grammer:
-            self.wort_tree = tree_node(0)
-            self.fill_tree(self.wort_tree, dp, len(dp) - 1, 0)
+            self.parse_tree = tree_node(0)
+            self.fill_tree(self.parse_tree, dp, len(dp) - 1, 0)
         else:
-            self.wort_tree = None
+            self.parse_tree = None
         
         
         
@@ -275,11 +278,21 @@ def DB_pre_event(node):
 def Hydroxyl_pre_event(node):
     print("Hydroxyl length: %s" % node.get_text())
     
+    
+def Hydroxyl_LCB_pre_event(node):
+    print("Hydroxyl length: %s" % node.get_text())
+    
+    
+def Ether_pre_event(node):
+    print("adding ether: %s" % node.get_text())
+    
 
 events = {"Carbon_pre_event": Carbon_pre_event,
           "DB_pre_event": DB_pre_event,
           "Hydroxyl_pre_event": Hydroxyl_pre_event,
+          "Hydroxyl_LCB_pre_event": Hydroxyl_LCB_pre_event,
           "FA_pre_event": FA_pre_event,
+          "Ether_pre_event": Ether_pre_event,
           "HG_PL_pre_event": HG_PL_pre_event,
           "HG_LPL_pre_event": HG_LPL_pre_event}
 
@@ -288,22 +301,20 @@ def unit_test():
     G = []
     with open("grammer.txt") as infile:
         for line in infile:
-            if line[0] == "#": continue
-            if len(line) < 2: continue
             G.append(line.strip())
             
     lipidnames = []
     with open("../../../lipidnames.txt") as infile:
         for line in infile:
             lipidnames.append(line.strip())
-    
+        
+    p = parser(G, events, "\"")
     for lipidname in lipidnames:
         print("testing  %s" % lipidname)
-        p = parser(G, events, "\"")
         p.parse(lipidname)
+        print(p.word_in_grammer)
         p.raise_events()
         if p.word_in_grammer: print()
-
       
 if __name__ == "__main__":
     unit_test()
