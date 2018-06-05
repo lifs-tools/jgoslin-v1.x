@@ -303,18 +303,31 @@ def unit_test():
         for line in infile:
             G.append(line.strip())
             
+    p = parser(G, events, "\"")
+    
     lipidnames = []
     with open("../../../lipidnames.txt") as infile:
         for line in infile:
             lipidnames.append(line.strip())
         
-    p = parser(G, events, "\"")
     for lipidname in lipidnames:
         print("testing  %s" % lipidname)
         p.parse(lipidname)
         print(p.word_in_grammer)
         p.raise_events()
         if p.word_in_grammer: print()
+    
+    lipidnames_invalid = []
+    with open("../../../lipidnames-invalid.txt") as infile:
+        for line in infile:
+            lipidnames_invalid.append(line.strip())
+        
+    for lipidname in lipidnames_invalid:
+        print("testing  %s" % lipidname)
+        p.parse(lipidname)
+        if p.word_in_grammer: print("ERROR: lipid was parsed as valid")
+        else: print()
+      
       
 if __name__ == "__main__":
     unit_test()
