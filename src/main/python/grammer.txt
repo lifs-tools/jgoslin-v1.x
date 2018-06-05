@@ -1,0 +1,7 @@
+lipid = GL | PL | SL
+PL = HG_PL " " FA "-" FA | HG_LPL " " FA
+FA = Carbon ":" DB
+Carbon = "2" | "3" | "4" | "5" | "6" | "7"
+DB = "0" | "1" | "2" | "3" | "4"
+HG_PL = "PA" | "PE" | "BMP"
+HG_LPL = "LPA" | "LPE" | "LPG"
