@@ -225,6 +225,7 @@ class parser:
     
     # re-implementation of Cocke-Younger-Kasami algorithm
     def parse(self, text):
+        self.word_in_grammer = False
         n = len(text)
         dp = [[{} for ii in text] for i in text]
         
