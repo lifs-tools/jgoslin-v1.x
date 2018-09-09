@@ -31,7 +31,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterDb_position(PaLiNomParser.Db_positionContext ctx) {
-        super.enterDb_position(ctx);
+        System.out.println("Enter Double Bond Position");
         if (this.activeFa != null) {
             this.activeFa.addDoubleBondWithLocation(Integer.parseInt(ctx.
                 getText()));
@@ -45,9 +45,9 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterDb_count(PaLiNomParser.Db_countContext ctx) {
-        super.enterDb_count(ctx);
+        System.out.println("Enter Double Bond Count");
         if (this.activeFa != null) {
-            this.activeFa.addDoubleBond();
+            this.activeFa.addDoubleBonds(Integer.parseInt(ctx.getText()));
         }
     }
 
@@ -58,7 +58,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterLcb(PaLiNomParser.LcbContext ctx) {
-        super.enterLcb(ctx);
+        System.out.println("Enter LCB");
         if (activeFa != null) {
             throw new IllegalStateException(
                 "Previous FA context was not exited!");
@@ -97,6 +97,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     @Override
     public void enterMediator(PaLiNomParser.MediatorContext ctx) {
         super.enterMediator(ctx);
+        System.out.println("Enter Mediator");
         this.lipid.setCategory("ME");
         this.lipid.setHeadGroup(ctx.getText());
     }
@@ -119,7 +120,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterCholesterol(PaLiNomParser.CholesterolContext ctx) {
-        super.enterCholesterol(ctx);
+        System.out.println("Enter Cholesterol");
         this.lipid.setCategory("CH");
     }
 
@@ -152,7 +153,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterSl(PaLiNomParser.SlContext ctx) {
-        super.enterSl(ctx);
+        System.out.println("Enter SL");
         this.lipid.setCategory("SL");
     }
 
@@ -193,7 +194,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterDpl(PaLiNomParser.DplContext ctx) {
-        super.enterDpl(ctx);
+        System.out.println("Enter DPL");
     }
 
     @Override
@@ -223,7 +224,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterPl_o(PaLiNomParser.Pl_oContext ctx) {
-        super.enterPl_o(ctx);
+        System.out.println("Enter PL O");
     }
 
     @Override
@@ -284,7 +285,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterAdduct_term(PaLiNomParser.Adduct_termContext ctx) {
-        super.enterAdduct_term(ctx);
+        System.out.println("Enter Adduct Term");
         this.adduct = new Adduct();
     }
 
@@ -397,7 +398,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterHg_pl(PaLiNomParser.Hg_plContext ctx) {
-        super.enterHg_pl(ctx);
+        System.out.println("Enter HeadGroup PL");
         this.lipid.setHeadGroup(ctx.getText());
     }
 
@@ -474,7 +475,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterCharge_sign(PaLiNomParser.Charge_signContext ctx) {
-        super.enterCharge_sign(ctx);
+        System.out.println("Enter Charge Sign");
         this.adduct.setChargeSign(Integer.parseInt(ctx.getText()));
     }
 
@@ -485,7 +486,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterCharge(PaLiNomParser.ChargeContext ctx) {
-        super.enterCharge(ctx);
+        System.out.println("Enter Charge");
         this.adduct.setCharge(Integer.parseInt(ctx.getText()));
     }
 
@@ -498,7 +499,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 //    public void exitHg(PaLiNomParser.HgContext ctx) {
     @Override
     public void enterAdduct(PaLiNomParser.AdductContext ctx) {
-        super.enterAdduct(ctx);
+        System.out.println("Enter Adduct");
         this.adduct.setType(ctx.getText());
     }
 
@@ -512,11 +513,13 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     @Override
     public void exitLipidIdentifier(
         PaLiNomParser.LipidIdentifierContext ctx) {
+        System.out.println("Exit LipidIdentifier");
         super.exitLipidIdentifier(ctx);
     }
 
     @Override
     public void enterLipidIdentifier(PaLiNomParser.LipidIdentifierContext ctx) {
+        System.out.println("Enter LipidIdentifier");
         this.lipid = new Lipid();
     }
 
@@ -527,6 +530,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterDb(PaLiNomParser.DbContext ctx) {
+        System.out.println("Enter Double Bond");
         this.activeFa.addDoubleBonds(Integer.parseInt(ctx.getText()));
     }
 
@@ -537,6 +541,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterPl(PaLiNomParser.PlContext ctx) {
+        System.out.println("Enter PL");
         this.lipid.setCategory("PL");
     }
 
@@ -547,6 +552,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterCategory(PaLiNomParser.CategoryContext ctx) {
+        System.out.println("Enter Category");
         super.enterCategory(ctx);
     }
 
@@ -557,6 +563,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterFa(PaLiNomParser.FaContext ctx) {
+        System.out.println("Enter FA");
         if (activeFa != null) {
             throw new IllegalStateException(
                 "Previous FA context was not exited!");
@@ -574,6 +581,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterCarbon(PaLiNomParser.CarbonContext ctx) {
+        System.out.println("Enter Carbon");
         if (activeFa != null) {
             activeFa.setNCarbon(Integer.parseInt(ctx.getText()));
         }
@@ -586,6 +594,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     @Override
     public void enterHydro(PaLiNomParser.HydroContext ctx) {
+        System.out.println("Enter Hydro");
         if (activeFa != null) {
             activeFa.setNHydroxy(Integer.parseInt(ctx.getText()));
         }
