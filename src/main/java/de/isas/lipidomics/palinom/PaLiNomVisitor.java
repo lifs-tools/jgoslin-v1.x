@@ -18,6 +18,9 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 public class PaLiNomVisitor extends PaLiNomBaseListener {
 
     private Adduct adduct;
+    private Lipid lipid;
+    private Map<String, FattyAcid> fa = new LinkedHashMap<>();
+    private FattyAcid activeFa;
 
     @Override
     public void exitEveryRule(ParserRuleContext ctx) {
@@ -54,6 +57,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     @Override
     public void exitLcb(PaLiNomParser.LcbContext ctx) {
         super.exitLcb(ctx);
+        this.activeFa = null;
     }
 
     @Override
@@ -288,10 +292,6 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
         System.out.println("Enter Adduct Term");
         this.adduct = new Adduct();
     }
-
-    private Lipid lipid;
-    private Map<String, FattyAcid> fa = new LinkedHashMap<>();
-    private FattyAcid activeFa;
 
     public Lipid visit(PaLiNomParser.LipidIdentifierContext context) {
         ParseTreeWalker.DEFAULT.walk(this, context);
@@ -531,7 +531,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     @Override
     public void enterDb(PaLiNomParser.DbContext ctx) {
         System.out.println("Enter Double Bond");
-        this.activeFa.addDoubleBonds(Integer.parseInt(ctx.getText()));
+//        this.activeFa.addDoubleBonds(Integer.parseInt(ctx.getText()));
     }
 
     @Override
@@ -571,6 +571,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
         FattyAcid fa1 = new FattyAcid();
         fa1.setName("FA" + (fa.size() + 1));
         this.activeFa = fa1;
+        System.out.println("Adding " + fa1.getName());
         fa.put(fa1.getName(), fa1);
     }
 
@@ -584,6 +585,9 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
         System.out.println("Enter Carbon");
         if (activeFa != null) {
             activeFa.setNCarbon(Integer.parseInt(ctx.getText()));
+            System.out.println(
+                "Active FA " + activeFa.getName() + " received " + activeFa.
+                getNCarbon() + " carbons!");
         }
     }
 
