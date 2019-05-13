@@ -15,11 +15,11 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
  *
  * @author nilshoffmann
  */
-public class PaLiNomVisitor extends PaLiNomBaseListener {
+public class PaLiNomListenerParser extends PaLiNomBaseListener {
 
     private Adduct adduct;
     private Lipid lipid;
-    private Map<String, FattyAcid> fa = new LinkedHashMap<>();
+    private final Map<String, FattyAcid> fa = new LinkedHashMap<>();
     private FattyAcid activeFa;
 
     @Override
@@ -102,7 +102,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     public void enterMediator(PaLiNomParser.MediatorContext ctx) {
         super.enterMediator(ctx);
         System.out.println("Enter Mediator");
-        this.lipid.setCategory("ME");
+        this.lipid.setLipidCategory("ME");
         this.lipid.setHeadGroup(ctx.getText());
     }
 
@@ -125,7 +125,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     @Override
     public void enterCholesterol(PaLiNomParser.CholesterolContext ctx) {
         System.out.println("Enter Cholesterol");
-        this.lipid.setCategory("CH");
+        this.lipid.setLipidCategory("CH");
     }
 
     @Override
@@ -158,7 +158,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     @Override
     public void enterSl(PaLiNomParser.SlContext ctx) {
         System.out.println("Enter SL");
-        this.lipid.setCategory("SL");
+        this.lipid.setLipidCategory("SL");
     }
 
     @Override
@@ -279,7 +279,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     @Override
     public void enterGl(PaLiNomParser.GlContext ctx) {
         super.enterGl(ctx);
-        this.lipid.setCategory("GL");
+        this.lipid.setLipidCategory("GL");
     }
 
     @Override
@@ -291,6 +291,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     public void enterAdduct_term(PaLiNomParser.Adduct_termContext ctx) {
         System.out.println("Enter Adduct Term");
         this.adduct = new Adduct();
+//        this.adduct.setAdductString(adductString);
     }
 
     public Lipid visit(PaLiNomParser.LipidIdentifierContext context) {
@@ -500,7 +501,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     @Override
     public void enterAdduct(PaLiNomParser.AdductContext ctx) {
         System.out.println("Enter Adduct");
-        this.adduct.setType(ctx.getText());
+//        this.adduct.setType(ctx.getText());
     }
 
 //        super.exitHg(ctx); 
@@ -542,7 +543,7 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     @Override
     public void enterPl(PaLiNomParser.PlContext ctx) {
         System.out.println("Enter PL");
-        this.lipid.setCategory("PL");
+        this.lipid.setLipidCategory("PL");
     }
 
     @Override
@@ -592,12 +593,12 @@ public class PaLiNomVisitor extends PaLiNomBaseListener {
     }
 
     @Override
-    public void exitHydro(PaLiNomParser.HydroContext ctx) {
-        super.exitHydro(ctx);
+    public void exitHydroxyl(PaLiNomParser.HydroxylContext ctx) {
+        super.exitHydroxyl(ctx);
     }
 
     @Override
-    public void enterHydro(PaLiNomParser.HydroContext ctx) {
+    public void enterHydroxyl(PaLiNomParser.HydroxylContext ctx) {
         System.out.println("Enter Hydro");
         if (activeFa != null) {
             activeFa.setNHydroxy(Integer.parseInt(ctx.getText()));

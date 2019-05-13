@@ -20,6 +20,7 @@ charge: LDIGIT;
 
 charge_sign: '-' | '+';
 
+/* Lipid category level */
 category
   : gl | pl | sl | cholesterol | mediator
   ;
@@ -54,13 +55,14 @@ tgl
   | hg_tgl hg_sep fa sorted_fa_sep fa sorted_fa_sep fa
   ;
 
-/* Glycerolipid headgroups */
+/* Head group rule for monoacyl-glycerol */
 hg_mgl
   : MAG
   ;
 
 MAG: 'MAG';
 
+/* Head group rule for diacyl-glycerols */
 hg_dgl
   : DAG
   ;
@@ -76,13 +78,13 @@ MGDG: 'MGDG';
 DGDG: 'DGDG';
 SQDG: 'SQDG';
 
+/* Head group rule for tri-acyl-glycerols */
 hg_tgl
   : HG_TGL
   ;
 HG_TGL: 'TAG';
 
 /* Phospholipids */
-
 pl: lpl | dpl | pl_o | cl | mlcl;
 pl_o: lpl_o | dpl_o;
 lpl: hg_lpl hg_sep fa;
@@ -92,10 +94,13 @@ dpl_o: hg_pl_o hg_sep fa unsorted_fa_sep fa | hg_pl_o hg_sep fa sorted_fa_sep fa
 cl: hg_cl hg_sep fa unsorted_fa_sep fa unsorted_fa_sep fa unsorted_fa_sep fa | hg_cl hg_sep fa sorted_fa_sep fa sorted_fa_sep fa sorted_fa_sep fa;
 mlcl: hg_mlcl hg_sep fa unsorted_fa_sep fa unsorted_fa_sep fa | hg_mlcl hg_sep fa sorted_fa_sep fa sorted_fa_sep fa;
 
+/* Head group rule for cardiolipins */
 hg_cl: CL;
 CL: 'CL';
 hg_mlcl: MLCL;
 MLCL: 'MLCL';
+
+/* Head group rule for phospholipids */
 hg_pl: BMP | CDPDAG | DMPE | MMPE | PA | PC | PE | PET | PG | PI | PIP | PIP2 | PIP3 | PS;
 BMP: 'BMP';
 CDPDAG: 'CDPDAG';
@@ -112,6 +117,7 @@ PIP2: 'PIP2';
 PIP3: 'PIP3';
 PS: 'PS';
 
+/* Head group rule for lyso-phospholipids */
 hg_lpl: LPA | LPC | LPE | LPG | LPI | LPS;
 LPA: 'LPA';
 LPC: 'LPC';
@@ -120,6 +126,7 @@ LPG: 'LPG';
 LPI: 'LPI';
 LPS: 'LPS';
 
+/* Head group rule for lyso-phospholipids */ 
 hg_lpl_o: LPC_O | LPE_O;
 LPC_O: 'LPC O';
 LPE_O: 'LPE O';
@@ -132,12 +139,14 @@ sl: lsl | dsl;
 lsl: hg_lsl hg_sep lcb;
 dsl: hg_dsl hg_sep lcb sorted_fa_sep fa;
 
+/* Head group rule for lyso-sphingolipids */
 hg_lsl: LCB | LCBP | LHEXCER | LSM;
 LCB: 'LCB';
 LCBP: 'LCBP';
 LHEXCER: 'LHexCer';
 LSM: 'LSM';
 
+/* Head group rule for sphingolipids */
 hg_dsl: CER | CERP | EPC | GB3 | GB4 | GD3 | GM3 | GM4 | HEX2CER | HEXCER | IPC | MIP2C | MIPC | SHEXCER | SM;
 CER: 'Cer';
 CERP: 'CerP';
@@ -164,7 +173,6 @@ hg_che: CHE;
 CHE: 'ChE';
 
 /* Mediators */
-
 mediator:  
 M_10_HDOHE |
 M_11_HDOHE |
@@ -228,6 +236,7 @@ M_TXB1 |
 M_TXB2 |
 M_TXB3 ;
 
+/* Mediator terminal symbols */
 M_10_HDOHE: '10-HDoHE';
 M_11_HDOHE: '11-HDoHE';
 M_11_HETE: '11-HETE';
@@ -290,34 +299,42 @@ M_TXB1: 'TXB1';
 M_TXB2: 'TXB2';
 M_TXB3: 'TXB3';
 
+/* Fatty acid rule, pure FA or FA followed by ether */
 fa: fa_pure | fa_pure ether;
 fa_pure
   : carbon c_db_sep db
-  | carbon c_db_sep db db_hydroxyl_sep hydro
+  | carbon c_db_sep db db_hydroxyl_sep hydroxyl
   ;
 ether: 'a' | 'p';
 
 /* Long chain base */
-lcb: carbon c_db_sep db db_hydroxyl_sep hydro;
+lcb: carbon c_db_sep db db_hydroxyl_sep hydroxyl;
 
-
+/* Number of Carbons */
 carbon
   : DIGIT
   ;
 
+/* Double bond rule, count or count with position. */
 db: db_count | db_count LRB db_position RRB;
 
+/* Number of double bonds */
 db_count
   : DIGIT
   ;
 
+/* Double bond position */
 db_position: DIGIT cistrans | db_position db_pos_sep db_position;
 
+/* Cis (E) or Trans (Z) structural isomer */
 cistrans: 'E' | 'Z';
 
-hydro
+/* Number of Hydroxy groups */
+hydroxyl
   : DIGIT
   ;
+
+/* Separators */
 
 /* Left round bracket ( */
 LRB: '(';
@@ -360,12 +377,12 @@ SEMICOLON
 
 db_hydroxyl_sep: SEMICOLON;
 
-UNDERSCORE
-  : '_'
+DASH
+  : '-'
   ;
 
 unsorted_fa_sep
-  : UNDERSCORE
+  : DASH
   ;
 
 SLASH

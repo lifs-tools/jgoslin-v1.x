@@ -13,8 +13,17 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class Adduct {
+    
+    private static final class None extends Adduct {
+        private None() {
+            super("", "", 0, 0);
+        }
+    }
+    
+    public static final Adduct NONE = new None();
 
-    private String type;
+    private String sumFormula;
+    private String adductString;
     private Integer charge;
     private Integer chargeSign;
 

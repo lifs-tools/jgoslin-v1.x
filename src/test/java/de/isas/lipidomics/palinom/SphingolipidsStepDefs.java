@@ -22,7 +22,7 @@ public class SphingolipidsStepDefs {
     private String lipidname;
     private Lipid lipid;
 
-    @Given("the lipid sub species name is {string}")
+    @Given("the sphingolipid sub species name is {string}")
     public void the_lipid_sub_species_name_is(String string) {
         this.lipidname = string;
     }
@@ -35,7 +35,7 @@ public class SphingolipidsStepDefs {
         PaLiNomParser parser = new PaLiNomParser(tokens);
         PaLiNomParser.LipidIdentifierContext context = parser.
             lipidIdentifier();
-        PaLiNomVisitor visitor = new PaLiNomVisitor();
+        PaLiNomListenerParser visitor = new PaLiNomListenerParser();
         this.lipid = visitor.visit(context);
     }
 
@@ -58,7 +58,7 @@ public class SphingolipidsStepDefs {
             new FattyAcid("FA" + fa1, fa1_c, fa1_db, fa1_hydroxy),
             new FattyAcid("FA" + fa2, fa2_c, fa2_db, fa2_hydroxy));
         Assert.assertEquals(referenceLipid, lipid);
-        Assert.assertEquals(category, lipid.getCategory());
+        Assert.assertEquals(category, lipid.getLipidCategory());
         Assert.assertEquals(species, toSpeciesString(lipid));
     }
 

@@ -16,7 +16,17 @@ import lombok.Data;
 @Data
 public class Lipid {
 
-    private String category;
+private static final class None extends Lipid {
+        private None() {
+            super(LipidCategory.UNDEFINED.toString(), "");
+        }
+    }
+    
+    public static final Lipid NONE = new None();
+    
+    private String lipidCategory;
+    private String lipidClass;
+    private String lipidSpecies;
     private String headGroup;
     private Map<String, FattyAcid> fa = new HashMap<>();
 
@@ -25,7 +35,7 @@ public class Lipid {
     }
 
     public Lipid(String category, String headGroup) {
-        this.category = category;
+        this.lipidCategory = category;
         this.headGroup = headGroup;
     }
 

@@ -8,7 +8,7 @@ Feature: Is this a valid Sphingolipid name?
 
     Examples:
       | lipid_sub_species  | lipid_category |  lipid_species | headgroup | fa1_n_carb | fa1_n_db | fa1_n_hydroxy | fa2_n_carb | fa2_n_db | fa2_n_hydroxy |
-      | "PE 18:3;1_16:2"   | "PL"           |    "PE 34:5;1" |      "PE" |         18 |        3 |             1 |         16 |        2 |             0 |
-      | "PE 18:2;1_16:2"   | "PL"           |    "PE 34:4;1" |      "PE" |         18 |        2 |             1 |         16 |        2 |             0 |
-      | "PE 18:2_16:2"     | "PL"           |    "PE 34:4"   |      "PE" |         18 |        2 |             0 |         16 |        2 |             0 |
-      | "PC 16:2_16:1"     | "PL"           |    "PC 32:3"   |      "PC" |         16 |        2 |             0 |         16 |        1 |             0 |
+      | "PE 18:3;1-16:2"   | "PL"           |    "PE 34:5;1" |      "PE" |         18 |        3 |             1 |         16 |        2 |             0 |
+      | "PE 18:2;1-16:2"   | "PL"           |    "PE 34:4;1" |      "PE" |         18 |        2 |             1 |         16 |        2 |             0 |
+      | "PE 18:2-16:2"     | "PL"           |    "PE 34:4"   |      "PE" |         18 |        2 |             0 |         16 |        2 |             0 |
+      | "PC 16:2-16:1"     | "PL"           |    "PC 32:3"   |      "PC" |         16 |        2 |             0 |         16 |        1 |             0 |
