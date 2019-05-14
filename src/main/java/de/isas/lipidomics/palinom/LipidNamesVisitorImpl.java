@@ -20,14 +20,12 @@ import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.Lipid;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
-import static de.isas.lipidomics.domain.LipidCategory.PL;
-import de.isas.lipidomics.palinom.PaLiNomParser.Adduct_termContext;
-import de.isas.lipidomics.palinom.PaLiNomParser.CategoryContext;
+import de.isas.lipidomics.palinom.LipidNamesParser.AdductInfoContext;
+import de.isas.lipidomics.palinom.LipidNamesParser.Lipid_pureContext;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,34 +33,34 @@ import lombok.extern.slf4j.Slf4j;
  * @author nils.hoffmann
  */
 @Slf4j
-class LipidVisitor extends PaLiNomBaseVisitor<LipidAdduct> {
+class LipidNamesVisitorImpl extends LipidNamesBaseVisitor<LipidAdduct> {
 
     @Override
-    public LipidAdduct visitLipidIdentifier(PaLiNomParser.LipidIdentifierContext ctx) {
+    public LipidAdduct visitLipid(LipidNamesParser.LipidContext ctx) {
 
 //        CategoryContext categoryContext = ctx.category().;
-        Optional<CategoryContext> categoryContext = Optional.ofNullable(ctx.category());
-        Optional<Adduct_termContext> adductTermContext = Optional.ofNullable(ctx.adduct_term());
+        Optional<Lipid_pureContext> categoryContext = Optional.ofNullable(ctx.lipid_pure());
+        Optional<AdductInfoContext> adductTermContext = Optional.ofNullable(ctx.adductInfo());
 
         LipidAdduct la = new LipidAdduct(categoryContext.map((cc) -> {
-            return new CategoryVisitor().visitCategory(cc);
+            return new LipidVisitor().visitLipid_pure(cc);
         }).orElse(Lipid.NONE), adductTermContext.map((t) -> {
-            return new AdductVisitor().visitAdduct_term(t);
+            return new AdductVisitor().visitAdductInfo(t);
         }).orElse(Adduct.NONE));
         return la;
     }
 
-    private static class CategoryVisitor extends PaLiNomBaseVisitor<Lipid> {
+    private static class LipidVisitor extends LipidNamesBaseVisitor<Lipid> {
 
         @Override
-        public Lipid visitCategory(PaLiNomParser.CategoryContext ctx) {
-            Lipid lipid = new Lipid();
+        public Lipid visitLipid_pure(LipidNamesParser.Lipid_pureContext ctx) {
+            Lipid lipid = null;
             BitSet bs = new BitSet(5);
             bs.set(LipidCategory.ST.ordinal(), ctx.cholesterol() != null);
             bs.set(LipidCategory.GL.ordinal(), ctx.gl() != null);
-            bs.set(LipidCategory.MEDIATOR.ordinal(), ctx.mediator() != null);
-            bs.set(LipidCategory.PL.ordinal(), ctx.pl() != null);
-            bs.set(LipidCategory.SL.ordinal(), ctx.sl() != null);
+            bs.set(LipidCategory.FA.ordinal(), ctx.mediatorc() != null);
+            bs.set(LipidCategory.GP.ordinal(), ctx.pl() != null);
+            bs.set(LipidCategory.SP.ordinal(), ctx.sl() != null);
             LipidCategory contextCategory = LipidCategory.UNDEFINED;
             switch (bs.cardinality()) {
                 case 0:
@@ -75,92 +73,100 @@ class LipidVisitor extends PaLiNomBaseVisitor<LipidAdduct> {
             }
             switch (contextCategory) {
                 case ST:
-                    if (ctx.cholesterol().ch() != null) {
-                        lipid.setHeadGroup(ctx.cholesterol().ch().CH().getText());
+                    if (ctx.cholesterol().chc()!= null) {
+                        lipid = new Lipid(ctx.cholesterol().chc().ch().getText());
                         break;
                     } else if (ctx.cholesterol().che() != null) {
 //                            lipid.setHeadGroup(ctx.cholesterol().che().().getText());
                         throw new RuntimeException("CHe not implemented yet!");
+                    } else {
+                        throw new RuntimeException("Unhandled sterol lipid: " + ctx.cholesterol().getText());
                     }
-                    break;
                 case GL:
 //                    ctx.gl();
                     throw new RuntimeException("GL not implemented yet!");
-                case MEDIATOR:
+                case FA:
 //                    ctx.mediator();
-                    lipid.setHeadGroup(ctx.mediator().getText());
+                    lipid = new Lipid(ctx.mediatorc().getText());
                     break;
-                case PL:
-                    //cardiolipin
-                    if(ctx.pl().cl()!=null) {
-                        lipid.setLipidClass("CL");
-                        lipid.setHeadGroup(ctx.pl().cl().hg_cl().getText());
-                        visitFas(ctx.pl().cl().fa(), lipid);
-                    } else if(ctx.pl().dpl()!=null) {
-                        lipid.setHeadGroup(ctx.pl().dpl().hg_pl().getText());
-                        visitFas(ctx.pl().dpl().fa(), lipid);
-                    } else if(ctx.pl().lpl()!=null) {
-                        lipid.setHeadGroup(ctx.pl().lpl().hg_lpl().getText());
-                        visitFas(Arrays.asList(ctx.pl().lpl().fa()), lipid);
-                    } else if(ctx.pl().mlcl()!=null) {
-                        lipid.setHeadGroup(ctx.pl().mlcl().hg_mlcl().getText());
-                        visitFas(ctx.pl().mlcl().fa(), lipid);
-                    }  else if(ctx.pl().pl_o()!=null) {
-                        throw new RuntimeException("PL_o handling not implemented yet in PL!");
-                    } else {
-                        throw new RuntimeException("Unhandled context state in PL!");
-                    }
+                case GP:
+                    lipid = handleGlyceroPhospholipid(ctx).orElse(Lipid.NONE);
                     break;
-                case SL:
-                    if(ctx.sl().dsl()!=null) {
-                        lipid.setLipidClass("DSL");
-                        lipid.setHeadGroup(ctx.sl().dsl().hg_dsl().getText());
+                case SP:
+                    if (ctx.sl().dsl() != null) {
+                        lipid = new Lipid(ctx.sl().dsl().hg_dslc().getText());
                         visitFas(Arrays.asList(ctx.sl().dsl().fa()), lipid);
-                    } else if(ctx.sl().lsl()!=null) {
+                    } else if (ctx.sl().lsl() != null) {
                         throw new RuntimeException("LSL handling not implemented yet in SL!");
 //                        lipid.setLipidClass("LSL");
 //                        lipid.setHeadGroup(ctx.sl().lsl().hg_lsl().getText());
 //                        visitFas(Arrays.asList(ctx.sl().lsl().lcb().fa()), lipid);
                     } else {
-                        throw new RuntimeException("Unhandled context state in PL!");
+                        throw new RuntimeException("Unhandled sphingolipid: " + ctx.sl().getText());
                     }
                     break;
                 default:
                     log.warn("Unhandled contextCategory: {}", contextCategory);
             }
-            lipid.setLipidCategory(contextCategory.name());
+//            lipid.setLipidCategory(contextCategory.name());
 //            lipid.setHeadGroup(headGroup);
 //            lipid.setFa(fa);
             return lipid;
         }
 
-        private void visitFas(List<PaLiNomParser.FaContext> faContexts, Lipid lipid) {
-            for(int i=0;i<faContexts.size();i++) {
+        private Optional<Lipid> handleGlyceroPhospholipid(Lipid_pureContext ctx) throws RuntimeException {
+            //glycerophospholipids
+            //cardiolipin
+            if (ctx.pl().cl() != null) {
+//                lipid.setLipidClass("CL");
+                Lipid lipid = new Lipid(ctx.pl().cl().hg_clc().getText());
+                visitFas(ctx.pl().cl().fa(), lipid);
+                return Optional.of(lipid);
+            } else if (ctx.pl().dpl() != null) {
+                Lipid lipid = new Lipid(ctx.pl().dpl().hg_plc().getText());
+                visitFas(ctx.pl().dpl().fa(), lipid);
+                return Optional.of(lipid);
+            } else if (ctx.pl().lpl() != null) {
+                Lipid lipid = new Lipid(ctx.pl().lpl().hg_lplc().getText());
+                visitFas(Arrays.asList(ctx.pl().lpl().fa()), lipid);
+                return Optional.of(lipid);
+            } else if (ctx.pl().mlcl() != null) {
+                Lipid lipid = new Lipid(ctx.pl().mlcl().hg_mlclc().getText());
+                visitFas(ctx.pl().mlcl().fa(), lipid);
+                return Optional.of(lipid);
+            } else if (ctx.pl().pl_o() != null) {
+                throw new RuntimeException("PL_o handling not implemented yet in PL!");
+            } else {
+                throw new RuntimeException("Unhandled context state in PL!");
+            }
+        }
+
+        private void visitFas(List<LipidNamesParser.FaContext> faContexts, Lipid lipid) {
+            for (int i = 0; i < faContexts.size(); i++) {
                 FaVisitor faVisitor = new FaVisitor();
                 FattyAcid fa = faVisitor.visit(faContexts.get(i));
-                fa.setName("FA"+(i+1));
+                fa.setName("FA" + (i + 1));
                 lipid.getFa().put(fa.getName(), fa);
             }
         }
     }
-    
+
 //    private static class PlVisitor extends PaLiNomBaseVisitor<Object> {
 //        
 //    }
-
-    private static class AdductVisitor extends PaLiNomBaseVisitor<Adduct> {
+    private static class AdductVisitor extends LipidNamesBaseVisitor<Adduct> {
 
         @Override
-        public Adduct visitAdduct_term(PaLiNomParser.Adduct_termContext ctx) {
-            Adduct adduct = new Adduct(ctx.ADD_SUM_FORMULA().getText(), ctx.adduct().getText(), Integer.parseInt(ctx.charge().getText()), Integer.parseInt(ctx.charge_sign().getText()));
+        public Adduct visitAdductInfo(LipidNamesParser.AdductInfoContext ctx) {
+            Adduct adduct = new Adduct(ctx.adduct().getText(), ctx.adduct().getText(), Integer.parseInt(ctx.charge().getText()), Integer.parseInt(ctx.charge_sign().getText()));
             return adduct;
         }
     }
 
-    private static class FaVisitor extends PaLiNomBaseVisitor<FattyAcid> {
+    private static class FaVisitor extends LipidNamesBaseVisitor<FattyAcid> {
 
         @Override
-        public FattyAcid visitFa(PaLiNomParser.FaContext ctx) {
+        public FattyAcid visitFa(LipidNamesParser.FaContext ctx) {
             if (ctx.ether() != null) {
                 throw new RuntimeException("Not implemented yet!");
             } else if (ctx.fa_pure() != null) {

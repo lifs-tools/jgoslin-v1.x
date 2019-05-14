@@ -17,26 +17,20 @@ import org.junit.Assert;
  *
  * @author nilshoffmann
  */
-public class SphingolipidsStepDefs {
+public class Sphingolipids2FAStepDefs {
 
     private String lipidname;
     private Lipid lipid;
 
-    @Given("the sphingolipid sub species name is {string}")
+    @Given("the lipid sub species name is {string}")
     public void the_lipid_sub_species_name_is(String string) {
         this.lipidname = string;
     }
 
     @When("I parse {string}")
-    public void i_parse(String string) {
-        PaLiNomLexer lexer = new PaLiNomLexer(CharStreams.fromString(
-            string));
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        PaLiNomParser parser = new PaLiNomParser(tokens);
-        PaLiNomParser.LipidIdentifierContext context = parser.
-            lipidIdentifier();
-        PaLiNomListenerParser visitor = new PaLiNomListenerParser();
-        this.lipid = visitor.visit(context);
+    public void i_parse(String string) throws ParsingException {
+        LipidNamesVisitorParser parser = new LipidNamesVisitorParser();
+        this.lipid = parser.parse(string).getLipid();
     }
 
     @Then(
@@ -54,7 +48,7 @@ public class SphingolipidsStepDefs {
         Integer fa2_db,
         Integer fa2_hydroxy) {
 
-        Lipid referenceLipid = new Lipid(category, headgroup,
+        Lipid referenceLipid = new Lipid(headgroup,
             new FattyAcid("FA" + fa1, fa1_c, fa1_db, fa1_hydroxy),
             new FattyAcid("FA" + fa2, fa2_c, fa2_db, fa2_hydroxy));
         Assert.assertEquals(referenceLipid, lipid);

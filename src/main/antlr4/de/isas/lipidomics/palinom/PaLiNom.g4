@@ -126,7 +126,7 @@ LPG: 'LPG';
 LPI: 'LPI';
 LPS: 'LPS';
 
-/* Head group rule for lyso-phospholipids */ 
+/* Head group rule for lyso-phospholipids with O-alkyl-bond */ 
 hg_lpl_o: LPC_O | LPE_O;
 LPC_O: 'LPC O';
 LPE_O: 'LPE O';

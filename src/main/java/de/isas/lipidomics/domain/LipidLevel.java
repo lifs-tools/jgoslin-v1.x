@@ -19,7 +19,7 @@ public enum LipidLevel {
     */
     SPECIES, 
     /*
-     Phosphatidylinositol (8:0_8:0) PI(8:0_8:0)
+     Phosphatidylinositol (8:0-8:0) PI(8:0-8:0)
     */
     MOLECULAR_SUBSPECIES,
     /*

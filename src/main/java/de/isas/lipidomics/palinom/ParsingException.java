@@ -15,25 +15,17 @@
  */
 package de.isas.lipidomics.palinom;
 
-import jdk.internal.module.Resources;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
 /**
  *
  * @author nils.hoffmann
  */
-public class InvalidLipidNamesTest {
-    
+public class ParsingException extends Exception {
 
-    
-    @Test
-    public void parseInvalidLipidNames() {
-    
-        InvalidLipidNamesTest.class.getResourceAsStream("de/isas/lipidomics/palinom/lipidnames-invalid.txt");
+    public ParsingException(String message) {
+        super(message);
+    }
+
+    public ParsingException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
