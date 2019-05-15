@@ -16,21 +16,21 @@ import org.antlr.v4.runtime.TokenStream;
  * @author nilshoffmann
  */
 @Slf4j
-public class LipidNamesVisitorParser {
+public class GoslinVisitorParser {
 
     public LipidAdduct parse(String lipidString, SyntaxErrorListener listener) throws ParsingException {
         CharStream charStream = CharStreams.fromString(lipidString);
-        LipidNamesLexer lexer = new LipidNamesLexer(charStream);
+        GoslinLexer lexer = new GoslinLexer(charStream);
         TokenStream tokens = new CommonTokenStream(lexer);
         log.info("Parsing lipid identifier: {}", lipidString);
-        LipidNamesParser parser = new LipidNamesParser(tokens);
+        GoslinParser parser = new GoslinParser(tokens);
         parser.addErrorListener(listener);
         parser.setBuildParseTree(true);
-        LipidNamesParser.LipidContext context = parser.lipid();
+        GoslinParser.LipidContext context = parser.lipid();
         if (parser.getNumberOfSyntaxErrors() > 0) {
             throw new ParsingException("Parsing of " + lipidString + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
         }
-        LipidNamesVisitorImpl lipidVisitor = new LipidNamesVisitorImpl();
+        GoslinVisitorImpl lipidVisitor = new GoslinVisitorImpl();
         return lipidVisitor.visit(context);
     }
 

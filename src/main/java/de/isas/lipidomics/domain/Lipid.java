@@ -29,6 +29,12 @@ public class Lipid {
     private final String headGroup;
     private Map<String, FattyAcid> fa = new HashMap<>();
 
+    public Lipid(String headGroup, LipidClass lipidClass, LipidCategory category) {
+        this.headGroup = headGroup;
+        this.lipidClass = Optional.of(lipidClass);
+        this.lipidCategory = category;
+    }
+    
     public Lipid(String headGroup) {
         this.headGroup = headGroup;
         this.lipidClass = LipidClass.forHeadGroup(headGroup);

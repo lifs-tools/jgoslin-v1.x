@@ -20,8 +20,9 @@ import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.Lipid;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
-import de.isas.lipidomics.palinom.LipidNamesParser.AdductInfoContext;
-import de.isas.lipidomics.palinom.LipidNamesParser.Lipid_pureContext;
+import de.isas.lipidomics.domain.LipidClass;
+import de.isas.lipidomics.palinom.GoslinParser.Adduct_infoContext;
+import de.isas.lipidomics.palinom.GoslinParser.Lipid_pureContext;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
@@ -33,27 +34,27 @@ import lombok.extern.slf4j.Slf4j;
  * @author nils.hoffmann
  */
 @Slf4j
-class LipidNamesVisitorImpl extends LipidNamesBaseVisitor<LipidAdduct> {
+class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
     @Override
-    public LipidAdduct visitLipid(LipidNamesParser.LipidContext ctx) {
+    public LipidAdduct visitLipid(GoslinParser.LipidContext ctx) {
 
 //        CategoryContext categoryContext = ctx.category().;
         Optional<Lipid_pureContext> categoryContext = Optional.ofNullable(ctx.lipid_pure());
-        Optional<AdductInfoContext> adductTermContext = Optional.ofNullable(ctx.adductInfo());
+        Optional<Adduct_infoContext> adductTermContext = Optional.ofNullable(ctx.adduct_info());
 
         LipidAdduct la = new LipidAdduct(categoryContext.map((cc) -> {
             return new LipidVisitor().visitLipid_pure(cc);
         }).orElse(Lipid.NONE), adductTermContext.map((t) -> {
-            return new AdductVisitor().visitAdductInfo(t);
+            return new AdductVisitor().visitAdduct_info(t);
         }).orElse(Adduct.NONE));
         return la;
     }
 
-    private static class LipidVisitor extends LipidNamesBaseVisitor<Lipid> {
+    private static class LipidVisitor extends GoslinBaseVisitor<Lipid> {
 
         @Override
-        public Lipid visitLipid_pure(LipidNamesParser.Lipid_pureContext ctx) {
+        public Lipid visitLipid_pure(GoslinParser.Lipid_pureContext ctx) {
             Lipid lipid = null;
             BitSet bs = new BitSet(5);
             bs.set(LipidCategory.ST.ordinal(), ctx.cholesterol() != null);
@@ -87,7 +88,7 @@ class LipidNamesVisitorImpl extends LipidNamesBaseVisitor<LipidAdduct> {
                     throw new RuntimeException("GL not implemented yet!");
                 case FA:
 //                    ctx.mediator();
-                    lipid = new Lipid(ctx.mediatorc().getText());
+                    lipid = new Lipid(ctx.mediatorc().getText(), LipidClass.FA, LipidCategory.FA);
                     break;
                 case GP:
                     lipid = handleGlyceroPhospholipid(ctx).orElse(Lipid.NONE);
@@ -141,7 +142,7 @@ class LipidNamesVisitorImpl extends LipidNamesBaseVisitor<LipidAdduct> {
             }
         }
 
-        private void visitFas(List<LipidNamesParser.FaContext> faContexts, Lipid lipid) {
+        private void visitFas(List<GoslinParser.FaContext> faContexts, Lipid lipid) {
             for (int i = 0; i < faContexts.size(); i++) {
                 FaVisitor faVisitor = new FaVisitor();
                 FattyAcid fa = faVisitor.visit(faContexts.get(i));
@@ -154,19 +155,19 @@ class LipidNamesVisitorImpl extends LipidNamesBaseVisitor<LipidAdduct> {
 //    private static class PlVisitor extends PaLiNomBaseVisitor<Object> {
 //        
 //    }
-    private static class AdductVisitor extends LipidNamesBaseVisitor<Adduct> {
+    private static class AdductVisitor extends GoslinBaseVisitor<Adduct> {
 
         @Override
-        public Adduct visitAdductInfo(LipidNamesParser.AdductInfoContext ctx) {
+        public Adduct visitAdduct_info(GoslinParser.Adduct_infoContext ctx) {
             Adduct adduct = new Adduct(ctx.adduct().getText(), ctx.adduct().getText(), Integer.parseInt(ctx.charge().getText()), Integer.parseInt(ctx.charge_sign().getText()));
             return adduct;
         }
     }
 
-    private static class FaVisitor extends LipidNamesBaseVisitor<FattyAcid> {
+    private static class FaVisitor extends GoslinBaseVisitor<FattyAcid> {
 
         @Override
-        public FattyAcid visitFa(LipidNamesParser.FaContext ctx) {
+        public FattyAcid visitFa(GoslinParser.FaContext ctx) {
             if (ctx.ether() != null) {
                 throw new RuntimeException("Not implemented yet!");
             } else if (ctx.fa_pure() != null) {

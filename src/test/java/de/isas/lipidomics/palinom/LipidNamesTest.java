@@ -31,14 +31,14 @@ public class LipidNamesTest {
     @Test
     @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames.txt")
     public void isValidLipidName(String lipidName) throws ParsingException {
-        LipidNamesVisitorParser parser = new LipidNamesVisitorParser();
+        GoslinVisitorParser parser = new GoslinVisitorParser();
         parser.parse(lipidName);
     }
 
     @Test
     @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames-invalid.txt")
     public void isInvalidLipidName(String lipidName) {
-        LipidNamesVisitorParser parser = new LipidNamesVisitorParser();
+        GoslinVisitorParser parser = new GoslinVisitorParser();
         try {
             parser.parse(lipidName);
             Assert.fail("Test case for " + lipidName + " should cause parsing error!");

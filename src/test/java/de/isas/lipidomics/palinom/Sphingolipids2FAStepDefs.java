@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
 import cucumber.api.java.en.Then;
+import de.isas.lipidomics.domain.LipidCategory;
 import org.junit.Assert;
 
 /**
@@ -29,7 +30,7 @@ public class Sphingolipids2FAStepDefs {
 
     @When("I parse {string}")
     public void i_parse(String string) throws ParsingException {
-        LipidNamesVisitorParser parser = new LipidNamesVisitorParser();
+        GoslinVisitorParser parser = new GoslinVisitorParser();
         this.lipid = parser.parse(string).getLipid();
     }
 
@@ -52,8 +53,8 @@ public class Sphingolipids2FAStepDefs {
             new FattyAcid("FA" + fa1, fa1_c, fa1_db, fa1_hydroxy),
             new FattyAcid("FA" + fa2, fa2_c, fa2_db, fa2_hydroxy));
         Assert.assertEquals(referenceLipid, lipid);
-        Assert.assertEquals(category, lipid.getLipidCategory());
-        Assert.assertEquals(species, toSpeciesString(lipid));
+        Assert.assertEquals(LipidCategory.valueOf(category), lipid.getLipidCategory());
+        Assert.assertEquals(species, lipid.getLipidSpecies());
     }
 
     protected String toString(Lipid referenceLipid) {
@@ -70,20 +71,5 @@ public class Sphingolipids2FAStepDefs {
                 getNHydroxy() + referenceLipid.getFa().
                 get("FA2").
                 getNHydroxy();
-    }
-
-    protected String toSpeciesString(Lipid referenceLipid) {
-        int nDB = 0;
-        int nHydroxy = 0;
-        int nCarbon = 0;
-        for (String faKey : referenceLipid.getFa().
-            keySet()) {
-            FattyAcid fa = referenceLipid.getFa().
-                get(faKey);
-            nDB += fa.getNDoubleBonds();
-            nCarbon += fa.getNCarbon();
-            nHydroxy += fa.getNHydroxy();
-        }
-        return referenceLipid.getHeadGroup() + " " + nCarbon + ":" + nDB + (nHydroxy > 0 ? ";" + nHydroxy : "");
     }
 }

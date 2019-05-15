@@ -15,7 +15,7 @@ import org.junit.Test;
  *
  * @author nilshoffmann
  */
-public class PaLiNomVisitorParserTest {
+public class GoslinVisitorParserTest {
 
     @Test
     public void testCh() throws ParsingException {
@@ -221,7 +221,7 @@ public class PaLiNomVisitorParserTest {
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
-        LipidNamesVisitorParser parser = new LipidNamesVisitorParser();
+        GoslinVisitorParser parser = new GoslinVisitorParser();
         LipidAdduct lipid = parser.parse(ref);
         return lipid;
     }
