@@ -37,11 +37,10 @@ import lombok.extern.slf4j.Slf4j;
 class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
     @Override
-    public LipidAdduct visitLipid(GoslinParser.LipidContext ctx) {
-
-//        CategoryContext categoryContext = ctx.category().;
-        Optional<Lipid_pureContext> categoryContext = Optional.ofNullable(ctx.lipid_pure());
-        Optional<Adduct_infoContext> adductTermContext = Optional.ofNullable(ctx.adduct_info());
+    public LipidAdduct visitLipid_eof(GoslinParser.Lipid_eofContext ctx) {
+        GoslinParser.LipidContext lipid = ctx.lipid();
+        Optional<Lipid_pureContext> categoryContext = Optional.ofNullable(lipid.lipid_pure());
+        Optional<Adduct_infoContext> adductTermContext = Optional.ofNullable(lipid.adduct_info());
 
         LipidAdduct la = new LipidAdduct(categoryContext.map((cc) -> {
             return new LipidVisitor().visitLipid_pure(cc);
