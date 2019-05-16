@@ -70,6 +70,7 @@ public enum LipidClass {
     GLCCER(LipidCategory.SP, "GlcCer", "Neutral glycosphingolipids [SP05]"),
     GALCER(LipidCategory.SP, "GalCer", "Neutral glycosphingolipids [SP05]"),
     HEX2CER(LipidCategory.SP, "Hex2Cer", "Neutral glycosphingolipids [SP05]"),
+    HEX3CER(LipidCategory.SP, "Hex3Cer", "Neutral glycosphingolipids [SP05]"),
     LACCER(LipidCategory.SP, "LacCer", "Neutral glycosphingolipids [SP05]"),
     /** Sterol lipids */
     ST(LipidCategory.ST, "ST", "Sterols [ST01]"),

@@ -46,4 +46,11 @@ public class LipidNamesTest {
 
         }
     }
+    
+    @Test
+    @FileParameters("classpath:de/isas/lipidomics/palinom/wenk-lipids.txt")
+    public void isValidLipidNameForSingaporeanStudy(String lipidName) throws ParsingException {
+        GoslinVisitorParser parser = new GoslinVisitorParser();
+        parser.parse(lipidName);
+    }
 }

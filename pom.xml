@@ -227,6 +227,7 @@
                                     <directory>src/main/antlr4</directory>
                                     <includes>
                                         <include>**/*.txt</include>
+                                        <!--<include>**/*.g4</include>-->
                                     </includes>
                                 </resource>
                             </resources>
