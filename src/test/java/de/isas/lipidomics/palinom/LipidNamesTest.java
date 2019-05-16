@@ -31,14 +31,14 @@ public class LipidNamesTest {
     @Test
     @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames.txt")
     public void isValidLipidName(String lipidName) throws ParsingException {
-        GoslinVisitorParser parser = new GoslinVisitorParser();
+        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
         parser.parse(lipidName);
     }
 
     @Test
     @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames-invalid.txt")
     public void isInvalidLipidName(String lipidName) {
-        GoslinVisitorParser parser = new GoslinVisitorParser();
+        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
         try {
             parser.parse(lipidName);
             Assert.fail("Test case for " + lipidName + " should cause parsing error!");
@@ -50,7 +50,7 @@ public class LipidNamesTest {
     @Test
     @FileParameters("classpath:de/isas/lipidomics/palinom/wenk-lipids.txt")
     public void isValidLipidNameForSingaporeanStudy(String lipidName) throws ParsingException {
-        GoslinVisitorParser parser = new GoslinVisitorParser();
+        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
         parser.parse(lipidName);
     }
 }

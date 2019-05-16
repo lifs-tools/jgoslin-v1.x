@@ -4,9 +4,10 @@
 package de.isas.lipidomics.palinom;
 
 import de.isas.lipidomics.domain.Adduct;
-import de.isas.lipidomics.domain.Lipid;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
+import de.isas.lipidomics.domain.LipidMolecularSubspecies;
+import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
@@ -65,7 +66,7 @@ public class GoslinVisitorParserTest {
         System.out.println("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertNotNull(lipidAdduct);
-        Lipid lipid = lipidAdduct.getLipid();
+        LipidMolecularSubspecies lipid = LipidMolecularSubspecies.class.cast(lipidAdduct.getLipid());
         assertNotNull(lipid);
         System.out.println(lipid);
         assertEquals("PE", lipid.getHeadGroup());
@@ -101,7 +102,7 @@ public class GoslinVisitorParserTest {
         System.out.println("Testing lysolipid name " + ref1);
         LipidAdduct lipidAdduct1 = parseLipidName(ref1);
         assertNotNull(lipidAdduct1);
-        Lipid lipid1 = lipidAdduct1.getLipid();
+        LipidMolecularSubspecies lipid1 = (LipidMolecularSubspecies)lipidAdduct1.getLipid();
         assertNotNull(lipid1);
         System.out.println(lipid1);
         assertEquals("LPE", lipid1.getHeadGroup());
@@ -123,7 +124,7 @@ public class GoslinVisitorParserTest {
         System.out.println("Testing implicit lysolipid name " + ref2);
         LipidAdduct lipidAdduct2 = parseLipidName(ref2);
         assertNotNull(lipidAdduct2);
-        Lipid lipid2 = lipidAdduct2.getLipid();
+        LipidMolecularSubspecies lipid2 = (LipidMolecularSubspecies)lipidAdduct2.getLipid();
         assertNotNull(lipid2);
         System.out.println(lipid2);
         assertEquals("PE", lipid2.getHeadGroup());
@@ -161,7 +162,7 @@ public class GoslinVisitorParserTest {
         System.out.println("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertNotNull(lipidAdduct);
-        Lipid lipid = lipidAdduct.getLipid();
+        LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
         System.out.println(lipid);
         assertEquals("PE", lipid.getHeadGroup());
@@ -196,32 +197,32 @@ public class GoslinVisitorParserTest {
         String ref = "CL 18:1-18:1-18:1-18:1";
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertNotNull(lipidAdduct);
-        Lipid lipid = lipidAdduct.getLipid();
+        LipidMolecularSubspecies lipid = (LipidMolecularSubspecies) lipidAdduct.getLipid();
         System.out.println(lipid);
         assertEquals(4, lipid.getFa().size());
         assertEquals(18, lipid.getFa().get("FA1").getNCarbon());
         assertEquals(1, lipid.getFa().get("FA1").getNDoubleBonds());
         assertEquals(0, lipid.getFa().get("FA1").getNHydroxy());
-        assertEquals(lipid.getFa().get("FA1").getNDoubleBonds(), lipid.getFa().get("FA1").getDoubleBondLocations().size());
+        assertEquals(lipid.getFa().get("FA1").getNDoubleBonds(), lipid.getFa().get("FA1").getNDoubleBonds());
 
         assertEquals(18, lipid.getFa().get("FA2").getNCarbon());
         assertEquals(1, lipid.getFa().get("FA2").getNDoubleBonds());
         assertEquals(0, lipid.getFa().get("FA2").getNHydroxy());
-        assertEquals(lipid.getFa().get("FA2").getNDoubleBonds(), lipid.getFa().get("FA2").getDoubleBondLocations().size());
+        assertEquals(lipid.getFa().get("FA2").getNDoubleBonds(), lipid.getFa().get("FA2").getNDoubleBonds());
 
         assertEquals(18, lipid.getFa().get("FA3").getNCarbon());
         assertEquals(1, lipid.getFa().get("FA3").getNDoubleBonds());
         assertEquals(0, lipid.getFa().get("FA3").getNHydroxy());
-        assertEquals(lipid.getFa().get("FA3").getNDoubleBonds(), lipid.getFa().get("FA3").getDoubleBondLocations().size());
+        assertEquals(lipid.getFa().get("FA3").getNDoubleBonds(), lipid.getFa().get("FA3").getNDoubleBonds());
 
         assertEquals(18, lipid.getFa().get("FA4").getNCarbon());
         assertEquals(1, lipid.getFa().get("FA4").getNDoubleBonds());
         assertEquals(0, lipid.getFa().get("FA4").getNHydroxy());
-        assertEquals(lipid.getFa().get("FA4").getNDoubleBonds(), lipid.getFa().get("FA4").getDoubleBondLocations().size());
+        assertEquals(lipid.getFa().get("FA4").getNDoubleBonds(), lipid.getFa().get("FA4").getNDoubleBonds());
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
-        GoslinVisitorParser parser = new GoslinVisitorParser();
+        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
         LipidAdduct lipid = parser.parse(ref);
         return lipid;
     }

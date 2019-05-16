@@ -15,18 +15,28 @@
  */
 package de.isas.lipidomics.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 /**
  *
  * @author nils.hoffmann
  */
-public class Glycerophospholipid extends Lipid {
+@AllArgsConstructor
+@Data
+public class LipidSpeciesInfo {
     
-    public Glycerophospholipid(String headGroup) {
-        super(headGroup);
-    }
+    private static final class None extends LipidSpeciesInfo {
 
-    public Glycerophospholipid(String headGroup, FattyAcid... fa) {
-        super(headGroup, fa);
+        private None() {
+            super(LipidLevel.UNDEFINED, 0,0,0);
+        }
     }
     
+    public static final LipidSpeciesInfo NONE = new LipidSpeciesInfo.None();
+    
+    private final LipidLevel level;
+    private final int nCarbon;
+    private final int nHydroxy;
+    private final int nDoubleBonds;
 }

@@ -26,7 +26,7 @@ import lombok.Data;
 @Data
 public class LipidAdduct {
 
-    private Lipid lipid;
+    private LipidSpecies lipid;
     private Adduct adduct;
     
     public String getSumFormula() {

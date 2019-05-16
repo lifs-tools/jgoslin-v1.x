@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public enum LipidCategory {
 
-    UNDEFINED("Undefined"),
+    UNDEFINED("Undefined lipid category"),
     /* SLM:000117142 Glycerolipids */
     GL("Glycerolipid"),
     /* SLM:000001193 Glycerophospholipids */

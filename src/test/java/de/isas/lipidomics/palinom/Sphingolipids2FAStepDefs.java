@@ -3,15 +3,14 @@
  */
 package de.isas.lipidomics.palinom;
 
-import cucumber.api.PendingException;
-import de.isas.lipidomics.domain.FattyAcid;
-import de.isas.lipidomics.domain.Lipid;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import de.isas.lipidomics.domain.MolecularFattyAcid;
+import de.isas.lipidomics.domain.LipidSpecies;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
 import cucumber.api.java.en.Then;
 import de.isas.lipidomics.domain.LipidCategory;
+import de.isas.lipidomics.domain.LipidMolecularSubspecies;
+import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import org.junit.Assert;
 
 /**
@@ -21,16 +20,16 @@ import org.junit.Assert;
 public class Sphingolipids2FAStepDefs {
 
     private String lipidname;
-    private Lipid lipid;
+    private LipidSpecies lipid;
 
-    @Given("the lipid sub species name is {string}")
-    public void the_lipid_sub_species_name_is(String string) {
+    @Given("the lipid molecular sub species name is {string}")
+    public void the_lipid_molecular_sub_species_name_is(String string) {
         this.lipidname = string;
     }
 
     @When("I parse {string}")
     public void i_parse(String string) throws ParsingException {
-        GoslinVisitorParser parser = new GoslinVisitorParser();
+        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
         this.lipid = parser.parse(string).getLipid();
     }
 
@@ -49,15 +48,15 @@ public class Sphingolipids2FAStepDefs {
         Integer fa2_db,
         Integer fa2_hydroxy) {
 
-        Lipid referenceLipid = new Lipid(headgroup,
-            new FattyAcid("FA" + fa1, fa1_c, fa1_db, fa1_hydroxy),
-            new FattyAcid("FA" + fa2, fa2_c, fa2_db, fa2_hydroxy));
+        LipidMolecularSubspecies referenceLipid = new LipidMolecularSubspecies(headgroup,
+            new MolecularFattyAcid("FA" + fa1, fa1_c, fa1_hydroxy, fa1_db),
+            new MolecularFattyAcid("FA" + fa2, fa2_c, fa2_hydroxy, fa2_db));
         Assert.assertEquals(referenceLipid, lipid);
         Assert.assertEquals(LipidCategory.valueOf(category), lipid.getLipidCategory());
-        Assert.assertEquals(species, lipid.getLipidSpecies());
+        Assert.assertEquals(species, lipid.getLipidString());
     }
 
-    protected String toString(Lipid referenceLipid) {
+    protected String toString(LipidMolecularSubspecies referenceLipid) {
         return referenceLipid.getHeadGroup() + " " + referenceLipid.getFa().
             get("FA1").
             getNCarbon() + referenceLipid.getFa().

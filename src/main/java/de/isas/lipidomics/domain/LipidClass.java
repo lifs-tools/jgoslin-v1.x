@@ -24,6 +24,7 @@ import java.util.Optional;
  */
 public enum LipidClass {
     
+    UNDEFINED(LipidCategory.UNDEFINED, "UNDEFINED", "Undefined lipid class"),
     /** Fatty acyls [FA]
       * Fatty acids and conjugates [FA01] */
     FA(LipidCategory.FA, "FA","Fatty acids and conjugates [FA01]"),
