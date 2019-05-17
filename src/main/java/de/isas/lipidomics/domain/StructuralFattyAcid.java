@@ -3,6 +3,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -12,7 +13,8 @@ import lombok.Data;
 @Data
 public class StructuralFattyAcid extends MolecularFattyAcid {
 
-    public StructuralFattyAcid(String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds) {
-        super(name, position, nCarbon, nHydroxy, nDoubleBonds);
+    @Builder(builderMethodName = "structuralFaBuilder")
+    public StructuralFattyAcid(String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, boolean ether) {
+        super(name, position, nCarbon, nHydroxy, nDoubleBonds, ether);
     }
 }

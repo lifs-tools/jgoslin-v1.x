@@ -15,29 +15,10 @@
  */
 package de.isas.lipidomics.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 /**
  *
  * @author nils.hoffmann
  */
-@AllArgsConstructor
-@Data
-public class LipidSpeciesInfo {
-    
-    private static final class None extends LipidSpeciesInfo {
-
-        private None() {
-            super(LipidLevel.UNDEFINED, 0,0,0, false);
-        }
-    }
-    
-    public static final LipidSpeciesInfo NONE = new LipidSpeciesInfo.None();
-    
-    private final LipidLevel level;
-    private final int nCarbon;
-    private final int nHydroxy;
-    private final int nDoubleBonds;
-    private final boolean ether;
+public enum LipidFaBondType {
+    UNDEFINED, ESTER, ETHER_PLASMANYL, ETHER_PLASMENYL;
 }

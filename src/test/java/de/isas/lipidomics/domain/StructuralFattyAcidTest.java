@@ -15,7 +15,6 @@
  */
 package de.isas.lipidomics.domain;
 
-import java.util.Set;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -24,80 +23,57 @@ import static org.junit.Assert.*;
  * @author nils.hoffmann
  */
 public class StructuralFattyAcidTest {
-    
-    public StructuralFattyAcidTest() {
-    }
 
-    /**
-     * Test of getNDoubleBonds method, of class StructuralFattyAcid.
-     */
     @Test
     public void testGetNDoubleBonds() {
-        System.out.println("getNDoubleBonds");
-        StructuralFattyAcid instance = null;
-        int expResult = 0;
-        int result = instance.getNDoubleBonds();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        StructuralFattyAcid instanceZero = new StructuralFattyAcid("FA1", 0, 2, 0, 0, false);
+        assertEquals(0, instanceZero.getNDoubleBonds());
+        StructuralFattyAcid instanceOne = new StructuralFattyAcid("FA1", 0, 2, 0, 1, false);
+        assertEquals(1, instanceOne.getNDoubleBonds());
     }
 
-    /**
-     * Test of equals method, of class StructuralFattyAcid.
-     */
-    @Test
-    public void testEquals() {
-        System.out.println("equals");
-        Object o = null;
-        StructuralFattyAcid instance = null;
-        boolean expResult = false;
-        boolean result = instance.equals(o);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetNDoubleBondsException() {
+        StructuralFattyAcid instanceZero = new StructuralFattyAcid("FA1", 0, 2, 0, -1, false);
     }
 
-    /**
-     * Test of canEqual method, of class StructuralFattyAcid.
-     */
     @Test
-    public void testCanEqual() {
-        System.out.println("canEqual");
-        Object other = null;
-        StructuralFattyAcid instance = null;
-        boolean expResult = false;
-        boolean result = instance.canEqual(other);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetName() {
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 0, 2, 0, 0, false);
+        assertEquals("FAX", instance.getName());
     }
 
-    /**
-     * Test of hashCode method, of class StructuralFattyAcid.
-     */
     @Test
-    public void testHashCode() {
-        System.out.println("hashCode");
-        StructuralFattyAcid instance = null;
-        int expResult = 0;
-        int result = instance.hashCode();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetPosition() {
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, 0, 0, false);
+        assertEquals(1, instance.getPosition());
     }
 
-    /**
-     * Test of toString method, of class StructuralFattyAcid.
-     */
-    @Test
-    public void testToString() {
-        System.out.println("toString");
-        StructuralFattyAcid instance = null;
-        String expResult = "";
-        String result = instance.toString();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetPositionException() {
+        StructuralFattyAcid instanceZero = new StructuralFattyAcid("FA1", -2, 2, 0, 0, false);
     }
-    
+
+    @Test
+    public void testGetNCarbon() {
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, 0, 0, false);
+        assertEquals(2, instance.getNCarbon());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetNCarbonException() {
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 1, 0, 0, false);
+    }
+
+    @Test
+    public void testGetNHydroxy() {
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, 1, 0, false);
+        assertEquals(1, instance.getNHydroxy());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetNHydroxyException() {
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, -1, 0, false);
+    }
+
 }

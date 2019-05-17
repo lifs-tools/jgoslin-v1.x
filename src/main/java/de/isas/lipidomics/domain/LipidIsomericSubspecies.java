@@ -36,6 +36,7 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
+        boolean ether = false;
         for (IsomericFattyAcid fas : fa) {
             if (getFa().containsKey(fas.getName())) {
                 throw new IllegalArgumentException(
@@ -45,9 +46,10 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
                 nCarbon += fas.getNCarbon();
                 nHydroxyl += fas.getNHydroxy();
                 nDoubleBonds += fas.getNDoubleBonds();
+                ether = ether || fas.isEther();
             }
         }
-        info = Optional.of(new LipidSpeciesInfo(LipidLevel.STRUCTURAL_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds));
+        info = Optional.of(new LipidSpeciesInfo(LipidLevel.STRUCTURAL_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, ether));
         this.lipidSpeciesString = buildLipidStructuralSubspeciesName();
     }
 

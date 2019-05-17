@@ -40,6 +40,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
+        boolean ether = false;
         for (MolecularFattyAcid fas : fa) {
             if (fas.getPosition() != -1) {
                 throw new IllegalArgumentException("MolecularFattyAcid " + fas.getName() + " must have position set to -1! Was: " + fas.getPosition());
@@ -52,9 +53,10 @@ public class LipidMolecularSubspecies extends LipidSpecies {
                 nCarbon += fas.getNCarbon();
                 nHydroxyl += fas.getNHydroxy();
                 nDoubleBonds += fas.getNDoubleBonds();
+                ether = ether || fas.isEther();
             }
         }
-        info = Optional.of(new LipidSpeciesInfo(LipidLevel.MOLECULAR_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds));
+        info = Optional.of(new LipidSpeciesInfo(LipidLevel.MOLECULAR_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, ether));
         this.lipidSpeciesString = buildLipidMolecularSubspeciesName();
     }
     

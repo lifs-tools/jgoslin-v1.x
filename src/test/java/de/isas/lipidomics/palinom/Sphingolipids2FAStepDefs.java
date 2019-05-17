@@ -49,8 +49,8 @@ public class Sphingolipids2FAStepDefs {
         Integer fa2_hydroxy) {
 
         LipidMolecularSubspecies referenceLipid = new LipidMolecularSubspecies(headgroup,
-            new MolecularFattyAcid("FA" + fa1, fa1_c, fa1_hydroxy, fa1_db),
-            new MolecularFattyAcid("FA" + fa2, fa2_c, fa2_hydroxy, fa2_db));
+            new MolecularFattyAcid("FA" + fa1, fa1_c, fa1_hydroxy, fa1_db, false),
+            new MolecularFattyAcid("FA" + fa2, fa2_c, fa2_hydroxy, fa2_db, false));
         Assert.assertEquals(referenceLipid, lipid);
         Assert.assertEquals(LipidCategory.valueOf(category), lipid.getLipidCategory());
         Assert.assertEquals(species, lipid.getLipidString());

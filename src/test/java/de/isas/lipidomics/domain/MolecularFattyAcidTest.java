@@ -24,79 +24,55 @@ import static org.junit.Assert.*;
  */
 public class MolecularFattyAcidTest {
     
-    public MolecularFattyAcidTest() {
-    }
-
-    /**
-     * Test of getNDoubleBonds method, of class MolecularFattyAcid.
-     */
-    @Test
+     @Test
     public void testGetNDoubleBonds() {
-        System.out.println("getNDoubleBonds");
-        MolecularFattyAcid instance = null;
-        int expResult = 0;
-        int result = instance.getNDoubleBonds();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", 0, 2, 0, 0, false);
+        assertEquals(0, instanceZero.getNDoubleBonds());
+        MolecularFattyAcid instanceOne = new MolecularFattyAcid("FA1", 0, 2, 0, 1, false);
+        assertEquals(1, instanceOne.getNDoubleBonds());
     }
 
-    /**
-     * Test of equals method, of class MolecularFattyAcid.
-     */
-    @Test
-    public void testEquals() {
-        System.out.println("equals");
-        Object o = null;
-        MolecularFattyAcid instance = null;
-        boolean expResult = false;
-        boolean result = instance.equals(o);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetNDoubleBondsException() {
+        MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", 0, 2, 0, -1, false);
     }
 
-    /**
-     * Test of canEqual method, of class MolecularFattyAcid.
-     */
     @Test
-    public void testCanEqual() {
-        System.out.println("canEqual");
-        Object other = null;
-        MolecularFattyAcid instance = null;
-        boolean expResult = false;
-        boolean result = instance.canEqual(other);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetName() {
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 0, 2, 0, 0, false);
+        assertEquals("FAX", instance.getName());
     }
 
-    /**
-     * Test of hashCode method, of class MolecularFattyAcid.
-     */
     @Test
-    public void testHashCode() {
-        System.out.println("hashCode");
-        MolecularFattyAcid instance = null;
-        int expResult = 0;
-        int result = instance.hashCode();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetPosition() {
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, 0, 0, false);
+        assertEquals(1, instance.getPosition());
     }
 
-    /**
-     * Test of toString method, of class MolecularFattyAcid.
-     */
-    @Test
-    public void testToString() {
-        System.out.println("toString");
-        MolecularFattyAcid instance = null;
-        String expResult = "";
-        String result = instance.toString();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetPositionException() {
+        MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", -2, 2, 0, 0, false);
     }
-    
+
+    @Test
+    public void testGetNCarbon() {
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, 0, 0, false);
+        assertEquals(2, instance.getNCarbon());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetNCarbonException() {
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 1, 0, 0, false);
+    }
+
+    @Test
+    public void testGetNHydroxy() {
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, 1, 0, false);
+        assertEquals(1, instance.getNHydroxy());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetNHydroxyException() {
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, -1, 0, false);
+    }
 }

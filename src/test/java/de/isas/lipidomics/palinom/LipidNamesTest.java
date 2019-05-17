@@ -28,24 +28,24 @@ import org.junit.runner.RunWith;
 @RunWith(JUnitParamsRunner.class)
 public class LipidNamesTest {
 
-    @Test
-    @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames.txt")
-    public void isValidLipidName(String lipidName) throws ParsingException {
-        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
-        parser.parse(lipidName);
-    }
-
-    @Test
-    @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames-invalid.txt")
-    public void isInvalidLipidName(String lipidName) {
-        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
-        try {
-            parser.parse(lipidName);
-            Assert.fail("Test case for " + lipidName + " should cause parsing error!");
-        } catch (ParsingException rex) {
-
-        }
-    }
+//    @Test
+//    @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames.txt")
+//    public void isValidLipidName(String lipidName) throws ParsingException {
+//        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
+//        parser.parse(lipidName);
+//    }
+//
+//    @Test
+//    @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames-invalid.txt")
+//    public void isInvalidLipidName(String lipidName) {
+//        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
+//        try {
+//            parser.parse(lipidName);
+//            Assert.fail("Test case for " + lipidName + " should cause parsing error!");
+//        } catch (ParsingException rex) {
+//
+//        }
+//    }
     
     @Test
     @FileParameters("classpath:de/isas/lipidomics/palinom/wenk-lipids.txt")

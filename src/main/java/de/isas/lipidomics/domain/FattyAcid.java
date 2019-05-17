@@ -16,11 +16,12 @@ public abstract class FattyAcid {
     private final int position;
     private final int nCarbon;
     private final int nHydroxy;
+    private final boolean ether;
     
-    public FattyAcid(String name, int position, int nCarbon, int nHydroxy) {
+    public FattyAcid(String name, int position, int nCarbon, int nHydroxy, boolean ether) {
         this.name = name;
-        if(nCarbon<1) {
-            throw new IllegalArgumentException("FattyAcid must have at least 1 carbon!");
+        if(nCarbon<2) {
+            throw new IllegalArgumentException("FattyAcid must have at least 2 carbons!");
         }
         this.position = position;
         if(position < -1) {
@@ -31,8 +32,20 @@ public abstract class FattyAcid {
             throw new IllegalArgumentException("FattyAcid must have at least 0 hydroxy groups!");
         }
         this.nHydroxy = nHydroxy;
+        this.ether = ether;
     }
 
     public abstract int getNDoubleBonds();
+    
+    public LipidFaBondType getEtherFaType() {
+        if(this.ether) {
+            if(getNDoubleBonds()>0) {
+                return LipidFaBondType.ETHER_PLASMENYL;
+            }
+            return LipidFaBondType.ETHER_PLASMANYL;
+        } else {
+            return LipidFaBondType.ESTER;
+        }
+    }
 
 }
