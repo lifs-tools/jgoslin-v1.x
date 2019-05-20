@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom;
+package de.isas.lipidomics.palinom.exceptions;
 
 /**
  *
  * @author nils.hoffmann
  */
-public class ParsingException extends Exception {
+public class PalinomVisitorException extends RuntimeException {
 
-    public ParsingException(String message) {
+    public PalinomVisitorException(String message) {
         super(message);
     }
 
-    public ParsingException(String message, Throwable cause) {
+    public PalinomVisitorException(String message, Throwable cause) {
         super(message, cause);
     }
 }

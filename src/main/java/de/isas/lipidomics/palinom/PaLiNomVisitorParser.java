@@ -3,6 +3,7 @@
  */
 package de.isas.lipidomics.palinom;
 
+import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.LipidAdduct;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStream;
@@ -46,7 +47,7 @@ public class PaLiNomVisitorParser {
         GoslinParser parser = new GoslinParser(tokens);
         parser.addErrorListener(listener);
         parser.setBuildParseTree(true);
-        GoslinParser.Lipid_eofContext context = parser.lipid_eof();
+        GoslinParser.LipidContext context = parser.lipid();
         if (parser.getNumberOfSyntaxErrors() > 0) {
             throw new ParsingException("Parsing of " + lipidString + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
         }

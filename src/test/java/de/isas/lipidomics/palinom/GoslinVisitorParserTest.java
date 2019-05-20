@@ -3,11 +3,13 @@
  */
 package de.isas.lipidomics.palinom;
 
+import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
@@ -118,8 +120,10 @@ public class GoslinVisitorParserTest {
         assertEquals(0, lipid1.getFa().
             get("FA1").
             getNHydroxy());
-        
-        
+    }
+    
+    @Test(expected=ConstraintViolationException.class)
+    public void testFailForImplicitLyso() throws ParsingException {
         String ref2 = "PE 18:0-0:0";
         System.out.println("Testing implicit lysolipid name " + ref2);
         LipidAdduct lipidAdduct2 = parseLipidName(ref2);
@@ -157,7 +161,6 @@ public class GoslinVisitorParserTest {
 
     @Test
     public void testPL_slash() throws ParsingException{
-
         String ref = "PE 18:3;1/16:2";
         System.out.println("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);

@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom;
 
+import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import junitparams.FileParameters;
 import junitparams.JUnitParamsRunner;
 import org.junit.Assert;

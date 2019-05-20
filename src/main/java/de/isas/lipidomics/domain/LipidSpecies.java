@@ -4,8 +4,9 @@
 package de.isas.lipidomics.domain;
 
 import java.util.Optional;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 
 /**
  *
@@ -26,8 +27,9 @@ public class LipidSpecies {
     private final LipidCategory lipidCategory;
     private final Optional<LipidClass> lipidClass;
     private final String headGroup;
-    private final Optional<LipidSpeciesInfo> info;
-    
+    @Setter(AccessLevel.NONE)
+    protected Optional<LipidSpeciesInfo> info;
+
     public LipidSpecies(String headGroup) {
         this(headGroup, Optional.of(LipidSpeciesInfo.NONE));
     }
@@ -38,7 +40,7 @@ public class LipidSpecies {
         this.lipidClass = lipidClass;
         this.info = lipidSpeciesInfo;
     }
-    
+
     public LipidSpecies(String headGroup, Optional<LipidSpeciesInfo> lipidSpeciesInfo) {
         this.headGroup = headGroup;
         this.lipidClass = LipidClass.forHeadGroup(headGroup);
@@ -47,23 +49,33 @@ public class LipidSpecies {
         }).orElse(LipidCategory.UNDEFINED);
         this.info = lipidSpeciesInfo;
     }
-    
+
     public Optional<LipidSpeciesInfo> getInfo() {
         return this.info;
-    } 
+    }
 
-    public String getLipidString() {
-        StringBuilder lipidString = new StringBuilder();
-        lipidString.append(headGroup);
-        if(this.info.isPresent()) {
-            int nCarbon = info.get().getNCarbon();
-            lipidString.append(" ").append(nCarbon);
-            int nDB = info.get().getNDoubleBonds();
-            lipidString.append(":").append(nDB);
-            int nHydroxy = info.get().getNHydroxy();
-            lipidString.append((nHydroxy > 0 ? ";" + nHydroxy : ""));
+    public String getLipidString(LipidLevel level) {
+        switch (level) {
+            case CATEGORY:
+                return this.lipidCategory.name();
+            case CLASS:
+                return this.lipidClass.orElse(LipidClass.UNDEFINED).name();
+            case SPECIES:
+                StringBuilder lipidString = new StringBuilder();
+                lipidString.append(headGroup);
+                if (this.info.isPresent()) {
+                    int nCarbon = info.get().getNCarbon();
+                    lipidString.append(" ").append(nCarbon);
+                    int nDB = info.get().getNDoubleBonds();
+                    lipidString.append(":").append(nDB);
+                    int nHydroxy = info.get().getNHydroxy();
+                    lipidString.append((nHydroxy > 0 ? ";" + nHydroxy : ""));
+                }
+                return lipidString.toString();
+            default:
+                throw new RuntimeException(getClass().getSimpleName() + " does not know how to create a lipid string for level " + level);
         }
-        return lipidString.toString();
+
     }
 
 }

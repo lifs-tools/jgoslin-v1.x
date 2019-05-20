@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -108,7 +109,7 @@ public enum LipidClass {
         if(lipidClass.getCategory()==LipidCategory.GP) {
             return "L"+lipidClass.getAbbreviation();
         }
-        throw new UnsupportedOperationException("Lipid category must be "+LipidCategory.GP+" for lyso-classes!");
+        throw new ConstraintViolationException("Lipid category must be "+LipidCategory.GP+" for lyso-classes!");
     }
     
     public static Optional<LipidClass> forHeadGroup(String headGroup) {

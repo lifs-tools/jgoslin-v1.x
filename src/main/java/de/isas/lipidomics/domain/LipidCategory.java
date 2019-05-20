@@ -3,6 +3,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +48,7 @@ public enum LipidCategory {
         if (matches.isEmpty()) {
             return LipidCategory.UNDEFINED;
         } else if (matches.size() > 1) {
-            throw new RuntimeException("Query string " + fullName + " found more than once in enum values! Please check enum definition: fullName is compared case insensitive!");
+            throw new ConstraintViolationException("Query string " + fullName + " found more than once in enum values! Please check enum definition: fullName is compared case insensitive!");
         }
         return matches.get(0);
     }

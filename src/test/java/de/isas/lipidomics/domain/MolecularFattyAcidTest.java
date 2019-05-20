@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -32,7 +33,7 @@ public class MolecularFattyAcidTest {
         assertEquals(1, instanceOne.getNDoubleBonds());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetNDoubleBondsException() {
         MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", 0, 2, 0, -1, false);
     }
@@ -49,7 +50,7 @@ public class MolecularFattyAcidTest {
         assertEquals(1, instance.getPosition());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetPositionException() {
         MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", -2, 2, 0, 0, false);
     }
@@ -60,7 +61,7 @@ public class MolecularFattyAcidTest {
         assertEquals(2, instance.getNCarbon());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetNCarbonException() {
         MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 1, 0, 0, false);
     }
@@ -71,7 +72,7 @@ public class MolecularFattyAcidTest {
         assertEquals(1, instance.getNHydroxy());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testGetNHydroxyException() {
         MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, -1, 0, false);
     }

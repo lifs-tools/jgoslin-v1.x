@@ -3,6 +3,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,7 +24,7 @@ public class MolecularFattyAcid extends FattyAcid {
     protected MolecularFattyAcid(String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, boolean ether) {
         super(name, position, nCarbon, nHydroxy, ether);
         if (nDoubleBonds < 0) {
-            throw new IllegalArgumentException("MolecularFattyAcid must have at least 0 double bonds!");
+            throw new ConstraintViolationException("MolecularFattyAcid must have at least 0 double bonds!");
         }
         this.nDoubleBonds = nDoubleBonds;
     }

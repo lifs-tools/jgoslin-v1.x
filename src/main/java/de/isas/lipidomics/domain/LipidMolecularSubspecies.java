@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -31,8 +32,7 @@ import lombok.Data;
 @Data
 public class LipidMolecularSubspecies extends LipidSpecies {
 
-    private final Map<String, FattyAcid> fa = new LinkedHashMap<>();
-    private final Optional<LipidSpeciesInfo> info;
+    protected final Map<String, FattyAcid> fa = new LinkedHashMap<>();
     private final String lipidSpeciesString;
 
     public LipidMolecularSubspecies(String headGroup, MolecularFattyAcid... fa) {
@@ -43,10 +43,10 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         boolean ether = false;
         for (MolecularFattyAcid fas : fa) {
             if (fas.getPosition() != -1) {
-                throw new IllegalArgumentException("MolecularFattyAcid " + fas.getName() + " must have position set to -1! Was: " + fas.getPosition());
+                throw new ConstraintViolationException("MolecularFattyAcid " + fas.getName() + " must have position set to -1! Was: " + fas.getPosition());
             }
             if (this.fa.containsKey(fas.getName())) {
-                throw new IllegalArgumentException(
+                throw new ConstraintViolationException(
                         "FA names must be unique! FA with name " + fas.getName() + " was already added!");
             } else {
                 this.fa.put(fas.getName(), fas);
@@ -56,7 +56,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
                 ether = ether || fas.isEther();
             }
         }
-        info = Optional.of(new LipidSpeciesInfo(LipidLevel.MOLECULAR_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, ether));
+        super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.MOLECULAR_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, ether));
         this.lipidSpeciesString = buildLipidMolecularSubspeciesName();
     }
     
@@ -82,13 +82,17 @@ public class LipidMolecularSubspecies extends LipidSpecies {
     }
 
     @Override
-    public Optional<LipidSpeciesInfo> getInfo() {
-        return info;
-    }
-
-    @Override
-    public String getLipidString() {
-        return lipidSpeciesString;
+    public String getLipidString(LipidLevel level) {
+        switch(level) {
+            case MOLECULAR_SUBSPECIES:
+                return lipidSpeciesString;
+            case CATEGORY:
+            case CLASS:
+            case SPECIES:
+                return super.getLipidString(level);
+            default:
+                throw new RuntimeException(getClass().getSimpleName() + " does not know how to create a lipid string for level " + level);
+        }
     }
 
 }

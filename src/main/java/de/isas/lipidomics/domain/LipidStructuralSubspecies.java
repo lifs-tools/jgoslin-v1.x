@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -27,10 +28,9 @@ import lombok.Data;
  */
 @Data
 public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
-    
-    private final Optional<LipidSpeciesInfo> info;
+
     private final String lipidSpeciesString;
-    
+
     public LipidStructuralSubspecies(String headGroup, StructuralFattyAcid... fa) {
         super(headGroup);
         int nCarbon = 0;
@@ -38,21 +38,21 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
         int nDoubleBonds = 0;
         boolean ether = false;
         for (StructuralFattyAcid fas : fa) {
-            if (getFa().containsKey(fas.getName())) {
-                throw new IllegalArgumentException(
+            if (super.fa.containsKey(fas.getName())) {
+                throw new ConstraintViolationException(
                         "FA names must be unique! FA with name " + fas.getName() + " was already added!");
             } else {
-                getFa().put(fas.getName(), fas);
+                super.fa.put(fas.getName(), fas);
                 nCarbon += fas.getNCarbon();
                 nHydroxyl += fas.getNHydroxy();
                 nDoubleBonds += fas.getNDoubleBonds();
                 ether = ether || fas.isEther();
             }
         }
-        info = Optional.of(new LipidSpeciesInfo(LipidLevel.STRUCTURAL_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, ether));
+        super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.STRUCTURAL_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, ether));
         this.lipidSpeciesString = buildLipidStructuralSubspeciesName();
     }
-    
+
     private String buildLipidStructuralSubspeciesName() {
         List<String> faStrings = new LinkedList<>();
         for (String faKey : getFa().
@@ -65,18 +65,23 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
             nDB += fattyAcid.getNDoubleBonds();
             nCarbon += fattyAcid.getNCarbon();
             nHydroxy += fattyAcid.getNHydroxy();
-            faStrings.add(nCarbon+":"+nDB+(nHydroxy > 0 ? ";" + nHydroxy : ""));
+            faStrings.add(nCarbon + ":" + nDB + (nHydroxy > 0 ? ";" + nHydroxy : ""));
         }
         return getHeadGroup() + " " + faStrings.stream().collect(Collectors.joining("/"));
     }
 
     @Override
-    public Optional<LipidSpeciesInfo> getInfo() {
-        return info;
-    }
-
-    @Override
-    public String getLipidString() {
-        return lipidSpeciesString;
+    public String getLipidString(LipidLevel level) {
+        switch (level) {
+            case STRUCTURAL_SUBSPECIES:
+                return lipidSpeciesString;
+            case MOLECULAR_SUBSPECIES:
+            case CATEGORY:
+            case CLASS:
+            case SPECIES:
+                return super.getLipidString(level);
+            default:
+                throw new RuntimeException(getClass().getSimpleName() + " does not know how to create a lipid string for level " + level);
+        }
     }
 }
