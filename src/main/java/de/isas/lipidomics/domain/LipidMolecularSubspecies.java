@@ -76,7 +76,20 @@ public class LipidMolecularSubspecies extends LipidSpecies {
             nDB += fattyAcid.getNDoubleBonds();
             nCarbon += fattyAcid.getNCarbon();
             nHydroxy += fattyAcid.getNHydroxy();
-            faStrings.add(nCarbon+":"+nDB+(nHydroxy > 0 ? ";" + nHydroxy : ""));
+            String etherType = "";
+            switch (fattyAcid.getEtherFaType()) {
+                case ETHER_PLASMANYL:
+                    etherType = "a";
+                    break;
+                case ETHER_PLASMENYL:
+                    etherType = "p";
+                    break;
+                case ESTER:
+                case UNDEFINED:
+                default:
+                    etherType = "";
+            }
+            faStrings.add(nCarbon + ":" + nDB + (nHydroxy > 0 ? ";" + nHydroxy : "") + etherType);
         }
         return getHeadGroup() + " " + faStrings.stream().collect(Collectors.joining("/"));
     }

@@ -47,11 +47,12 @@ import org.antlr.v4.runtime.tree.RuleNode;
 class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
     /**
-     * 
-     * @throws PalinomVisitorException for structural or state-related issues while trying to process a parsing context.
+     *
+     * @throws PalinomVisitorException for structural or state-related issues
+     * while trying to process a parsing context.
      * @throws RuntimeException
      * @param ctx
-     * @return 
+     * @return
      */
     @Override
     public LipidAdduct visitLipid(GoslinParser.LipidContext ctx) {
@@ -94,42 +95,150 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                         lipid = new LipidSpecies(ctx.cholesterol().chc().ch().getText());
                         break;
                     } else if (ctx.cholesterol().che() != null) {
-//                            lipid.setHeadGroup(ctx.cholesterol().che().().getText());
-                        throw new RuntimeException("CHe not implemented yet!");
+                        lipid = handleChe(ctx.cholesterol().che()).orElse(LipidSpecies.NONE);
+                        break;
                     } else {
                         throw new PalinomVisitorException("Unhandled sterol lipid: " + ctx.cholesterol().getText());
                     }
                 case GL:
-//                    ctx.gl();
-                    throw new RuntimeException("GL not implemented yet!");
+                    lipid = handleGlycerolipid(ctx).orElse(LipidSpecies.NONE);
+                    break;
                 case FA:
-//                    ctx.mediator();
                     lipid = new LipidSpecies(ctx.mediatorc().getText(), LipidCategory.FA, Optional.empty(), Optional.empty());
                     break;
                 case GP:
                     lipid = handleGlyceroPhospholipid(ctx).orElse(LipidSpecies.NONE);
                     break;
                 case SP:
-                    throw new RuntimeException("SP not implemented yet!");
-//                    if (ctx.sl().dsl() != null) {
+//                    throw new RuntimeException("SP not implemented yet!");
+                    if (ctx.sl().dsl() != null) {
+                        lipid = handleDsl(ctx.sl().dsl()).orElse(LipidSpecies.NONE);
 //                        lipid = new LipidSpecies(ctx.sl().dsl().hg_dslc().getText());
 //                        visitFas(Arrays.asList(ctx.sl().dsl().fa()), lipid);
-//                    } else if (ctx.sl().lsl() != null) {
-//                        throw new RuntimeException("LSL handling not implemented yet in SL!");
-////                        lipid.setLipidClass("LSL");
-////                        lipid.setHeadGroup(ctx.sl().lsl().hg_lsl().getText());
-////                        visitFas(Arrays.asList(ctx.sl().lsl().lcb().fa()), lipid);
-//                    } else {
-//                        throw new RuntimeException("Unhandled sphingolipid: " + ctx.sl().getText());
-//                    }
-//                    break;
+                    } else if (ctx.sl().lsl() != null) {
+                        throw new RuntimeException("LSL handling not implemented yet in SL!");
+//                        lipid.setLipidClass("LSL");
+//                        lipid.setHeadGroup(ctx.sl().lsl().hg_lsl().getText());
+//                        visitFas(Arrays.asList(ctx.sl().lsl().lcb().fa()), lipid);
+                    } else {
+                        throw new RuntimeException("Unhandled sphingolipid: " + ctx.sl().getText());
+                    }
+                    break;
                 default:
-                    throw new PalinomVisitorException("Unhandled contextCategory: "+contextCategory);
+                    throw new PalinomVisitorException("Unhandled contextCategory: " + contextCategory);
             }
-//            lipid.setLipidCategory(contextCategory.name());
-//            lipid.setHeadGroup(headGroup);
-//            lipid.setFa(fa);
             return lipid;
+        }
+
+        private Optional<LipidSpecies> handleGlycerolipid(Lipid_pureContext ctx) throws RuntimeException {
+            //glycerophospholipids
+            //cardiolipin
+            if (ctx.gl().dgl() != null) {
+                return handleDgl(ctx.gl().dgl());
+            } else if (ctx.gl().mgl() != null) {
+                return handleMgl(ctx.gl().mgl());
+            } else if (ctx.gl().sgl() != null) {
+                return handleSgl(ctx.gl().sgl());
+            } else if (ctx.gl().tgl() != null) {
+                return handleTgl(ctx.gl().tgl());
+            } else {
+                throw new PalinomVisitorException("Unhandled context state in GL!");
+            }
+        }
+
+        private Optional<LipidSpecies> handleDsl(GoslinParser.DslContext dsl) {
+            String headGroup = dsl.hg_dslc().getText();
+            if (dsl.sl_species() != null) { //species level
+                //process species level
+                return visitSpeciesLcb(headGroup, dsl.sl_species().lcb());
+            } else if (dsl.sl_subspecies() != null) {
+                //process subspecies
+                if (dsl.sl_subspecies().sorted_fa_separator() != null) {
+                    //sorted => StructuralSubspecies
+                    return visitStructuralSubspeciesLcb(headGroup, Arrays.asList(dsl.sl_subspecies().fa()));
+                }
+            } else {
+                throw new PalinomVisitorException("Unhandled context state in SGL!");
+            }
+            return Optional.empty();
+        }
+        
+        private Optional<LipidSpecies> handleTgl(GoslinParser.TglContext tgl) {
+            String headGroup = tgl.hg_tgl().getText();
+            if (tgl.gl_species() != null) { //species level
+                //process species level
+                return visitSpeciesFas(headGroup, tgl.gl_species().fa());
+            } else if (tgl.tgl_subspecies() != null) {
+                //process subspecies
+                if (tgl.tgl_subspecies().sorted_fa_separator() != null) {
+                    //sorted => StructuralSubspecies
+                    return visitStructuralSubspeciesFas(headGroup, tgl.tgl_subspecies().fa());
+                } else if (tgl.tgl_subspecies().unsorted_fa_separator() != null) {
+                    //unsorted => MolecularSubspecies
+                    return visitMolecularSubspeciesFas(headGroup, tgl.tgl_subspecies().fa());
+                }
+            } else {
+                throw new PalinomVisitorException("Unhandled context state in SGL!");
+            }
+            return Optional.empty();
+        }
+
+        private Optional<LipidSpecies> handleSgl(GoslinParser.SglContext sgl) {
+            String headGroup = sgl.hg_sgl().getText();
+            if (sgl.gl_species() != null) { //species level
+                //process species level
+                return visitSpeciesFas(headGroup, sgl.gl_species().fa());
+            } else if (sgl.dgl_subspecies() != null) {
+                //process subspecies
+                if (sgl.dgl_subspecies().sorted_fa_separator() != null) {
+                    //sorted => StructuralSubspecies
+                    return visitStructuralSubspeciesFas(headGroup, sgl.dgl_subspecies().fa());
+                } else if (sgl.dgl_subspecies().unsorted_fa_separator() != null) {
+                    //unsorted => MolecularSubspecies
+                    return visitMolecularSubspeciesFas(headGroup, sgl.dgl_subspecies().fa());
+                }
+            } else {
+                throw new PalinomVisitorException("Unhandled context state in SGL!");
+            }
+            return Optional.empty();
+        }
+
+        private Optional<LipidSpecies> handleChe(GoslinParser.CheContext che) {
+            String headGroup = che.hg_chec().getText();
+            if (che.fa() != null) {
+                return visitStructuralSubspeciesFas(headGroup, Arrays.asList(che.fa()));
+            } else {
+                throw new PalinomVisitorException("Unhandled context state in ChE!");
+            }
+        }
+
+        private Optional<LipidSpecies> handleMgl(GoslinParser.MglContext mgl) {
+            String headGroup = mgl.hg_mgl().getText();
+            if (mgl.fa() != null) {
+                return visitStructuralSubspeciesFas(headGroup, Arrays.asList(mgl.fa()));
+            } else {
+                throw new PalinomVisitorException("Unhandled context state in MGL!");
+            }
+        }
+
+        private Optional<LipidSpecies> handleDgl(GoslinParser.DglContext dgl) {
+            String headGroup = dgl.hg_dgl().getText();
+            if (dgl.gl_species() != null) { //species level
+                //process species level
+                return visitSpeciesFas(headGroup, dgl.gl_species().fa());
+            } else if (dgl.dgl_subspecies() != null) {
+                //process subspecies
+                if (dgl.dgl_subspecies().sorted_fa_separator() != null) {
+                    //sorted => StructuralSubspecies
+                    return visitStructuralSubspeciesFas(headGroup, dgl.dgl_subspecies().fa());
+                } else if (dgl.dgl_subspecies().unsorted_fa_separator() != null) {
+                    //unsorted => MolecularSubspecies
+                    return visitMolecularSubspeciesFas(headGroup, dgl.dgl_subspecies().fa());
+                }
+            } else {
+                throw new PalinomVisitorException("Unhandled context state in DGL!");
+            }
+            return Optional.empty();
         }
 
         private Optional<LipidSpecies> handleGlyceroPhospholipid(Lipid_pureContext ctx) throws RuntimeException {
@@ -144,29 +253,29 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             } else if (ctx.pl().mlcl() != null) {
                 return handleMlcl(ctx.pl().mlcl());
             } else if (ctx.pl().pl_o() != null) {
-                throw new RuntimeException("PL_o handling not implemented yet in PL!");
+                return handlePlo(ctx.pl().pl_o());
             } else {
                 throw new PalinomVisitorException("Unhandled context state in PL!");
             }
         }
 
         private Optional<LipidSpecies> handlePlo(GoslinParser.Pl_oContext ploc) {
-//            String headGroup = ploc.hg_clc().getText();
-//            if (cl.pl_species() != null) { //species level
-//                //process species level
-//                return visitSpeciesFas(headGroup, cl.pl_species().fa());
-//            } else if (cl.cl_subspecies() != null) {
-//                //process subspecies
-//                if (cl.cl_subspecies().sorted_fa_separator() != null) {
-//                    //sorted => StructuralSubspecies
-//                    return visitStructuralSubspeciesFas(headGroup, cl.cl_subspecies().fa());
-//                } else if (cl.cl_subspecies().unsorted_fa_separator() != null) {
-//                    //unsorted => MolecularSubspecies
-//                    return visitMolecularSubspeciesFas(headGroup, cl.cl_subspecies().fa());
-//                }
-//            } else {
-//                throw new RuntimeException("Unhandled context state in CL!");
-//            }
+            if (ploc.dpl_o() != null) {
+                String headGroup = ploc.dpl_o().hg_pl_oc().getText();
+                if (ploc.dpl_o().pl_species() != null) {
+                    return visitSpeciesFas(headGroup, ploc.dpl_o().pl_species().fa());
+                } else if (ploc.dpl_o().pl_subspecies() != null) {
+                    if (ploc.dpl_o().pl_subspecies().sorted_fa_separator() != null) {
+                        return visitStructuralSubspeciesFas(headGroup, ploc.dpl_o().pl_subspecies().fa());
+                    } else if (ploc.dpl_o().pl_subspecies().unsorted_fa_separator() != null) {
+                        return visitMolecularSubspeciesFas(headGroup, ploc.dpl_o().pl_subspecies().fa());
+                    }
+                }
+            } else if (ploc.lpl_o() != null) {
+
+            } else {
+                throw new PalinomVisitorException("Unhandled context state in PL O!");
+            }
             return Optional.empty();
         }
 
@@ -239,6 +348,10 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 throw new PalinomVisitorException("Unhandled context state in PL!");
             }
         }
+        
+        private Optional<LipidSpecies> visitSpeciesLcb(String headGroup, GoslinParser.LcbContext lcbContext) {
+            return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(lcbContext)));
+        }
 
         private Optional<LipidSpecies> visitSpeciesFas(String headGroup, GoslinParser.FaContext faContext) {
             return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(faContext)));
@@ -255,6 +368,17 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             return Optional.of(new LipidMolecularSubspecies(headGroup, arrs));
         }
 
+         private Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, List<GoslinParser.FaContext> faContexts) {
+            List<StructuralFattyAcid> fas = new LinkedList<>();
+            for (int i = 0; i < faContexts.size(); i++) {
+                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 1);
+                fas.add(fa);
+            }
+            StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
+            fas.toArray(arrs);
+            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+        }
+        
         private Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<GoslinParser.FaContext> faContexts) {
             List<StructuralFattyAcid> fas = new LinkedList<>();
             for (int i = 0; i < faContexts.size(); i++) {
@@ -271,11 +395,35 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 throw new RuntimeException("Heavy label in FA_pure context not implemented yet!");
             }
             return Optional.of(new LipidSpeciesInfo(
-                    LipidLevel.SPECIES, 
-                    asInt(faContext.fa_pure().carbon(), 0), 
-                    asInt(faContext.fa_pure().hydroxyl(), 0), 
-                    asInt(faContext.fa_pure().hydroxyl(), 0), 
+                    LipidLevel.SPECIES,
+                    asInt(faContext.fa_pure().carbon(), 0),
+                    asInt(faContext.fa_pure().hydroxyl(), 0),
+                    asInt(faContext.fa_pure().db(), 0),
                     faContext.ether() != null));
+        }
+        
+        private Optional<LipidSpeciesInfo> getSpeciesInfo(GoslinParser.LcbContext lcbContext) {
+            Integer hydroxyl = 0;
+            if(lcbContext.old_hydroxyl()!=null) {
+                switch(lcbContext.old_hydroxyl().getText()) {
+                    case "t":
+                        hydroxyl = 3;
+                        break;
+                    case "d":
+                        hydroxyl = 2;
+                        break;
+                    default:
+                        throw new PalinomVisitorException("Unsupported old hydroxyl prefix: "+lcbContext.old_hydroxyl().getText());
+                }
+            } else if(lcbContext.hydroxyl()!=null) {
+                hydroxyl = asInt(lcbContext.hydroxyl(), 0);
+            }
+            return Optional.of(new LipidSpeciesInfo(
+                    LipidLevel.SPECIES,
+                    asInt(lcbContext.carbon(), 0),
+                    hydroxyl,
+                    asInt(lcbContext.db(), 0),
+                    false));
         }
     }
 

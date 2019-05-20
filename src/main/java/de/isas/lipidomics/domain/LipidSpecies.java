@@ -70,6 +70,7 @@ public class LipidSpecies {
                     lipidString.append(":").append(nDB);
                     int nHydroxy = info.get().getNHydroxy();
                     lipidString.append((nHydroxy > 0 ? ";" + nHydroxy : ""));
+                    lipidString.append(info.get().isEther()?((nDB==0)?"a":"p"):"");
                 }
                 return lipidString.toString();
             default:

@@ -28,7 +28,7 @@ import lombok.Data;
  */
 @Data
 public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
-    
+
     private final String lipidSpeciesString;
 
     public LipidIsomericSubspecies(String headGroup, IsomericFattyAcid... fa) {
@@ -73,14 +73,27 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
             }
             nCarbon += fattyAcid.getNCarbon();
             nHydroxy += fattyAcid.getNHydroxy();
-            faStrings.add(nCarbon + ":" + nDB + dbPos + (nHydroxy > 0 ? ";" + nHydroxy : ""));
+            String etherType = "";
+            switch (fattyAcid.getEtherFaType()) {
+                case ETHER_PLASMANYL:
+                    etherType = "a";
+                    break;
+                case ETHER_PLASMENYL:
+                    etherType = "p";
+                    break;
+                case ESTER:
+                case UNDEFINED:
+                default:
+                    etherType = "";
+            }
+            faStrings.add(nCarbon + ":" + nDB + (nHydroxy > 0 ? ";" + nHydroxy : "") + etherType);
         }
         return getHeadGroup() + " " + faStrings.stream().collect(Collectors.joining("/"));
     }
 
     @Override
     public String getLipidString(LipidLevel level) {
-        switch(level) {
+        switch (level) {
             case ISOMERIC_SUBSPECIES:
                 return lipidSpeciesString;
             case STRUCTURAL_SUBSPECIES:
