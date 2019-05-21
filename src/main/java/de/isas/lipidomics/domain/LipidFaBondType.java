@@ -21,4 +21,16 @@ package de.isas.lipidomics.domain;
  */
 public enum LipidFaBondType {
     UNDEFINED, ESTER, ETHER_PLASMANYL, ETHER_PLASMENYL;
+
+    String suffix() {
+        switch (this) {
+            case ETHER_PLASMANYL:
+                return "a";
+            case ETHER_PLASMENYL:
+                return "p";
+            case ESTER:
+            default:
+                return "";
+        }
+    }
 }

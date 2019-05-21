@@ -29,7 +29,7 @@ public class LipidSpeciesInfo {
     private static final class None extends LipidSpeciesInfo {
 
         private None() {
-            super(LipidLevel.UNDEFINED, 0,0,0, false);
+            super(LipidLevel.UNDEFINED, 0,0,0, LipidFaBondType.UNDEFINED);
         }
     }
     
@@ -39,5 +39,5 @@ public class LipidSpeciesInfo {
     private final int nCarbon;
     private final int nHydroxy;
     private final int nDoubleBonds;
-    private final boolean ether;
+    private final LipidFaBondType lipidFaBondType;
 }

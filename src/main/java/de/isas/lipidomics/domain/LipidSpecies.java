@@ -63,14 +63,14 @@ public class LipidSpecies {
             case SPECIES:
                 StringBuilder lipidString = new StringBuilder();
                 lipidString.append(headGroup);
-                if (this.info.isPresent()) {
+                if (this.info.isPresent() && this.info.get().getNCarbon() > 0) {
                     int nCarbon = info.get().getNCarbon();
                     lipidString.append(" ").append(nCarbon);
                     int nDB = info.get().getNDoubleBonds();
                     lipidString.append(":").append(nDB);
                     int nHydroxy = info.get().getNHydroxy();
-                    lipidString.append((nHydroxy > 0 ? ";" + nHydroxy : ""));
-                    lipidString.append(info.get().isEther()?((nDB==0)?"a":"p"):"");
+                    lipidString.append(nHydroxy > 0 ? ";" + nHydroxy : "");
+                    lipidString.append(info.get().getLipidFaBondType().suffix());
                 }
                 return lipidString.toString();
             default:

@@ -14,7 +14,7 @@ import lombok.Data;
 public class StructuralFattyAcid extends MolecularFattyAcid {
 
     @Builder(builderMethodName = "structuralFaBuilder")
-    public StructuralFattyAcid(String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, boolean ether, boolean lcb) {
-        super(name, position, nCarbon, nHydroxy, nDoubleBonds, ether, lcb);
+    public StructuralFattyAcid(String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb) {
+        super(name, position, nCarbon, nHydroxy, nDoubleBonds, lipidFaBondType, lcb);
     }
 }

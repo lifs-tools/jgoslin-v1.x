@@ -27,54 +27,54 @@ public class StructuralFattyAcidTest {
 
     @Test
     public void testGetNDoubleBonds() {
-        StructuralFattyAcid instanceZero = new StructuralFattyAcid("FA1", 0, 2, 0, 0, false, false);
+        StructuralFattyAcid instanceZero = new StructuralFattyAcid("FA1", 0, 2, 0, 0, LipidFaBondType.UNDEFINED, false);
         assertEquals(0, instanceZero.getNDoubleBonds());
-        StructuralFattyAcid instanceOne = new StructuralFattyAcid("FA1", 0, 2, 0, 1, false, false);
+        StructuralFattyAcid instanceOne = new StructuralFattyAcid("FA1", 0, 2, 0, 1, LipidFaBondType.UNDEFINED, false);
         assertEquals(1, instanceOne.getNDoubleBonds());
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void testGetNDoubleBondsException() {
-        StructuralFattyAcid instanceZero = new StructuralFattyAcid("FA1", 0, 2, 0, -1, false, false);
+        StructuralFattyAcid instanceZero = new StructuralFattyAcid("FA1", 0, 2, 0, -1, LipidFaBondType.UNDEFINED, false);
     }
 
     @Test
     public void testGetName() {
-        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 0, 2, 0, 0, false, false);
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 0, 2, 0, 0, LipidFaBondType.UNDEFINED, false);
         assertEquals("FAX", instance.getName());
     }
 
     @Test
     public void testGetPosition() {
-        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, 0, 0, false, false);
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, 0, 0, LipidFaBondType.UNDEFINED, false);
         assertEquals(1, instance.getPosition());
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void testGetPositionException() {
-        StructuralFattyAcid instanceZero = new StructuralFattyAcid("FA1", -2, 2, 0, 0, false, false);
+        StructuralFattyAcid instanceZero = new StructuralFattyAcid("FA1", -2, 2, 0, 0, LipidFaBondType.UNDEFINED, false);
     }
 
     @Test
     public void testGetNCarbon() {
-        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, 0, 0, false, false);
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, 0, 0, LipidFaBondType.UNDEFINED, false);
         assertEquals(2, instance.getNCarbon());
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void testGetNCarbonException() {
-        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 1, 0, 0, false, false);
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 1, 0, 0, LipidFaBondType.UNDEFINED, false);
     }
 
     @Test
     public void testGetNHydroxy() {
-        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, 1, 0, false, false);
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, 1, 0, LipidFaBondType.UNDEFINED, false);
         assertEquals(1, instance.getNHydroxy());
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void testGetNHydroxyException() {
-        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, -1, 0, false, false);
+        StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 2, -1, 0, LipidFaBondType.UNDEFINED, false);
     }
 
 }

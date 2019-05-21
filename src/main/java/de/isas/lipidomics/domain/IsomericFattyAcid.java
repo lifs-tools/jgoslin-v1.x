@@ -16,8 +16,8 @@ public class IsomericFattyAcid extends StructuralFattyAcid {
 
     private final Map<Integer, String> doubleBondPositions = new TreeMap<Integer, String>();
     
-    public IsomericFattyAcid(String name, int position, int nCarbon, int nHydroxy, boolean ether, boolean lcb, Map<Integer, String> doubleBondPositions) {
-        super(name, position, nCarbon, nHydroxy, doubleBondPositions.size(), ether, lcb);
+    public IsomericFattyAcid(String name, int position, int nCarbon, int nHydroxy, LipidFaBondType lipidFaBondType, boolean lcb, Map<Integer, String> doubleBondPositions) {
+        super(name, position, nCarbon, nHydroxy, doubleBondPositions.size(), lipidFaBondType, lcb);
         this.doubleBondPositions.putAll(doubleBondPositions);
     }
 }

@@ -15,10 +15,13 @@
  */
 package de.isas.lipidomics.palinom;
 
+import de.isas.lipidomics.domain.LipidAdduct;
+import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
+import org.junit.Assert;
 import junitparams.FileParameters;
 import junitparams.JUnitParamsRunner;
-import org.junit.Assert;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -26,32 +29,17 @@ import org.junit.runner.RunWith;
  *
  * @author nils.hoffmann
  */
+@Slf4j
 @RunWith(JUnitParamsRunner.class)
 public class LipidNamesTest {
 
-//    @Test
-//    @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames.txt")
-//    public void isValidLipidName(String lipidName) throws ParsingException {
-//        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
-//        parser.parse(lipidName);
-//    }
-//
-//    @Test
-//    @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames-invalid.txt")
-//    public void isInvalidLipidName(String lipidName) {
-//        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
-//        try {
-//            parser.parse(lipidName);
-//            Assert.fail("Test case for " + lipidName + " should cause parsing error!");
-//        } catch (ParsingException rex) {
-//
-//        }
-//    }
-    
     @Test
     @FileParameters("classpath:de/isas/lipidomics/palinom/wenk-lipids.txt")
     public void isValidLipidNameForSingaporeanStudy(String lipidName) throws ParsingException {
         PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
-        parser.parse(lipidName);
+        LipidAdduct la = parser.parse(lipidName);
+        LipidSpecies l = la.getLipid();
+        log.info("{}\t{} ({})", lipidName, l.getLipidString(l.getInfo().get().getLevel()), l.getInfo().get().getLevel());
+        Assert.assertEquals(lipidName, l.getLipidString(l.getInfo().get().getLevel()));
     }
 }

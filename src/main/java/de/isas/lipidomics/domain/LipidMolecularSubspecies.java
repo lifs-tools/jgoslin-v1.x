@@ -40,7 +40,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
-        boolean ether = false;
+        LipidFaBondType lipidFaBondType = LipidFaBondType.ESTER;
         for (MolecularFattyAcid fas : fa) {
             if (fas.getPosition() != -1) {
                 throw new ConstraintViolationException("MolecularFattyAcid " + fas.getName() + " must have position set to -1! Was: " + fas.getPosition());
@@ -53,18 +53,22 @@ public class LipidMolecularSubspecies extends LipidSpecies {
                 nCarbon += fas.getNCarbon();
                 nHydroxyl += fas.getNHydroxy();
                 nDoubleBonds += fas.getNDoubleBonds();
-                ether = ether || fas.isEther();
+                if (lipidFaBondType == LipidFaBondType.ESTER && (fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL)) {
+                    lipidFaBondType = fas.getLipidFaBondType();
+                } else if (lipidFaBondType != LipidFaBondType.ESTER && (fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL)) {
+                    throw new ConstraintViolationException("Only one FA can define an ether bond to the head group! Tried to add " + fas.getLipidFaBondType() + " over existing " + lipidFaBondType);
+                }
             }
         }
-        super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.MOLECULAR_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, ether));
-        this.lipidSpeciesString = buildLipidMolecularSubspeciesName();
+        super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.MOLECULAR_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, lipidFaBondType));
+        this.lipidSpeciesString = buildLipidSubspeciesName("_");
     }
     
     public Map<String, FattyAcid> getFa() {
         return Collections.unmodifiableMap(fa);
     }
 
-    private String buildLipidMolecularSubspeciesName() {
+    protected String buildLipidSubspeciesName(String faSeparator) {
         List<String> faStrings = new LinkedList<>();
         for (String faKey : getFa().
                 keySet()) {
@@ -76,29 +80,16 @@ public class LipidMolecularSubspecies extends LipidSpecies {
             nDB += fattyAcid.getNDoubleBonds();
             nCarbon += fattyAcid.getNCarbon();
             nHydroxy += fattyAcid.getNHydroxy();
-            String etherType = "";
-            switch (fattyAcid.getEtherFaType()) {
-                case ETHER_PLASMANYL:
-                    etherType = "a";
-                    break;
-                case ETHER_PLASMENYL:
-                    etherType = "p";
-                    break;
-                case ESTER:
-                case UNDEFINED:
-                default:
-                    etherType = "";
-            }
-            faStrings.add(nCarbon + ":" + nDB + (nHydroxy > 0 ? ";" + nHydroxy : "") + etherType);
+            faStrings.add(nCarbon + ":" + nDB + (nHydroxy > 0 ? ";" + nHydroxy : "") + fattyAcid.getLipidFaBondType().suffix());
         }
-        return getHeadGroup() + " " + faStrings.stream().collect(Collectors.joining("/"));
+        return getHeadGroup() + " " + faStrings.stream().collect(Collectors.joining(faSeparator));
     }
 
     @Override
     public String getLipidString(LipidLevel level) {
         switch(level) {
             case MOLECULAR_SUBSPECIES:
-                return lipidSpeciesString;
+                return this.lipidSpeciesString;
             case CATEGORY:
             case CLASS:
             case SPECIES:

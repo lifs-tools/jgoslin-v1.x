@@ -17,12 +17,12 @@ public class MolecularFattyAcid extends FattyAcid {
     private final int nDoubleBonds;
 
     @Builder(builderMethodName = "molecularFaBuilder")
-    public MolecularFattyAcid(String name, int nCarbon, int nHydroxy, int nDoubleBonds, boolean ether, boolean lcb) {
-        this(name, -1, nCarbon, nHydroxy, nDoubleBonds, ether, lcb);
+    public MolecularFattyAcid(String name, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb) {
+        this(name, -1, nCarbon, nHydroxy, nDoubleBonds, lipidFaBondType, lcb);
     }
     
-    protected MolecularFattyAcid(String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, boolean ether, boolean lcb) {
-        super(name, position, nCarbon, nHydroxy, ether, lcb);
+    protected MolecularFattyAcid(String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb) {
+        super(name, position, nCarbon, nHydroxy, lipidFaBondType, lcb);
         if (nDoubleBonds < 0) {
             throw new ConstraintViolationException("MolecularFattyAcid must have at least 0 double bonds!");
         }

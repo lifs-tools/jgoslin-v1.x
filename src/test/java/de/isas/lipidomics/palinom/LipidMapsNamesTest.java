@@ -35,18 +35,6 @@ import org.junit.runner.RunWith;
 @RunWith(JUnitParamsRunner.class)
 public class LipidMapsNamesTest {
 
-//    @Test
-//    @FileParameters("classpath:de/isas/lipidomics/palinom/lipidnames-invalid.txt")
-//    public void isInvalidLipidName(String lipidName) {
-//        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
-//        try {
-//            parser.parse(lipidName);
-//            Assert.fail("Test case for " + lipidName + " should cause parsing error!");
-//        } catch (ParsingException rex) {
-//
-//        }
-//    }
-    
     @Test
     @FileParameters("classpath:de/isas/lipidomics/palinom/wenk-lm-lipids.txt")
     public void isValidLipidMapsNameForSingaporeanStudy(String lipidMapsName) throws ParsingException {

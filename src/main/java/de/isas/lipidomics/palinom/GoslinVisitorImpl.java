@@ -20,6 +20,8 @@ import de.isas.lipidomics.domain.MolecularFattyAcid;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
+import de.isas.lipidomics.domain.LipidClass;
+import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
@@ -92,7 +94,8 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             switch (contextCategory) {
                 case ST:
                     if (ctx.cholesterol().chc() != null) {
-                        lipid = new LipidSpecies(ctx.cholesterol().chc().ch().getText());
+                        LipidSpeciesInfo lsi = new LipidSpeciesInfo(LipidLevel.SPECIES, 0, 0, 0, LipidFaBondType.UNDEFINED);
+                        lipid = new LipidSpecies(ctx.cholesterol().chc().ch().getText(), LipidCategory.ST, Optional.of(LipidClass.CH), Optional.of(lsi));
                         break;
                     } else if (ctx.cholesterol().che() != null) {
                         lipid = handleChe(ctx.cholesterol().che()).orElse(LipidSpecies.NONE);
@@ -149,7 +152,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 //process subspecies
                 if (dsl.sl_subspecies().sorted_fa_separator() != null) {
                     //sorted => StructuralSubspecies
-                    return visitStructuralSubspeciesLcb(headGroup, Arrays.asList(dsl.sl_subspecies().fa()));
+                    return visitStructuralSubspeciesLcb(headGroup, dsl.sl_subspecies().lcb(), Arrays.asList(dsl.sl_subspecies().fa()));
                 }
             } else {
                 throw new PalinomVisitorException("Unhandled context state in DSL!");
@@ -166,6 +169,10 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 throw new PalinomVisitorException("Unhandled context state in LSL!");
             }
         }
+        
+        private static boolean hasElements(List<?> l) {
+            return (l==null?false:!l.isEmpty());
+        }
 
         private Optional<LipidSpecies> handleTgl(GoslinParser.TglContext tgl) {
             String headGroup = tgl.hg_tgl().getText();
@@ -174,15 +181,19 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 return visitSpeciesFas(headGroup, tgl.gl_species().fa());
             } else if (tgl.tgl_subspecies() != null) {
                 //process subspecies
-                if (tgl.tgl_subspecies().sorted_fa_separator() != null) {
+                log.info("TGL sorted_fa_separator: {}", tgl.tgl_subspecies().sorted_fa_separator());
+                log.info("TGL unsorted_fa_separator: {}", tgl.tgl_subspecies().unsorted_fa_separator());
+                if (hasElements(tgl.tgl_subspecies().sorted_fa_separator())) {
                     //sorted => StructuralSubspecies
+                    log.info("Building structural subspecies");
                     return visitStructuralSubspeciesFas(headGroup, tgl.tgl_subspecies().fa());
-                } else if (tgl.tgl_subspecies().unsorted_fa_separator() != null) {
+                } else if (hasElements(tgl.tgl_subspecies().unsorted_fa_separator())) {
                     //unsorted => MolecularSubspecies
+                    log.info("Building molecular subspecies");
                     return visitMolecularSubspeciesFas(headGroup, tgl.tgl_subspecies().fa());
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in SGL!");
+                throw new PalinomVisitorException("Unhandled context state in TGL!");
             }
             return Optional.empty();
         }
@@ -276,7 +287,8 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     }
                 }
             } else if (ploc.lpl_o() != null) {
-
+                String headGroup = ploc.lpl_o().hg_lpl_oc().getText();
+                return visitStructuralSubspeciesFas(headGroup, Arrays.asList(ploc.lpl_o().fa()));
             } else {
                 throw new PalinomVisitorException("Unhandled context state in PL O!");
             }
@@ -290,10 +302,10 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 return visitSpeciesFas(headGroup, cl.pl_species().fa());
             } else if (cl.cl_subspecies() != null) {
                 //process subspecies
-                if (cl.cl_subspecies().sorted_fa_separator() != null) {
+                if (hasElements(cl.cl_subspecies().sorted_fa_separator())) {
                     //sorted => StructuralSubspecies
                     return visitStructuralSubspeciesFas(headGroup, cl.cl_subspecies().fa());
-                } else if (cl.cl_subspecies().unsorted_fa_separator() != null) {
+                } else if (hasElements(cl.cl_subspecies().unsorted_fa_separator())) {
                     //unsorted => MolecularSubspecies
                     return visitMolecularSubspeciesFas(headGroup, cl.cl_subspecies().fa());
                 }
@@ -310,10 +322,10 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 return visitSpeciesFas(headGroup, mlcl.pl_species().fa());
             } else if (mlcl.mlcl_subspecies() != null) {
                 //process subspecies
-                if (mlcl.mlcl_subspecies().sorted_fa_separator() != null) {
+                if (hasElements(mlcl.mlcl_subspecies().sorted_fa_separator())) {
                     //sorted => StructuralSubspecies
                     return visitStructuralSubspeciesFas(headGroup, mlcl.mlcl_subspecies().fa());
-                } else if (mlcl.mlcl_subspecies().unsorted_fa_separator() != null) {
+                } else if (hasElements(mlcl.mlcl_subspecies().unsorted_fa_separator())) {
                     //unsorted => MolecularSubspecies
                     return visitMolecularSubspeciesFas(headGroup, mlcl.mlcl_subspecies().fa());
                 }
@@ -372,10 +384,12 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             return Optional.of(new LipidMolecularSubspecies(headGroup, arrs));
         }
 
-        private Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, List<GoslinParser.FaContext> faContexts) {
+        private Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, GoslinParser.LcbContext lcbContext, List<GoslinParser.FaContext> faContexts) {
             List<StructuralFattyAcid> fas = new LinkedList<>();
+            StructuralFattyAcid lcbA = buildStructuralLcb(lcbContext, headGroup, 1);
+            fas.add(lcbA);
             for (int i = 0; i < faContexts.size(); i++) {
-                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 1);
+                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 2), i + 2);
                 fas.add(fa);
             }
             StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
@@ -403,12 +417,13 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             if (faContext.fa_pure().heavy() != null) {
                 throw new RuntimeException("Heavy label in FA_pure context not implemented yet!");
             }
+            LipidFaBondType lfbt = getLipidFaBondType(faContext);
             return Optional.of(new LipidSpeciesInfo(
                     LipidLevel.SPECIES,
                     asInt(faContext.fa_pure().carbon(), 0),
                     asInt(faContext.fa_pure().hydroxyl(), 0),
                     asInt(faContext.fa_pure().db(), 0),
-                    faContext.ether() != null));
+                    lfbt));
         }
 
         private Optional<LipidSpeciesInfo> getSpeciesInfo(GoslinParser.LcbContext lcbContext) {
@@ -431,14 +446,10 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     LipidLevel.SPECIES,
                     asInt(lcbContext.carbon(), 0),
                     hydroxyl,
-                    asInt(lcbContext.db(), 0),
-                    false));
+                    asInt(lcbContext.db(), 0), LipidFaBondType.ESTER));
         }
     }
 
-//    private static class PlVisitor extends PaLiNomBaseVisitor<Object> {
-//        
-//    }
     private static class AdductVisitor extends GoslinBaseVisitor<Adduct> {
 
         @Override
@@ -448,44 +459,23 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         }
     }
 
-//    private static class MolecularFaVisitor extends GoslinBaseVisitor<MolecularFattyAcid> {
-//
-//        @Override
-//        public MolecularFattyAcid visitFa(GoslinParser.FaContext ctx) {
-//            if (ctx.ether() != null) {
-//                throw new RuntimeException("Not implemented yet!");
-//            } else if (ctx.fa_pure() != null) {
-//                //hydroxyl case
-//                MolecularFattyAcid fa = buildMolecularFa(ctx.fa_pure()., faName)
-//                fa.setNCarbon(Integer.parseInt(ctx.fa_pure().carbon().getText()));
-//
-//                if (ctx.fa_pure().db() != null) {
-//                    //double bonds without positions
-//                    if (ctx.fa_pure().db().db_count() != null) {
-//                        fa.addDoubleBonds(Integer.parseInt(ctx.fa_pure().db().db_count().getText()));
-//                    } else if (ctx.fa_pure().db().db_position() != null) {
-//                        throw new RuntimeException("Support for double bond positions not implemented yet!");
-//                    } else {
-//                        throw new RuntimeException("Unsupported double bond specification!");
-//                    }
-//                }
-//                //base case
-//                if (ctx.fa_pure().hydroxyl() != null) {
-//                    fa.setNHydroxy(Integer.parseInt(ctx.fa_pure().hydroxyl().getText()));
-//                }
-//                return fa;
-//
-//            } else {
-//                throw new RuntimeException("Uninitialized FaContext!");
-//            }
-//        }
-//
-//    }
+    private static LipidFaBondType getLipidFaBondType(GoslinParser.FaContext faContext) throws PalinomVisitorException {
+        LipidFaBondType lfbt = LipidFaBondType.ESTER;
+        if (faContext.ether() != null) {
+            if ("a".equals(faContext.ether().getText())) {
+                lfbt = LipidFaBondType.ETHER_PLASMANYL;
+            } else if ("p".equals(faContext.ether().getText())) {
+                lfbt = LipidFaBondType.ETHER_PLASMENYL;
+            } else {
+                throw new PalinomVisitorException("Unknown ether context value: " + faContext.ether());
+            }
+        }
+        return lfbt;
+    }
+
     public static MolecularFattyAcid buildMolecularFa(GoslinParser.FaContext ctx, String faName) {
         MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFaBuilder();
-        if (ctx.ether() != null) {
-            fa.ether(true);
-        }
+        LipidFaBondType lfbt = getLipidFaBondType(ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
@@ -495,6 +485,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     throw new RuntimeException("Support for double bond positions not implemented yet!");
                 }
             }
+            fa.lipidFaBondType(lfbt);
             return fa.name(faName).build();
 
         } else {
@@ -526,14 +517,13 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 throw new RuntimeException("Support for double bond positions not implemented yet!");
             }
         }
+        fa.lipidFaBondType(LipidFaBondType.ESTER);
         return fa.name(faName).position(position).lcb(true).build();
     }
 
     public static StructuralFattyAcid buildStructuralFa(GoslinParser.FaContext ctx, String faName, int position) {
         StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
-        if (ctx.ether() != null) {
-            fa.ether(true);
-        }
+        LipidFaBondType lfbt = getLipidFaBondType(ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
@@ -543,12 +533,11 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     throw new RuntimeException("Support for double bond positions not implemented yet!");
                 }
             }
+            fa.lipidFaBondType(lfbt);
             return fa.name(faName).position(position).build();
 
         } else {
             throw new PalinomVisitorException("Uninitialized FaContext!");
         }
     }
-
-//    private static class MediatorVisitor extends PaLiNomBaseVisitor<Object> 
 }
