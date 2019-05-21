@@ -110,16 +110,10 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     lipid = handleGlyceroPhospholipid(ctx).orElse(LipidSpecies.NONE);
                     break;
                 case SP:
-//                    throw new RuntimeException("SP not implemented yet!");
                     if (ctx.sl().dsl() != null) {
                         lipid = handleDsl(ctx.sl().dsl()).orElse(LipidSpecies.NONE);
-//                        lipid = new LipidSpecies(ctx.sl().dsl().hg_dslc().getText());
-//                        visitFas(Arrays.asList(ctx.sl().dsl().fa()), lipid);
                     } else if (ctx.sl().lsl() != null) {
-                        throw new RuntimeException("LSL handling not implemented yet in SL!");
-//                        lipid.setLipidClass("LSL");
-//                        lipid.setHeadGroup(ctx.sl().lsl().hg_lsl().getText());
-//                        visitFas(Arrays.asList(ctx.sl().lsl().lcb().fa()), lipid);
+                        lipid = handleLsl(ctx.sl().lsl()).orElse(LipidSpecies.NONE);
                     } else {
                         throw new RuntimeException("Unhandled sphingolipid: " + ctx.sl().getText());
                     }
@@ -158,11 +152,21 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     return visitStructuralSubspeciesLcb(headGroup, Arrays.asList(dsl.sl_subspecies().fa()));
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in SGL!");
+                throw new PalinomVisitorException("Unhandled context state in DSL!");
             }
             return Optional.empty();
         }
-        
+
+        private Optional<LipidSpecies> handleLsl(GoslinParser.LslContext lsl) {
+            String headGroup = lsl.hg_lslc().getText();
+            if (lsl.lcb() != null) { //species / subspecies level
+                //process structural sub species level
+                return visitStructuralSubspeciesLcb(headGroup, lsl.lcb());
+            } else {
+                throw new PalinomVisitorException("Unhandled context state in LSL!");
+            }
+        }
+
         private Optional<LipidSpecies> handleTgl(GoslinParser.TglContext tgl) {
             String headGroup = tgl.hg_tgl().getText();
             if (tgl.gl_species() != null) { //species level
@@ -348,7 +352,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 throw new PalinomVisitorException("Unhandled context state in PL!");
             }
         }
-        
+
         private Optional<LipidSpecies> visitSpeciesLcb(String headGroup, GoslinParser.LcbContext lcbContext) {
             return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(lcbContext)));
         }
@@ -368,7 +372,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             return Optional.of(new LipidMolecularSubspecies(headGroup, arrs));
         }
 
-         private Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, List<GoslinParser.FaContext> faContexts) {
+        private Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, List<GoslinParser.FaContext> faContexts) {
             List<StructuralFattyAcid> fas = new LinkedList<>();
             for (int i = 0; i < faContexts.size(); i++) {
                 StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 1);
@@ -378,7 +382,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             fas.toArray(arrs);
             return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
         }
-        
+
         private Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<GoslinParser.FaContext> faContexts) {
             List<StructuralFattyAcid> fas = new LinkedList<>();
             for (int i = 0; i < faContexts.size(); i++) {
@@ -388,6 +392,11 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
             fas.toArray(arrs);
             return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+        }
+
+        private Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, GoslinParser.LcbContext lcbContext) {
+            StructuralFattyAcid fa = buildStructuralLcb(lcbContext, "FA" + 1, 1);
+            return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
         }
 
         private Optional<LipidSpeciesInfo> getSpeciesInfo(GoslinParser.FaContext faContext) {
@@ -401,11 +410,11 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     asInt(faContext.fa_pure().db(), 0),
                     faContext.ether() != null));
         }
-        
+
         private Optional<LipidSpeciesInfo> getSpeciesInfo(GoslinParser.LcbContext lcbContext) {
             Integer hydroxyl = 0;
-            if(lcbContext.old_hydroxyl()!=null) {
-                switch(lcbContext.old_hydroxyl().getText()) {
+            if (lcbContext.old_hydroxyl() != null) {
+                switch (lcbContext.old_hydroxyl().getText()) {
                     case "t":
                         hydroxyl = 3;
                         break;
@@ -413,9 +422,9 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                         hydroxyl = 2;
                         break;
                     default:
-                        throw new PalinomVisitorException("Unsupported old hydroxyl prefix: "+lcbContext.old_hydroxyl().getText());
+                        throw new PalinomVisitorException("Unsupported old hydroxyl prefix: " + lcbContext.old_hydroxyl().getText());
                 }
-            } else if(lcbContext.hydroxyl()!=null) {
+            } else if (lcbContext.hydroxyl() != null) {
                 hydroxyl = asInt(lcbContext.hydroxyl(), 0);
             }
             return Optional.of(new LipidSpeciesInfo(
@@ -505,6 +514,19 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
     public static <T, R> R maybeMapOr(T t, Function<? super T, R> mapper, R r) {
         return maybe(t).map(mapper).orElse(r);
+    }
+
+    public static StructuralFattyAcid buildStructuralLcb(GoslinParser.LcbContext ctx, String faName, int position) {
+        StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
+        fa.nCarbon(asInt(ctx.carbon(), 0));
+        fa.nHydroxy(asInt(ctx.hydroxyl(), 0));
+        if (ctx.db() != null) {
+            fa.nDoubleBonds(asInt(ctx.db().db_count(), 0));
+            if (ctx.db().db_position() != null) {
+                throw new RuntimeException("Support for double bond positions not implemented yet!");
+            }
+        }
+        return fa.name(faName).position(position).lcb(true).build();
     }
 
     public static StructuralFattyAcid buildStructuralFa(GoslinParser.FaContext ctx, String faName, int position) {

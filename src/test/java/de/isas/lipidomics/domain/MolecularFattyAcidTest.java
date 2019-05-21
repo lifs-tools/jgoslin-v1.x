@@ -27,53 +27,53 @@ public class MolecularFattyAcidTest {
     
      @Test
     public void testGetNDoubleBonds() {
-        MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", 0, 2, 0, 0, false);
+        MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", 0, 2, 0, 0, false, false);
         assertEquals(0, instanceZero.getNDoubleBonds());
-        MolecularFattyAcid instanceOne = new MolecularFattyAcid("FA1", 0, 2, 0, 1, false);
+        MolecularFattyAcid instanceOne = new MolecularFattyAcid("FA1", 0, 2, 0, 1, false, false);
         assertEquals(1, instanceOne.getNDoubleBonds());
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void testGetNDoubleBondsException() {
-        MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", 0, 2, 0, -1, false);
+        MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", 0, 2, 0, -1, false, false);
     }
 
     @Test
     public void testGetName() {
-        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 0, 2, 0, 0, false);
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 0, 2, 0, 0, false, false);
         assertEquals("FAX", instance.getName());
     }
 
     @Test
     public void testGetPosition() {
-        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, 0, 0, false);
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, 0, 0, false, false);
         assertEquals(1, instance.getPosition());
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void testGetPositionException() {
-        MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", -2, 2, 0, 0, false);
+        MolecularFattyAcid instanceZero = new MolecularFattyAcid("FA1", -2, 2, 0, 0, false, false);
     }
 
     @Test
     public void testGetNCarbon() {
-        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, 0, 0, false);
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, 0, 0, false, false);
         assertEquals(2, instance.getNCarbon());
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void testGetNCarbonException() {
-        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 1, 0, 0, false);
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 1, 0, 0, false, false);
     }
 
     @Test
     public void testGetNHydroxy() {
-        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, 1, 0, false);
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, 1, 0, false, false);
         assertEquals(1, instance.getNHydroxy());
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void testGetNHydroxyException() {
-        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, -1, 0, false);
+        MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 2, -1, 0, false, false);
     }
 }

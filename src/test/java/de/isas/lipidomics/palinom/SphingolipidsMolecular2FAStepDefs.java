@@ -20,7 +20,7 @@ import org.junit.Assert;
  * @author nilshoffmann
  */
 @Slf4j
-public class Sphingolipids2FAStepDefs {
+public class SphingolipidsMolecular2FAStepDefs {
 
     private String lipidname;
     private LipidSpecies lipid;
@@ -54,8 +54,8 @@ public void i_should_get_a_lipid_of_category_and_species_headgroup_FA_with_carbo
         Integer fa2_db, 
         Integer fa2_hydroxy) {
         LipidMolecularSubspecies referenceLipid = new LipidMolecularSubspecies(headgroup,
-            new MolecularFattyAcid("FA" + fa1, fa1_c, fa1_hydroxy, fa1_db, false),
-            new MolecularFattyAcid("FA" + fa2, fa2_c, fa2_hydroxy, fa2_db, false));
+            new MolecularFattyAcid("FA" + fa1, fa1_c, fa1_hydroxy, fa1_db, false, false),
+            new MolecularFattyAcid("FA" + fa2, fa2_c, fa2_hydroxy, fa2_db, false, false));
         Assert.assertEquals(referenceLipid, lipid);
         Assert.assertEquals(LipidCategory.valueOf(category), lipid.getLipidCategory());
         Assert.assertEquals(species, lipid.getLipidString(LipidLevel.SPECIES));

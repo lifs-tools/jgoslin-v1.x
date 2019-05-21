@@ -18,8 +18,9 @@ public abstract class FattyAcid {
     private final int nCarbon;
     private final int nHydroxy;
     private final boolean ether;
+    private final boolean lcb;
     
-    public FattyAcid(String name, int position, int nCarbon, int nHydroxy, boolean ether) {
+    public FattyAcid(String name, int position, int nCarbon, int nHydroxy, boolean ether, boolean lcb) {
         this.name = name;
         if(nCarbon<2) {
             throw new ConstraintViolationException("FattyAcid must have at least 2 carbons!");
@@ -34,6 +35,7 @@ public abstract class FattyAcid {
         }
         this.nHydroxy = nHydroxy;
         this.ether = ether;
+        this.lcb = lcb;
     }
 
     public abstract int getNDoubleBonds();
