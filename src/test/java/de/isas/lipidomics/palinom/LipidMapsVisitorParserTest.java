@@ -23,7 +23,7 @@ public class LipidMapsVisitorParserTest {
 
     @Test
     public void testCh() throws ParsingException {
-        String ref = "Ch";
+        String ref = "Cholesterol";
         System.out.println("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());

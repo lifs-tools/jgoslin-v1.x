@@ -148,12 +148,10 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                 return visitSpeciesLcb(headGroup, dsl.dsl_species().lcb());
             } else if (dsl.dsl_subspecies() != null) {
                 //process subspecies
-                if (dsl.dsl_subspecies().fa().fa_unmod() != null) {
+                if (dsl.dsl_subspecies().lcb_fa_sorted() != null) {
                     //sorted => StructuralSubspecies
-                    return visitStructuralSubspeciesLcb(headGroup, dsl.dsl_subspecies().lcb(), Arrays.asList(dsl.dsl_subspecies().fa()));
-                } else if (dsl.dsl_subspecies().fa().fa_mod() != null) {
-                    throw new RuntimeException("Support for modified FA context not implemented!");
-                }
+                    return visitStructuralSubspeciesLcb(headGroup, dsl.dsl_subspecies().lcb_fa_sorted().lcb(), Arrays.asList(dsl.dsl_subspecies().lcb_fa_sorted().fa()));
+                } 
             } else {
                 throw new PalinomVisitorException("Unhandled context state in DSL!");
             }
@@ -493,6 +491,8 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                         throw new PalinomVisitorException("Unknown ether type: " + ctx.fa_unmod().ether().getText());
                 }
 
+            } else {
+                fa.lipidFaBondType(LipidFaBondType.ESTER);
             }
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
@@ -555,6 +555,8 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                         throw new PalinomVisitorException("Unknown ether type: " + ctx.fa_unmod().ether().getText());
                 }
 
+            } else {
+                fa.lipidFaBondType(LipidFaBondType.ESTER);
             }
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));

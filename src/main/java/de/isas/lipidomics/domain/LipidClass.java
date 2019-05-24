@@ -24,21 +24,28 @@ import java.util.Optional;
  * @author nils.hoffmann
  */
 public enum LipidClass {
-    
+
     UNDEFINED(LipidCategory.UNDEFINED, "UNDEFINED", "Undefined lipid class"),
-    /** Fatty acyls [FA]
-      * Fatty acids and conjugates [FA01] */
-    FA(LipidCategory.FA, "FA","Fatty acids and conjugates [FA01]"),
-    /** Glycerolipids [GL] 
-      * Monoradylglycerols [GL01] */
-    MG(LipidCategory.GL, "MG","Monoradylglycerols [GL01]"),
-    /** Diradylglycerols [GL02] */
+    /**
+     * Fatty acyls [FA] Fatty acids and conjugates [FA01]
+     */
+    FA(LipidCategory.FA, "FA", "Fatty acids and conjugates [FA01]"),
+    /**
+     * Glycerolipids [GL] Monoradylglycerols [GL01]
+     */
+    MG(LipidCategory.GL, "MG", "Monoradylglycerols [GL01]"),
+    /**
+     * Diradylglycerols [GL02]
+     */
     DG(LipidCategory.GL, "DG", "Diradylglycerols [GL02]"),
-    /** Triradylglycerols [GL03] */
+    /**
+     * Triradylglycerols [GL03]
+     */
     TG(LipidCategory.GL, "TG", "Triradylglycerols [GL03]"),
     /* TODO: there are some newer categories in LipidMaps, like Glycosylmono/di-radylglycerols, SQMG and SQDG */
-    /** Glycerophospholipids [GP] 
-     *  
+    /**
+     * Glycerophospholipids [GP]
+     *
      */
     BMP(LipidCategory.GP, "BMP", "Monoacylglycerophosphomonoradylglycerols [GP0410]"),
     CL(LipidCategory.GP, "CL", "Glycerophosphoglycerophosphoglycerols [GP12]"),
@@ -62,7 +69,9 @@ public enum LipidClass {
     PIP2_3p_5p(LipidCategory.GP, "PIP2[3',5']", "Glycerophosphoinositol bisphosphates [GP08]"),
     PIP3(LipidCategory.GP, "PIP3", "Glycerophosphoinositol trisphosphates [GP09]"),
     PS(LipidCategory.GP, "PS", "Glycerophosphoserines [GP03]"),
-    /**Sphingolipids */
+    /**
+     * Sphingolipids
+     */
     CER(LipidCategory.SP, "Cer", "Ceramides [SP02]"),
     C1P(LipidCategory.SP, "C1P", "Ceramide-1-phosphates [SP0205]"),
     SPH(LipidCategory.SP, "SPH", "Sphingoid bases [SP01]"),
@@ -74,13 +83,16 @@ public enum LipidClass {
     HEX2CER(LipidCategory.SP, "Hex2Cer", "Neutral glycosphingolipids [SP05]"),
     HEX3CER(LipidCategory.SP, "Hex3Cer", "Neutral glycosphingolipids [SP05]"),
     LACCER(LipidCategory.SP, "LacCer", "Neutral glycosphingolipids [SP05]"),
-    /** Sterol lipids */
+    /**
+     * Sterol lipids
+     */
     ST(LipidCategory.ST, "ST", "Sterols [ST01]"),
     SE(LipidCategory.ST, "SE", "Steryl esters [ST0102]"),
     FC(LipidCategory.ST, "FC", "Cholesterol [LMST01010001]"),
     CH(LipidCategory.ST, "Ch", "Cholesterol [LMST01010001]"),
     CHE(LipidCategory.ST, "ChE", "Cholesteryl esters [ST0102]"),
-    CE(LipidCategory.ST, "CE", "Cholesteryl esters [ST0102]")
+    CE(LipidCategory.ST, "CE", "Cholesteryl esters [ST0102]"),
+    CHOLESTEROL(LipidCategory.ST, "Cholesterol", "Cholesterol [LMST01010001]");
     ;
     
     private final LipidCategory category;
@@ -96,22 +108,22 @@ public enum LipidClass {
     public LipidCategory getCategory() {
         return this.category;
     }
-    
+
     public String getAbbreviation() {
         return this.abbreviation;
     }
-    
+
     public String getLipidMapsClassName() {
         return this.lipidMapsClassName;
     }
-    
+
     public String getLysoAbbreviation(LipidClass lipidClass) {
-        if(lipidClass.getCategory()==LipidCategory.GP) {
-            return "L"+lipidClass.getAbbreviation();
+        if (lipidClass.getCategory() == LipidCategory.GP) {
+            return "L" + lipidClass.getAbbreviation();
         }
-        throw new ConstraintViolationException("Lipid category must be "+LipidCategory.GP+" for lyso-classes!");
+        throw new ConstraintViolationException("Lipid category must be " + LipidCategory.GP + " for lyso-classes!");
     }
-    
+
     public static Optional<LipidClass> forHeadGroup(String headGroup) {
         return Arrays.asList(values()).stream().filter((lipidClass) -> {
             return lipidClass.getAbbreviation().equals(headGroup);
