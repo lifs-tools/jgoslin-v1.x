@@ -169,9 +169,9 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 throw new PalinomVisitorException("Unhandled context state in LSL!");
             }
         }
-        
+
         private static boolean hasElements(List<?> l) {
-            return (l==null?false:!l.isEmpty());
+            return (l == null ? false : !l.isEmpty());
         }
 
         private Optional<LipidSpecies> handleTgl(GoslinParser.TglContext tgl) {
@@ -181,16 +181,14 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 return visitSpeciesFas(headGroup, tgl.gl_species().fa());
             } else if (tgl.tgl_subspecies() != null) {
                 //process subspecies
-                log.info("TGL sorted_fa_separator: {}", tgl.tgl_subspecies().sorted_fa_separator());
-                log.info("TGL unsorted_fa_separator: {}", tgl.tgl_subspecies().unsorted_fa_separator());
-                if (hasElements(tgl.tgl_subspecies().sorted_fa_separator())) {
+                if (tgl.tgl_subspecies().fa3().fa3_sorted() != null) {
                     //sorted => StructuralSubspecies
                     log.info("Building structural subspecies");
-                    return visitStructuralSubspeciesFas(headGroup, tgl.tgl_subspecies().fa());
-                } else if (hasElements(tgl.tgl_subspecies().unsorted_fa_separator())) {
+                    return visitStructuralSubspeciesFas(headGroup, tgl.tgl_subspecies().fa3().fa3_sorted().fa());
+                } else if (tgl.tgl_subspecies().fa3().fa3_unsorted() != null) {
                     //unsorted => MolecularSubspecies
                     log.info("Building molecular subspecies");
-                    return visitMolecularSubspeciesFas(headGroup, tgl.tgl_subspecies().fa());
+                    return visitMolecularSubspeciesFas(headGroup, tgl.tgl_subspecies().fa3().fa3_unsorted().fa());
                 }
             } else {
                 throw new PalinomVisitorException("Unhandled context state in TGL!");
@@ -205,12 +203,12 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 return visitSpeciesFas(headGroup, sgl.gl_species().fa());
             } else if (sgl.dgl_subspecies() != null) {
                 //process subspecies
-                if (sgl.dgl_subspecies().sorted_fa_separator() != null) {
+                if (sgl.dgl_subspecies().fa2().fa2_sorted() != null) {
                     //sorted => StructuralSubspecies
-                    return visitStructuralSubspeciesFas(headGroup, sgl.dgl_subspecies().fa());
-                } else if (sgl.dgl_subspecies().unsorted_fa_separator() != null) {
+                    return visitStructuralSubspeciesFas(headGroup, sgl.dgl_subspecies().fa2().fa2_sorted().fa());
+                } else if (sgl.dgl_subspecies().fa2().fa2_unsorted() != null) {
                     //unsorted => MolecularSubspecies
-                    return visitMolecularSubspeciesFas(headGroup, sgl.dgl_subspecies().fa());
+                    return visitMolecularSubspeciesFas(headGroup, sgl.dgl_subspecies().fa2().fa2_unsorted().fa());
                 }
             } else {
                 throw new PalinomVisitorException("Unhandled context state in SGL!");
@@ -243,12 +241,12 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 return visitSpeciesFas(headGroup, dgl.gl_species().fa());
             } else if (dgl.dgl_subspecies() != null) {
                 //process subspecies
-                if (dgl.dgl_subspecies().sorted_fa_separator() != null) {
+                if (dgl.dgl_subspecies().fa2().fa2_sorted() != null) {
                     //sorted => StructuralSubspecies
-                    return visitStructuralSubspeciesFas(headGroup, dgl.dgl_subspecies().fa());
-                } else if (dgl.dgl_subspecies().unsorted_fa_separator() != null) {
+                    return visitStructuralSubspeciesFas(headGroup, dgl.dgl_subspecies().fa2().fa2_sorted().fa());
+                } else if (dgl.dgl_subspecies().fa2().fa2_unsorted() != null) {
                     //unsorted => MolecularSubspecies
-                    return visitMolecularSubspeciesFas(headGroup, dgl.dgl_subspecies().fa());
+                    return visitMolecularSubspeciesFas(headGroup, dgl.dgl_subspecies().fa2().fa2_unsorted().fa());
                 }
             } else {
                 throw new PalinomVisitorException("Unhandled context state in DGL!");
@@ -280,10 +278,10 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 if (ploc.dpl_o().pl_species() != null) {
                     return visitSpeciesFas(headGroup, ploc.dpl_o().pl_species().fa());
                 } else if (ploc.dpl_o().pl_subspecies() != null) {
-                    if (ploc.dpl_o().pl_subspecies().sorted_fa_separator() != null) {
-                        return visitStructuralSubspeciesFas(headGroup, ploc.dpl_o().pl_subspecies().fa());
-                    } else if (ploc.dpl_o().pl_subspecies().unsorted_fa_separator() != null) {
-                        return visitMolecularSubspeciesFas(headGroup, ploc.dpl_o().pl_subspecies().fa());
+                    if (ploc.dpl_o().pl_subspecies().fa2().fa2_sorted() != null) {
+                        return visitStructuralSubspeciesFas(headGroup, ploc.dpl_o().pl_subspecies().fa2().fa2_sorted().fa());
+                    } else if (ploc.dpl_o().pl_subspecies().fa2().fa2_unsorted() != null) {
+                        return visitMolecularSubspeciesFas(headGroup, ploc.dpl_o().pl_subspecies().fa2().fa2_unsorted().fa());
                     }
                 }
             } else if (ploc.lpl_o() != null) {
@@ -302,12 +300,12 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 return visitSpeciesFas(headGroup, cl.pl_species().fa());
             } else if (cl.cl_subspecies() != null) {
                 //process subspecies
-                if (hasElements(cl.cl_subspecies().sorted_fa_separator())) {
+                if (cl.cl_subspecies().fa4().fa4_sorted() != null) {
                     //sorted => StructuralSubspecies
-                    return visitStructuralSubspeciesFas(headGroup, cl.cl_subspecies().fa());
-                } else if (hasElements(cl.cl_subspecies().unsorted_fa_separator())) {
+                    return visitStructuralSubspeciesFas(headGroup, cl.cl_subspecies().fa4().fa4_sorted().fa());
+                } else if (cl.cl_subspecies().fa4().fa4_unsorted() != null) {
                     //unsorted => MolecularSubspecies
-                    return visitMolecularSubspeciesFas(headGroup, cl.cl_subspecies().fa());
+                    return visitMolecularSubspeciesFas(headGroup, cl.cl_subspecies().fa4().fa4_unsorted().fa());
                 }
             } else {
                 throw new PalinomVisitorException("Unhandled context state in CL!");
@@ -322,12 +320,12 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 return visitSpeciesFas(headGroup, mlcl.pl_species().fa());
             } else if (mlcl.mlcl_subspecies() != null) {
                 //process subspecies
-                if (hasElements(mlcl.mlcl_subspecies().sorted_fa_separator())) {
+                if (mlcl.mlcl_subspecies().fa3().fa3_sorted() != null) {
                     //sorted => StructuralSubspecies
-                    return visitStructuralSubspeciesFas(headGroup, mlcl.mlcl_subspecies().fa());
-                } else if (hasElements(mlcl.mlcl_subspecies().unsorted_fa_separator())) {
+                    return visitStructuralSubspeciesFas(headGroup, mlcl.mlcl_subspecies().fa3().fa3_sorted().fa());
+                } else if (mlcl.mlcl_subspecies().fa3().fa3_unsorted() != null) {
                     //unsorted => MolecularSubspecies
-                    return visitMolecularSubspeciesFas(headGroup, mlcl.mlcl_subspecies().fa());
+                    return visitMolecularSubspeciesFas(headGroup, mlcl.mlcl_subspecies().fa3().fa3_unsorted().fa());
                 }
             } else {
                 throw new PalinomVisitorException("Unhandled context state in CL!");
@@ -342,12 +340,12 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 return visitSpeciesFas(headGroup, dpl.pl_species().fa());
             } else if (dpl.pl_subspecies() != null) {
                 //process subspecies
-                if (dpl.pl_subspecies().sorted_fa_separator() != null) {
+                if (dpl.pl_subspecies().fa2().fa2_sorted() != null) {
                     //sorted => StructuralSubspecies
-                    return visitStructuralSubspeciesFas(headGroup, dpl.pl_subspecies().fa());
-                } else if (dpl.pl_subspecies().unsorted_fa_separator() != null) {
+                    return visitStructuralSubspeciesFas(headGroup, dpl.pl_subspecies().fa2().fa2_sorted().fa());
+                } else if (dpl.pl_subspecies().fa2().fa2_unsorted() != null) {
                     //unsorted => MolecularSubspecies
-                    return visitMolecularSubspeciesFas(headGroup, dpl.pl_subspecies().fa());
+                    return visitMolecularSubspeciesFas(headGroup, dpl.pl_subspecies().fa2().fa2_unsorted().fa());
                 }
             } else {
                 throw new PalinomVisitorException("Unhandled context state in PL!");
@@ -386,10 +384,10 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
         private Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, GoslinParser.LcbContext lcbContext, List<GoslinParser.FaContext> faContexts) {
             List<StructuralFattyAcid> fas = new LinkedList<>();
-            StructuralFattyAcid lcbA = buildStructuralLcb(lcbContext, headGroup, 1);
+            StructuralFattyAcid lcbA = buildStructuralLcb(lcbContext, "LCB", 1);
             fas.add(lcbA);
             for (int i = 0; i < faContexts.size(); i++) {
-                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 2), i + 2);
+                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 2);
                 fas.add(fa);
             }
             StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
@@ -409,7 +407,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         }
 
         private Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, GoslinParser.LcbContext lcbContext) {
-            StructuralFattyAcid fa = buildStructuralLcb(lcbContext, "FA" + 1, 1);
+            StructuralFattyAcid fa = buildStructuralLcb(lcbContext, "LCB", 1);
             return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
         }
 
