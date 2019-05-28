@@ -151,7 +151,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                 if (dsl.dsl_subspecies().lcb_fa_sorted() != null) {
                     //sorted => StructuralSubspecies
                     return visitStructuralSubspeciesLcb(headGroup, dsl.dsl_subspecies().lcb_fa_sorted().lcb(), Arrays.asList(dsl.dsl_subspecies().lcb_fa_sorted().fa()));
-                } 
+                }
             } else {
                 throw new PalinomVisitorException("Unhandled context state in DSL!");
             }
@@ -214,33 +214,6 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             }
         }
 
-//        private Optional<LipidSpecies> handleMgl(LipidMapsParser.MglContext mgl) {
-//            String headGroup = mgl.hg_mgl().getText();
-//            if (mgl.fa() != null) {
-//                return visitStructuralSubspeciesFas(headGroup, Arrays.asList(mgl.fa()));
-//            } else {
-//                throw new PalinomVisitorException("Unhandled context state in MGL!");
-//            }
-//        }
-//        private Optional<LipidSpecies> handleDgl(LipidMapsParser.DglContext dgl) {
-//            String headGroup = dgl.hg_dgl().getText();
-//            if (dgl.gl_species() != null) { //species level
-//                //process species level
-//                return visitSpeciesFas(headGroup, dgl.gl_species().fa());
-//            } else if (dgl.dgl_subspecies() != null) {
-//                //process subspecies
-//                if (dgl.dgl_subspecies().sorted_fa_separator() != null) {
-//                    //sorted => StructuralSubspecies
-//                    return visitStructuralSubspeciesFas(headGroup, dgl.dgl_subspecies().fa());
-//                } else if (dgl.dgl_subspecies().unsorted_fa_separator() != null) {
-//                    //unsorted => MolecularSubspecies
-//                    return visitMolecularSubspeciesFas(headGroup, dgl.dgl_subspecies().fa());
-//                }
-//            } else {
-//                throw new PalinomVisitorException("Unhandled context state in DGL!");
-//            }
-//            return Optional.empty();
-//        }
         private Optional<LipidSpecies> handleGlyceroPhospholipid(Lipid_pureContext ctx) throws RuntimeException {
             //glycerophospholipids
             //cardiolipin
@@ -257,25 +230,6 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             }
         }
 
-//        private Optional<LipidSpecies> handlePlo(LipidMapsParser.Pl_oContext ploc) {
-//            if (ploc.dpl_o() != null) {
-//                String headGroup = ploc.dpl_o().hg_pl_oc().getText();
-//                if (ploc.dpl_o().pl_species() != null) {
-//                    return visitSpeciesFas(headGroup, ploc.dpl_o().pl_species().fa());
-//                } else if (ploc.dpl_o().pl_subspecies() != null) {
-//                    if (ploc.dpl_o().pl_subspecies().sorted_fa_separator() != null) {
-//                        return visitStructuralSubspeciesFas(headGroup, ploc.dpl_o().pl_subspecies().fa());
-//                    } else if (ploc.dpl_o().pl_subspecies().unsorted_fa_separator() != null) {
-//                        return visitMolecularSubspeciesFas(headGroup, ploc.dpl_o().pl_subspecies().fa());
-//                    }
-//                }
-//            } else if (ploc.lpl_o() != null) {
-//
-//            } else {
-//                throw new PalinomVisitorException("Unhandled context state in PL O!");
-//            }
-//            return Optional.empty();
-//        }
         private Optional<LipidSpecies> handleCl(LipidMapsParser.ClContext cl) {
             String headGroup = cl.hg_clc().getText();
             if (cl.cl_species() != null) { //species level
@@ -294,25 +248,6 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             }
         }
 
-//        private Optional<LipidSpecies> handleMlcl(LipidMapsParser.MlclContext mlcl) {
-//            String headGroup = mlcl.hg_mlclc().getText();
-//            if (mlcl.pl_species() != null) { //species level
-//                //process species level
-//                return visitSpeciesFas(headGroup, mlcl.pl_species().fa());
-//            } else if (mlcl.mlcl_subspecies() != null) {
-//                //process subspecies
-//                if (mlcl.mlcl_subspecies().sorted_fa_separator() != null) {
-//                    //sorted => StructuralSubspecies
-//                    return visitStructuralSubspeciesFas(headGroup, mlcl.mlcl_subspecies().fa());
-//                } else if (mlcl.mlcl_subspecies().unsorted_fa_separator() != null) {
-//                    //unsorted => MolecularSubspecies
-//                    return visitMolecularSubspeciesFas(headGroup, mlcl.mlcl_subspecies().fa());
-//                }
-//            } else {
-//                throw new PalinomVisitorException("Unhandled context state in CL!");
-//            }
-//            return Optional.empty();
-//        }
         private Optional<LipidSpecies> handleDpl(LipidMapsParser.DplContext dpl) {
             String headGroup = dpl.hg_pl().getText();
             if (dpl.dpl_species() != null) { //species level
@@ -431,29 +366,22 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
         }
 
-        private static LipidFaBondType getLipidFaBondTypeUnmod(LipidMapsParser.FaContext faContext) throws PalinomVisitorException {
-            LipidFaBondType lfbt = LipidFaBondType.ESTER;
-            if (faContext.fa_unmod().ether() != null) {
-                if ("a".equals(faContext.fa_unmod().ether().getText())) {
-                    lfbt = LipidFaBondType.ETHER_PLASMANYL;
-                } else if ("p".equals(faContext.fa_unmod().ether().getText())) {
-                    lfbt = LipidFaBondType.ETHER_PLASMENYL;
-                } else {
-                    throw new PalinomVisitorException("Unknown ether context value: " + faContext.fa_unmod().ether());
-                }
-            }
-            return lfbt;
-        }
-
         private Optional<LipidSpeciesInfo> getSpeciesInfo(LipidMapsParser.FaContext faContext) {
             if (faContext.fa_unmod() != null) {
-                LipidFaBondType lfbt = getLipidFaBondTypeUnmod(faContext);
+                LipidFaBondType faBondType = getLipidFaBondTypeUnmod(faContext);
+                int plasmenylEtherDbBondCorrection = 0;
+                switch (faBondType) {
+                    case ETHER_PLASMENYL:
+                        plasmenylEtherDbBondCorrection = 1;
+                    default:
+                        plasmenylEtherDbBondCorrection = 0;
+                }
                 return Optional.of(new LipidSpeciesInfo(
                         LipidLevel.SPECIES,
                         asInt(faContext.fa_unmod().fa_pure().carbon(), 0),
                         asInt(faContext.fa_unmod().fa_pure().hydroxyl(), 0),
-                        asInt(faContext.fa_unmod().fa_pure().db(), 0),
-                        lfbt));
+                        plasmenylEtherDbBondCorrection + asInt(faContext.fa_unmod().fa_pure().db(), 0),
+                        faBondType));
             } else if (faContext.fa_mod() != null) {
                 throw new RuntimeException("Modified FA handling not implemented yet for " + faContext.getText());
             }
@@ -474,30 +402,43 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         }
     }
 
+    public static LipidFaBondType getLipidFaBondTypeUnmod(LipidMapsParser.FaContext faContext) throws PalinomVisitorException {
+        LipidFaBondType lfbt = LipidFaBondType.ESTER;
+        if (faContext.fa_unmod().ether() != null) {
+            if (null == faContext.fa_unmod().ether().getText()) {
+                throw new PalinomVisitorException("Undefined ether context value!");
+            } else {
+                switch (faContext.fa_unmod().ether().getText()) {
+                    case "O-":
+                        lfbt = LipidFaBondType.ETHER_PLASMANYL;
+                        break;
+                    case "P-":
+                        lfbt = LipidFaBondType.ETHER_PLASMENYL;
+                        break;
+                    default:
+                        throw new PalinomVisitorException("Unknown ether context value: " + faContext.fa_unmod().ether());
+                }
+            }
+        }
+        return lfbt;
+    }
+
     public static MolecularFattyAcid buildMolecularFa(LipidMapsParser.FaContext ctx, String faName) {
         MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFaBuilder();
         if (ctx.fa_unmod() != null) {
-            int doubleBondCorrectionForPlasmenyl = 0;
-            if (ctx.fa_unmod().ether() != null) {
-                switch (ctx.fa_unmod().ether().getText()) {
-                    case "P-":
-                        fa.lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL);
-                        doubleBondCorrectionForPlasmenyl = 1;
-                        break;
-                    case "O-":
-                        fa.lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);
-                        break;
-                    default:
-                        throw new PalinomVisitorException("Unknown ether type: " + ctx.fa_unmod().ether().getText());
-                }
-
-            } else {
-                fa.lipidFaBondType(LipidFaBondType.ESTER);
+            LipidFaBondType faBondType = getLipidFaBondTypeUnmod(ctx);
+            int plasmenylEtherDbBondCorrection = 0;
+            switch (faBondType) {
+                case ETHER_PLASMENYL:
+                    plasmenylEtherDbBondCorrection = 1;
+                default:
+                    plasmenylEtherDbBondCorrection = 0;
             }
+            fa.lipidFaBondType(faBondType);
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
-                fa.nDoubleBonds(doubleBondCorrectionForPlasmenyl + asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0));
+                fa.nDoubleBonds(plasmenylEtherDbBondCorrection + asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0));
                 if (ctx.fa_unmod().fa_pure().db().db_position() != null) {
                     throw new RuntimeException("Support for double bond positions not implemented yet!");
                 }
@@ -541,27 +482,19 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
     public static StructuralFattyAcid buildStructuralFa(LipidMapsParser.FaContext ctx, String faName, int position) {
         StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
         if (ctx.fa_unmod() != null) {
-            int doubleBondCorrectionForPlasmenyl = 0;
-            if (ctx.fa_unmod().ether() != null) {
-                switch (ctx.fa_unmod().ether().getText()) {
-                    case "P-":
-                        fa.lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL);
-                        doubleBondCorrectionForPlasmenyl = 1;
-                        break;
-                    case "O-":
-                        fa.lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL);
-                        break;
-                    default:
-                        throw new PalinomVisitorException("Unknown ether type: " + ctx.fa_unmod().ether().getText());
-                }
-
-            } else {
-                fa.lipidFaBondType(LipidFaBondType.ESTER);
+            LipidFaBondType faBondType = getLipidFaBondTypeUnmod(ctx);
+            int plasmenylEtherDbBondCorrection = 0;
+            switch (faBondType) {
+                case ETHER_PLASMENYL:
+                    plasmenylEtherDbBondCorrection = 1;
+                default:
+                    plasmenylEtherDbBondCorrection = 0;
             }
+            fa.lipidFaBondType(faBondType);
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
-                fa.nDoubleBonds(doubleBondCorrectionForPlasmenyl + asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0));
+                fa.nDoubleBonds(plasmenylEtherDbBondCorrection + asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0));
                 if (ctx.fa_unmod().fa_pure().db().db_position() != null) {
                     throw new RuntimeException("Support for double bond positions not implemented yet!");
                 }

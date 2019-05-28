@@ -35,15 +35,15 @@ public class LipidSpecies {
     }
 
     public LipidSpecies(String headGroup, LipidCategory lipidCategory, Optional<LipidClass> lipidClass, Optional<LipidSpeciesInfo> lipidSpeciesInfo) {
-        this.headGroup = headGroup;
+        this.headGroup = headGroup.trim();
         this.lipidCategory = lipidCategory;
         this.lipidClass = lipidClass;
         this.info = lipidSpeciesInfo;
     }
 
     public LipidSpecies(String headGroup, Optional<LipidSpeciesInfo> lipidSpeciesInfo) {
-        this.headGroup = headGroup;
-        this.lipidClass = LipidClass.forHeadGroup(headGroup);
+        this.headGroup = headGroup.trim();
+        this.lipidClass = LipidClass.forHeadGroup(this.headGroup);
         this.lipidCategory = this.lipidClass.map((lipidClass) -> {
             return lipidClass.getCategory();
         }).orElse(LipidCategory.UNDEFINED);

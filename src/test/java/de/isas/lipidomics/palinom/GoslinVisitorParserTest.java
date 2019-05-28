@@ -7,6 +7,7 @@ import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
+import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
@@ -217,6 +218,8 @@ public class GoslinVisitorParserTest {
         assertEquals(0, lipid.getFa().get("FA3").getNHydroxy());
         
         assertEquals(ref, lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
+        assertEquals(LipidCategory.GL, lipid.getLipidCategory());
+        assertEquals(LipidClass.TG, lipid.getLipidClass().get());
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

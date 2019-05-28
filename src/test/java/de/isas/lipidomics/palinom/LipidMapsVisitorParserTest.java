@@ -5,8 +5,10 @@ package de.isas.lipidomics.palinom;
 
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.Adduct;
+import de.isas.lipidomics.domain.Bond;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
+import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
@@ -161,7 +163,7 @@ public class LipidMapsVisitorParserTest {
     }
 
     @Test
-    public void testPL_slash() throws ParsingException{
+    public void testPE_plasmanyl() throws ParsingException{
         String ref = "PE(O-18:3;1/16:2)";
         System.out.println("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
@@ -170,13 +172,15 @@ public class LipidMapsVisitorParserTest {
         assertNotNull(lipid);
         System.out.println(lipid);
         assertEquals("PE", lipid.getHeadGroup());
+        assertEquals(LipidFaBondType.ETHER_PLASMANYL, lipid.getFa().get("FA1").getLipidFaBondType());
         assertEquals("FA1", lipid.getFa().
             get("FA1").
             getName());
         assertEquals(18, lipid.getFa().
             get("FA1").
             getNCarbon());
-        assertEquals(4, lipid.getFa().
+        // these are actually 3 + 1 (double bond after ether)
+        assertEquals(3, lipid.getFa().
             get("FA1").
             getNDoubleBonds());
         assertEquals(1, lipid.getFa().
@@ -195,10 +199,48 @@ public class LipidMapsVisitorParserTest {
             get("FA2").
             getNHydroxy());
     }
+    
+    @Test
+    public void testPE_plasmenyl() throws ParsingException{
+        String ref = "PE(P-18:0/16:2;1)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertNotNull(lipidAdduct);
+        LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
+        assertNotNull(lipid);
+        System.out.println(lipid);
+        assertEquals("PE", lipid.getHeadGroup());
+        assertEquals(LipidFaBondType.ETHER_PLASMENYL, lipid.getFa().get("FA1").getLipidFaBondType());
+        assertEquals("FA1", lipid.getFa().
+            get("FA1").
+            getName());
+        assertEquals(18, lipid.getFa().
+            get("FA1").
+            getNCarbon());
+        // these are actually 0 + 1 (double bond after ether)
+        assertEquals(0, lipid.getFa().
+            get("FA1").
+            getNDoubleBonds());
+        assertEquals(0, lipid.getFa().
+            get("FA1").
+            getNHydroxy());
+        assertEquals("FA2", lipid.getFa().
+            get("FA2").
+            getName());
+        assertEquals(16, lipid.getFa().
+            get("FA2").
+            getNCarbon());
+        assertEquals(2, lipid.getFa().
+            get("FA2").
+            getNDoubleBonds());
+        assertEquals(1, lipid.getFa().
+            get("FA2").
+            getNHydroxy());
+    }
 
     @Test
     public void testTag() throws ParsingException {
-        String ref = "TAG(14:0-16:0-18:1)";
+        String ref = "TG(14:0-16:0-18:1)";
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertNotNull(lipidAdduct);
         LipidMolecularSubspecies lipid = (LipidMolecularSubspecies) lipidAdduct.getLipid();
@@ -216,7 +258,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(1, lipid.getFa().get("FA3").getNDoubleBonds());
         assertEquals(0, lipid.getFa().get("FA3").getNHydroxy());
         
-        assertEquals(ref, lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
+        assertEquals("TG 14:0_16:0_18:1", lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

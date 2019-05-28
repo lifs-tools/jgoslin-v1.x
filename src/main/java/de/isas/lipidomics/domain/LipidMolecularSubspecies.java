@@ -24,11 +24,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * @author nils.hoffmann
  */
+@Slf4j
 @Data
 public class LipidMolecularSubspecies extends LipidSpecies {
 
@@ -55,6 +57,8 @@ public class LipidMolecularSubspecies extends LipidSpecies {
                 nDoubleBonds += fas.getNDoubleBonds();
                 if (lipidFaBondType == LipidFaBondType.ESTER && (fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL)) {
                     lipidFaBondType = fas.getLipidFaBondType();
+//                    nDoubleBonds += lipidFaBondType.doubleBondCorrection();
+//                    log.debug("Correcting double bond count to {} due to ether bond.", nDoubleBonds);
                 } else if (lipidFaBondType != LipidFaBondType.ESTER && (fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL)) {
                     throw new ConstraintViolationException("Only one FA can define an ether bond to the head group! Tried to add " + fas.getLipidFaBondType() + " over existing " + lipidFaBondType);
                 }

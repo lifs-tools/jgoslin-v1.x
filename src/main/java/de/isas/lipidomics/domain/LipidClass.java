@@ -17,6 +17,7 @@ package de.isas.lipidomics.domain;
 
 import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -29,80 +30,80 @@ public enum LipidClass {
     /**
      * Fatty acyls [FA] Fatty acids and conjugates [FA01]
      */
-    FA(LipidCategory.FA, "FA", "Fatty acids and conjugates [FA01]"),
+    FA(LipidCategory.FA, "Fatty acids and conjugates [FA01]", "FA"),
     /**
      * Glycerolipids [GL] Monoradylglycerols [GL01]
      */
-    MG(LipidCategory.GL, "MG", "Monoradylglycerols [GL01]"),
+    MG(LipidCategory.GL, "Monoradylglycerols [GL01]", "MG", "MAG"),
     /**
      * Diradylglycerols [GL02]
      */
-    DG(LipidCategory.GL, "DG", "Diradylglycerols [GL02]"),
+    DG(LipidCategory.GL, "Diradylglycerols [GL02]", "DG", "DAG"),
     /**
      * Triradylglycerols [GL03]
      */
-    TG(LipidCategory.GL, "TG", "Triradylglycerols [GL03]"),
+    TG(LipidCategory.GL, "Triradylglycerols [GL03]", "TG", "TAG"),
     /* TODO: there are some newer categories in LipidMaps, like Glycosylmono/di-radylglycerols, SQMG and SQDG */
     /**
      * Glycerophospholipids [GP]
      *
      */
-    BMP(LipidCategory.GP, "BMP", "Monoacylglycerophosphomonoradylglycerols [GP0410]"),
-    CL(LipidCategory.GP, "CL", "Glycerophosphoglycerophosphoglycerols [GP12]"),
-    PA(LipidCategory.GP, "PA", "Glycerophosphates [GP10]"),
-    LPA(LipidCategory.GP, "LPA", "Glycerophosphates [GP10]"),
-    PC(LipidCategory.GP, "PC", "Glycerophosphocholines [GP01]"),
-    LPC(LipidCategory.GP, "LPC", "Glycerophosphocholines [GP01]"),
-    PE(LipidCategory.GP, "PE", "Glycerophosphoethanolamines [GP02]"),
-    LPE(LipidCategory.GP, "LPE", "Glycerophosphoethanolamines [GP02]"),
-    PG(LipidCategory.GP, "PG", "Glycerophosphoglycerols [GP04]"),
-    LPG(LipidCategory.GP, "LPG", "Glycerophosphoglycerols [GP04]"),
-    PGP(LipidCategory.GP, "PGP", "Glycerophosphoglycerophosphates [GP05]"),
-    PI(LipidCategory.GP, "PI", "Glycerophosphoinositols [GP06]"),
-    LPI(LipidCategory.GP, "LPI", "Glycerophosphoinositols [GP06]"),
-    PIP(LipidCategory.GP, "PIP", "Glycerophosphoinositol monophosphates [GP07]"),
-    PIP_3p(LipidCategory.GP, "PIP[3']", "Glycerophosphoinositol monophosphates [GP07]"),
-    PIP_4p(LipidCategory.GP, "PIP[4']", "Glycerophosphoinositol monophosphates [GP07]"),
-    PIP_5p(LipidCategory.GP, "PIP[5']", "Glycerophosphoinositol monophosphates [GP07]"),
-    PIP2(LipidCategory.GP, "PIP2", "Glycerophosphoinositol bisphosphates [GP08]"),
-    PIP2_3p_4p(LipidCategory.GP, "PIP2[3',4']", "Glycerophosphoinositol bisphosphates [GP08]"),
-    PIP2_3p_5p(LipidCategory.GP, "PIP2[3',5']", "Glycerophosphoinositol bisphosphates [GP08]"),
-    PIP3(LipidCategory.GP, "PIP3", "Glycerophosphoinositol trisphosphates [GP09]"),
-    PS(LipidCategory.GP, "PS", "Glycerophosphoserines [GP03]"),
+    BMP(LipidCategory.GP, "Monoacylglycerophosphomonoradylglycerols [GP0410]", "BMP"),
+    CL(LipidCategory.GP, "Glycerophosphoglycerophosphoglycerols [GP12]", "CL"),
+    PA(LipidCategory.GP, "Glycerophosphates [GP10]", "PA"),
+    LPA(LipidCategory.GP, "Glycerophosphates [GP10]", "LPA"),
+    PC(LipidCategory.GP, "Glycerophosphocholines [GP01]", "PC"),
+    LPC(LipidCategory.GP, "Glycerophosphocholines [GP01]", "LPC"),
+    PE(LipidCategory.GP, "Glycerophosphoethanolamines [GP02]", "PE"),
+    LPE(LipidCategory.GP, "Glycerophosphoethanolamines [GP02]", "LPE"),
+    PG(LipidCategory.GP, "Glycerophosphoglycerols [GP04]", "PG"),
+    LPG(LipidCategory.GP, "Glycerophosphoglycerols [GP04]", "LPG"),
+    PGP(LipidCategory.GP, "Glycerophosphoglycerophosphates [GP05]", "PGP"),
+    PI(LipidCategory.GP, "Glycerophosphoinositols [GP06]", "PI"),
+    LPI(LipidCategory.GP, "Glycerophosphoinositols [GP06]", "LPI"),
+    PIP(LipidCategory.GP, "Glycerophosphoinositol monophosphates [GP07]", "PIP"),
+    PIP_3p(LipidCategory.GP, "Glycerophosphoinositol monophosphates [GP07]", "PIP[3']"),
+    PIP_4p(LipidCategory.GP, "Glycerophosphoinositol monophosphates [GP07]", "PIP[4']"),
+    PIP_5p(LipidCategory.GP, "Glycerophosphoinositol monophosphates [GP07]", "PIP[5']"),
+    PIP2(LipidCategory.GP, "Glycerophosphoinositol bisphosphates [GP08]", "PIP2"),
+    PIP2_3p_4p(LipidCategory.GP, "Glycerophosphoinositol bisphosphates [GP08]", "PIP2[3',4']"),
+    PIP2_3p_5p(LipidCategory.GP, "Glycerophosphoinositol bisphosphates [GP08]", "PIP2[3',5']"),
+    PIP3(LipidCategory.GP, "Glycerophosphoinositol trisphosphates [GP09]", "PIP3"),
+    PS(LipidCategory.GP, "Glycerophosphoserines [GP03]", "PS"),
     /**
      * Sphingolipids
      */
-    CER(LipidCategory.SP, "Cer", "Ceramides [SP02]"),
-    C1P(LipidCategory.SP, "C1P", "Ceramide-1-phosphates [SP0205]"),
-    SPH(LipidCategory.SP, "SPH", "Sphingoid bases [SP01]"),
-    S1P(LipidCategory.SP, "S1P", "Sphingoid bases [SP01]"),
-    SM(LipidCategory.SP, "SM", "Phosphosphingolipids [SP03]"),
-    HEXCER(LipidCategory.SP, "HexCer", "Neutral glycosphingolipids [SP05]"),
-    GLCCER(LipidCategory.SP, "GlcCer", "Neutral glycosphingolipids [SP05]"),
-    GALCER(LipidCategory.SP, "GalCer", "Neutral glycosphingolipids [SP05]"),
-    HEX2CER(LipidCategory.SP, "Hex2Cer", "Neutral glycosphingolipids [SP05]"),
-    HEX3CER(LipidCategory.SP, "Hex3Cer", "Neutral glycosphingolipids [SP05]"),
-    LACCER(LipidCategory.SP, "LacCer", "Neutral glycosphingolipids [SP05]"),
+    CER(LipidCategory.SP, "Ceramides [SP02]", "Cer"),
+    C1P(LipidCategory.SP, "Ceramide-1-phosphates [SP0205]", "C1P"),
+    SPH(LipidCategory.SP, "Sphingoid bases [SP01]", "SPH"),
+    S1P(LipidCategory.SP, "Sphingoid bases [SP01]", "S1P"),
+    SM(LipidCategory.SP, "Phosphosphingolipids [SP03]", "SM"),
+    HEXCER(LipidCategory.SP, "Neutral glycosphingolipids [SP05]", "HexCer"),
+    GLCCER(LipidCategory.SP, "Neutral glycosphingolipids [SP05]", "GlcCer"),
+    GALCER(LipidCategory.SP, "Neutral glycosphingolipids [SP05]", "GalCer"),
+    HEX2CER(LipidCategory.SP, "Neutral glycosphingolipids [SP05]", "Hex2Cer"),
+    HEX3CER(LipidCategory.SP, "Neutral glycosphingolipids [SP05]", "Hex3Cer"),
+    LACCER(LipidCategory.SP, "Neutral glycosphingolipids [SP05]", "LacCer"),
     /**
      * Sterol lipids
      */
-    ST(LipidCategory.ST, "ST", "Sterols [ST01]"),
-    SE(LipidCategory.ST, "SE", "Steryl esters [ST0102]"),
-    FC(LipidCategory.ST, "FC", "Cholesterol [LMST01010001]"),
-    CH(LipidCategory.ST, "Ch", "Cholesterol [LMST01010001]"),
-    CHE(LipidCategory.ST, "ChE", "Cholesteryl esters [ST0102]"),
-    CE(LipidCategory.ST, "CE", "Cholesteryl esters [ST0102]"),
-    CHOLESTEROL(LipidCategory.ST, "Cholesterol", "Cholesterol [LMST01010001]");
-    ;
-    
-    private final LipidCategory category;
-    private final String abbreviation;
-    private final String lipidMapsClassName;
+    ST(LipidCategory.ST, "Sterols [ST01]", "ST"),
+    SE(LipidCategory.ST, "Steryl esters [ST0102]", "SE"),
+    FC(LipidCategory.ST, "Cholesterol [LMST01010001]", "FC"),
+    CH(LipidCategory.ST, "Cholesterol [LMST01010001]", "Ch", "Cholesterol"),
+    CHE(LipidCategory.ST, "Cholesteryl esters [ST0102]", "ChE", "CE");
 
-    private LipidClass(LipidCategory category, String abbreviation, String lipidMapsClassName) {
+    private final LipidCategory category;
+    private final String lipidMapsClassName;
+    private final List<String> synonyms;
+
+    private LipidClass(LipidCategory category, String lipidMapsClassName, String... synonyms) {
         this.category = category;
-        this.abbreviation = abbreviation;
         this.lipidMapsClassName = lipidMapsClassName;
+        if(synonyms.length==0) {
+            throw new IllegalArgumentException("Must supply at least one synonym!");
+        }
+        this.synonyms = Arrays.asList(synonyms);
     }
 
     public LipidCategory getCategory() {
@@ -110,11 +111,17 @@ public enum LipidClass {
     }
 
     public String getAbbreviation() {
-        return this.abbreviation;
+        return this.synonyms.get(0);
     }
 
     public String getLipidMapsClassName() {
         return this.lipidMapsClassName;
+    }
+    
+    public boolean matchesAbbreviation(String headGroup) {
+        return this.synonyms.stream().anyMatch((synonym) -> {
+            return synonym.equals(headGroup);
+        });
     }
 
     public String getLysoAbbreviation(LipidClass lipidClass) {
@@ -126,7 +133,7 @@ public enum LipidClass {
 
     public static Optional<LipidClass> forHeadGroup(String headGroup) {
         return Arrays.asList(values()).stream().filter((lipidClass) -> {
-            return lipidClass.getAbbreviation().equals(headGroup);
+            return lipidClass.matchesAbbreviation(headGroup);
         }).findFirst();
     }
 
