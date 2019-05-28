@@ -4,6 +4,7 @@
 package de.isas.lipidomics.domain;
 
 import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
+import java.util.Optional;
 import lombok.Data;
 
 /**
@@ -34,7 +35,7 @@ public abstract class FattyAcid {
             throw new ConstraintViolationException("FattyAcid must have at least 0 hydroxy groups!");
         }
         this.nHydroxy = nHydroxy;
-        this.lipidFaBondType = lipidFaBondType;
+        this.lipidFaBondType = Optional.ofNullable(lipidFaBondType).orElse(LipidFaBondType.UNDEFINED);
         this.lcb = lcb;
     }
 

@@ -50,6 +50,7 @@ public enum LipidClass {
      */
     BMP(LipidCategory.GP, "Monoacylglycerophosphomonoradylglycerols [GP0410]", "BMP"),
     CL(LipidCategory.GP, "Glycerophosphoglycerophosphoglycerols [GP12]", "CL"),
+    MLCL(LipidCategory.GP, "Glycerophosphoglycerophosphoglycerols [GP12]", "CL"),
     PA(LipidCategory.GP, "Glycerophosphates [GP10]", "PA"),
     LPA(LipidCategory.GP, "Glycerophosphates [GP10]", "LPA"),
     PC(LipidCategory.GP, "Glycerophosphocholines [GP01]", "PC"),
@@ -118,6 +119,10 @@ public enum LipidClass {
         return this.lipidMapsClassName;
     }
     
+    public List<String> getSynonyms() {
+        return this.synonyms;
+    }
+    
     public boolean matchesAbbreviation(String headGroup) {
         return this.synonyms.stream().anyMatch((synonym) -> {
             return synonym.equals(headGroup);
@@ -133,7 +138,7 @@ public enum LipidClass {
 
     public static Optional<LipidClass> forHeadGroup(String headGroup) {
         return Arrays.asList(values()).stream().filter((lipidClass) -> {
-            return lipidClass.matchesAbbreviation(headGroup);
+            return lipidClass.matchesAbbreviation(headGroup.trim());
         }).findFirst();
     }
 

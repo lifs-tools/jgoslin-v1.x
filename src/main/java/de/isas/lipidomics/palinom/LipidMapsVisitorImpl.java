@@ -391,7 +391,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         private Optional<LipidSpeciesInfo> getSpeciesInfo(LipidMapsParser.LcbContext lcbContext) {
             Integer hydroxyl = 0;
             if (lcbContext.hydroxyl_lcb() != null) {
-                hydroxyl = asInt(lcbContext.hydroxyl_lcb(), 0);
+                hydroxyl = getHydroxyCount(lcbContext);
             }
             return Optional.of(new LipidSpeciesInfo(
                     LipidLevel.SPECIES,
@@ -469,7 +469,8 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
     public static StructuralFattyAcid buildStructuralLcb(LipidMapsParser.LcbContext ctx, String faName, int position) {
         StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
         fa.nCarbon(asInt(ctx.carbon(), 0));
-        fa.nHydroxy(asInt(ctx.hydroxyl_lcb(), 0));
+        Integer nHydroxy = getHydroxyCount(ctx);
+        fa.nHydroxy(nHydroxy);
         if (ctx.db() != null) {
             fa.nDoubleBonds(asInt(ctx.db().db_count(), 0));
             if (ctx.db().db_position() != null) {
@@ -477,6 +478,22 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             }
         }
         return fa.name(faName).position(position).lcb(true).build();
+    }
+
+    private static Integer getHydroxyCount(LipidMapsParser.LcbContext ctx) {
+        Integer nHydroxy = Optional.ofNullable(ctx.hydroxyl_lcb()).map((t) -> {
+            String hydroxy = t.getText();
+            switch(hydroxy) {
+                case "m":
+                    return 1;
+                case "d":
+                    return 2;
+                case "t":
+                    return 3;
+            }
+            return Integer.valueOf(0);
+        }).orElse(0);
+        return nHydroxy;
     }
 
     public static StructuralFattyAcid buildStructuralFa(LipidMapsParser.FaContext ctx, String faName, int position) {
