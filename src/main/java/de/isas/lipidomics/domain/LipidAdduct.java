@@ -30,7 +30,7 @@ public class LipidAdduct {
     private Adduct adduct;
     
     public String getSumFormula() {
-        throw new RuntimeException("Not implemented yet!");
+        return "N.D.";
     }
 
 }
