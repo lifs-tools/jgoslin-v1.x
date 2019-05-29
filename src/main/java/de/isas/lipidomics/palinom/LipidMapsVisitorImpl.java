@@ -71,7 +71,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
 
         LipidAdduct la = new LipidAdduct(categoryContext.map((cc) -> {
             return new LipidVisitor().visitLipid_pure(cc);
-        }).orElse(LipidSpecies.NONE), Adduct.NONE);
+        }).orElse(LipidSpecies.NONE), Adduct.NONE, "");
         return la;
     }
 

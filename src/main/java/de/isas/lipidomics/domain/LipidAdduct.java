@@ -28,9 +28,6 @@ public class LipidAdduct {
 
     private LipidSpecies lipid;
     private Adduct adduct;
-    
-    public String getSumFormula() {
-        return "N.D.";
-    }
+    private String sumFormula;
 
 }
