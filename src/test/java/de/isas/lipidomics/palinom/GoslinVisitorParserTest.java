@@ -8,11 +8,13 @@ import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
+import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
@@ -183,6 +185,90 @@ public class GoslinVisitorParserTest {
         assertEquals(1, lipid.getFa().
             get("FA1").
             getNHydroxy());
+        assertEquals("FA2", lipid.getFa().
+            get("FA2").
+            getName());
+        assertEquals(16, lipid.getFa().
+            get("FA2").
+            getNCarbon());
+        assertEquals(2, lipid.getFa().
+            get("FA2").
+            getNDoubleBonds());
+        assertEquals(0, lipid.getFa().
+            get("FA2").
+            getNHydroxy());
+    }
+    
+    @Test
+    public void testPL_Plasmanyl_slash() throws ParsingException{
+        String ref = "PE O 18:3;1a/16:2";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertNotNull(lipidAdduct);
+        LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
+        assertNotNull(lipid);
+        System.out.println(lipid);
+        assertEquals("PE O", lipid.getHeadGroup());
+        assertEquals("FA1", lipid.getFa().
+            get("FA1").
+            getName());
+        assertEquals(18, lipid.getFa().
+            get("FA1").
+            getNCarbon());
+        assertEquals(3, lipid.getFa().
+            get("FA1").
+            getNDoubleBonds());
+        assertEquals(1, lipid.getFa().
+            get("FA1").
+            getNHydroxy());
+        assertEquals(LipidFaBondType.ETHER_PLASMANYL, lipid.getFa().
+            get("FA1").
+            getLipidFaBondType());
+        assertFalse(lipid.getFa().
+            get("FA1").
+            isLcb());
+        assertEquals("FA2", lipid.getFa().
+            get("FA2").
+            getName());
+        assertEquals(16, lipid.getFa().
+            get("FA2").
+            getNCarbon());
+        assertEquals(2, lipid.getFa().
+            get("FA2").
+            getNDoubleBonds());
+        assertEquals(0, lipid.getFa().
+            get("FA2").
+            getNHydroxy());
+    }
+    
+    @Test
+    public void testPL_Plasmenyl_slash() throws ParsingException{
+        String ref = "PE O 18:3;1p/16:2";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertNotNull(lipidAdduct);
+        LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
+        assertNotNull(lipid);
+        System.out.println(lipid);
+        assertEquals("PE O", lipid.getHeadGroup());
+        assertEquals("FA1", lipid.getFa().
+            get("FA1").
+            getName());
+        assertEquals(18, lipid.getFa().
+            get("FA1").
+            getNCarbon());
+        assertEquals(3, lipid.getFa().
+            get("FA1").
+            getNDoubleBonds());
+        assertEquals(1, lipid.getFa().
+            get("FA1").
+            getNHydroxy());
+        assertEquals(LipidFaBondType.ETHER_PLASMENYL, lipid.getFa().
+            get("FA1").
+            getLipidFaBondType());
+        assertFalse(lipid.getFa().
+            get("FA1").
+            isLcb());
         assertEquals("FA2", lipid.getFa().
             get("FA2").
             getName());
