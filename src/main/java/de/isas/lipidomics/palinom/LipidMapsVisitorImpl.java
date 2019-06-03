@@ -395,9 +395,9 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             }
             return Optional.of(new LipidSpeciesInfo(
                     LipidLevel.SPECIES,
-                    asInt(lcbContext.carbon(), 0),
+                    asInt(lcbContext.lcb_fa().carbon(), 0),
                     hydroxyl,
-                    asInt(lcbContext.db(), 0),
+                    asInt(lcbContext.lcb_fa().db(), 0),
                     LipidFaBondType.ESTER));
         }
     }
@@ -468,12 +468,12 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
 
     public static StructuralFattyAcid buildStructuralLcb(LipidMapsParser.LcbContext ctx, String faName, int position) {
         StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
-        fa.nCarbon(asInt(ctx.carbon(), 0));
+        fa.nCarbon(asInt(ctx.lcb_fa().carbon(), 0));
         Integer nHydroxy = getHydroxyCount(ctx);
         fa.nHydroxy(nHydroxy);
-        if (ctx.db() != null) {
-            fa.nDoubleBonds(asInt(ctx.db().db_count(), 0));
-            if (ctx.db().db_position() != null) {
+        if (ctx.lcb_fa().db() != null) {
+            fa.nDoubleBonds(asInt(ctx.lcb_fa().db().db_count(), 0));
+            if (ctx.lcb_fa().db().db_position() != null) {
                 throw new RuntimeException("Support for double bond positions not implemented yet!");
             }
         }

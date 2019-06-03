@@ -260,6 +260,34 @@ public class LipidMapsVisitorParserTest {
         
         assertEquals("TG 14:0_16:0_18:1", lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
     }
+    
+    @Test
+    public void testSmSpeciesHydroxy() throws ParsingException {
+        String ref = "SM(d32:0)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("SM", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.SP, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(32, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(2, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
+    
+    @Test
+    public void testSmSpeciesPlain() throws ParsingException {
+        String ref = "SM(32:0)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("SM", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.SP, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(32, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
         LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
