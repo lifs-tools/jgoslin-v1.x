@@ -288,6 +288,20 @@ public class LipidMapsVisitorParserTest {
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
     }
+    
+    @Test
+    public void testHex3Cer() throws ParsingException {
+        String ref = "Hex3Cer(d18:1/16:0)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("Hex3Cer", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.SP, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(34, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(2, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
         LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
