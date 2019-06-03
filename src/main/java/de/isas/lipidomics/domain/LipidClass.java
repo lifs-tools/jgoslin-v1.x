@@ -94,8 +94,8 @@ public enum LipidClass {
      */
     ST(LipidCategory.ST, "Sterols [ST01]", "ST"),
     SE(LipidCategory.ST, "Steryl esters [ST0102]", "SE"),
-    FC(LipidCategory.ST, "Cholesterol [LMST01010001]", "FC"),
-    CH(LipidCategory.ST, "Cholesterol [LMST01010001]", "Ch", "Cholesterol"),
+//    FC(LipidCategory.ST, "Cholesterol [LMST01010001]", "FC"),
+    CH(LipidCategory.ST, "Cholesterol [LMST01010001]", "FC", "Ch", "Cholesterol"),
     CHE(LipidCategory.ST, "Cholesteryl esters [ST0102]", "ChE", "CE");
 
     private final LipidCategory category;

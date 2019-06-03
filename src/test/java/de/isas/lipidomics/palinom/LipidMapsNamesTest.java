@@ -15,6 +15,9 @@
  */
 package de.isas.lipidomics.palinom;
 
+import de.isas.lipidomics.domain.LipidAdduct;
+import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import junitparams.FileParameters;
 import junitparams.JUnitParamsRunner;
@@ -23,7 +26,6 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -50,5 +52,15 @@ public class LipidMapsNamesTest {
         if (parser.getNumberOfSyntaxErrors() > 0) {
             throw new ParsingException("Parsing of " + lipidMapsName + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
         }
+    }
+
+    @Test
+    @FileParameters("classpath:de/isas/lipidomics/palinom/wenk-lm-lipids.txt")
+    public void isValidLipidMapsNameForVisitorParser(String lipidMapsName) throws ParsingException {
+        log.info("Parsing lipid maps identifier: {}", lipidMapsName);
+        LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
+        LipidAdduct lipidAdduct = parser.parse(lipidMapsName);
+        LipidSpecies ls = lipidAdduct.getLipid();
+        log.info("Lipid maps name {}:{}", lipidMapsName, ls.getLipidString(ls.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel()));
     }
 }

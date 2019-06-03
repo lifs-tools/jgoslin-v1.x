@@ -31,6 +31,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals(ref, lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidCategory.ST, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
     }
     
     

@@ -21,7 +21,9 @@ import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import static de.isas.lipidomics.domain.LipidCategory.GL;
 import static de.isas.lipidomics.domain.LipidCategory.ST;
+import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
@@ -99,7 +101,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             switch (contextCategory) {
                 case ST:
                     if (ctx.cholesterol().chc() != null) {
-                        lipid = new LipidSpecies(ctx.cholesterol().chc().ch().getText());
+                        lipid = handleCh(ctx);
                         break;
                     } else if (ctx.cholesterol().chec() != null) {
                         lipid = handleChe(ctx.cholesterol().chec()).orElse(LipidSpecies.NONE);
@@ -129,6 +131,14 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     throw new PalinomVisitorException("Unhandled contextCategory: " + contextCategory);
             }
             return lipid;
+        }
+
+        private LipidSpecies handleCh(Lipid_pureContext ctx) {
+            if (ctx.cholesterol() != null && ctx.cholesterol().chc().ch() != null) {
+                return new LipidIsomericSubspecies(ctx.cholesterol().chc().ch().getText());
+            } else {
+                throw new PalinomVisitorException("Unhandled context state in Cholesterol!");
+            }
         }
 
         private Optional<LipidSpecies> handleGlycerolipid(Lipid_pureContext ctx) throws RuntimeException {
@@ -206,9 +216,10 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         }
 
         private Optional<LipidSpecies> handleChe(LipidMapsParser.ChecContext che) {
-            String headGroup = che.che().hg_che().getText();
             if (che.che_fa().fa() != null) {
-                return visitStructuralSubspeciesFas(headGroup, Arrays.asList(che.che_fa().fa()));
+                return visitStructuralSubspeciesFas(che.che_fa().hg_che().getText(), Arrays.asList(che.che_fa().fa()));
+            } else if (che.che() != null) {
+                return visitStructuralSubspeciesFas(che.che().hg_che().getText(), Arrays.asList(che.che().fa()));
             } else {
                 throw new PalinomVisitorException("Unhandled context state in ChE!");
             }
@@ -483,7 +494,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
     private static Integer getHydroxyCount(LipidMapsParser.LcbContext ctx) {
         Integer nHydroxy = Optional.ofNullable(ctx.hydroxyl_lcb()).map((t) -> {
             String hydroxy = t.getText();
-            switch(hydroxy) {
+            switch (hydroxy) {
                 case "m":
                     return 1;
                 case "d":
