@@ -60,9 +60,13 @@ public class GoslinVisitorParserTest {
         assertNotNull(lipidAdduct);
         System.out.println(lipidAdduct);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
-//        assertEquals("",lipidAdduct.getAdduct().getAdductString());
-//        assertEquals(Integer.valueOf(1),lipidAdduct.getAdduct().getCharge());
-//        assertEquals(Integer.valueOf(1),lipidAdduct.getAdduct().getChargeSign());
+        
+        String ref2 = ref+" [M+H]1+";
+        System.out.println("Testing lipid name " + ref2);
+        LipidAdduct lipidAdduct2 = parseLipidName(ref2);
+        assertNotNull(lipidAdduct2);
+        System.out.println(lipidAdduct2);
+        assertEquals(new Adduct("", "+H", 1, 1), lipidAdduct2.getAdduct());
     }
 
     @Test

@@ -452,7 +452,20 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
         @Override
         public Adduct visitAdduct_info(GoslinParser.Adduct_infoContext ctx) {
-            Adduct adduct = new Adduct(ctx.adduct().getText(), ctx.adduct().getText(), Integer.parseInt(ctx.charge().getText()), Integer.parseInt(ctx.charge_sign().getText()));
+            String chargeSign = ctx.charge_sign().getText();
+            Integer chargeSignValue = 0;
+            switch(chargeSign) {
+                case "+":
+                    chargeSignValue = 1;
+                    break;
+                case "-":
+                    chargeSignValue = -1;
+                    break;
+                default:
+                    chargeSignValue = 0;
+            }
+            String adductText = ctx.adduct().getText();
+            Adduct adduct = new Adduct("",adductText, Integer.parseInt(ctx.charge().getText()), chargeSignValue);
             return adduct;
         }
     }
