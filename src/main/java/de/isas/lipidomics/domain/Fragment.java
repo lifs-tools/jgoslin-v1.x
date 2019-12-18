@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 nils.hoffmann.
+ * Copyright 2019 nilshoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,11 @@ import lombok.Data;
 
 /**
  *
- * @author nils.hoffmann
+ * @author nilshoffmann
  */
 @AllArgsConstructor
 @Data
-public class LipidAdduct {
+public class Fragment {
 
-    private LipidSpecies lipid;
-    private Adduct adduct;
-    private String sumFormula;
-    private Fragment fragment;
-
+    private String name;
 }

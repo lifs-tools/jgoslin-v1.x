@@ -35,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 public class LipidMolecularSubspecies extends LipidSpecies {
 
     protected final Map<String, FattyAcid> fa = new LinkedHashMap<>();
-    private final String lipidSpeciesString;
 
     public LipidMolecularSubspecies(String headGroup, MolecularFattyAcid... fa) {
         super(headGroup);
@@ -65,7 +64,6 @@ public class LipidMolecularSubspecies extends LipidSpecies {
             }
         }
         super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.MOLECULAR_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, lipidFaBondType));
-        this.lipidSpeciesString = buildLipidSubspeciesName("_");
     }
     
     public Map<String, FattyAcid> getFa() {
@@ -93,7 +91,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
     public String getLipidString(LipidLevel level) {
         switch(level) {
             case MOLECULAR_SUBSPECIES:
-                return this.lipidSpeciesString;
+                return buildLipidSubspeciesName("_");
             case CATEGORY:
             case CLASS:
             case SPECIES:

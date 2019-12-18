@@ -16,10 +16,7 @@
 package de.isas.lipidomics.domain;
 
 import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.Data;
 
 /**
@@ -28,8 +25,6 @@ import lombok.Data;
  */
 @Data
 public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
-
-    private final String lipidSpeciesString;
 
     public LipidStructuralSubspecies(String headGroup, StructuralFattyAcid... fa) {
         super(headGroup);
@@ -54,14 +49,13 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
             }
         }
         super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.STRUCTURAL_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, lipidFaBondType));
-        this.lipidSpeciesString = super.buildLipidSubspeciesName("/");
     }
 
     @Override
     public String getLipidString(LipidLevel level) {
         switch (level) {
             case STRUCTURAL_SUBSPECIES:
-                return lipidSpeciesString;
+                return super.buildLipidSubspeciesName("/");
             case MOLECULAR_SUBSPECIES:
             case CATEGORY:
             case CLASS:

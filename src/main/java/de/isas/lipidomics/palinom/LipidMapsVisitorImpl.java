@@ -17,6 +17,7 @@ package de.isas.lipidomics.palinom;
 
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.Fragment;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import static de.isas.lipidomics.domain.LipidCategory.GL;
@@ -73,7 +74,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
 
         LipidAdduct la = new LipidAdduct(categoryContext.map((cc) -> {
             return new LipidVisitor().visitLipid_pure(cc);
-        }).orElse(LipidSpecies.NONE), Adduct.NONE, "");
+        }).orElse(LipidSpecies.NONE), Adduct.NONE, "", new Fragment(""));
         return la;
     }
 

@@ -16,6 +16,7 @@
 package de.isas.lipidomics.palinom;
 
 import de.isas.lipidomics.domain.Adduct;
+import de.isas.lipidomics.domain.Fragment;
 import de.isas.lipidomics.domain.MolecularFattyAcid;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidAdduct;
@@ -66,7 +67,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             return new LipidVisitor().visitLipid_pure(cc);
         }).orElse(LipidSpecies.NONE), adductTermContext.map((t) -> {
             return new AdductVisitor().visitAdduct_info(t);
-        }).orElse(Adduct.NONE), "");
+        }).orElse(Adduct.NONE), "", new Fragment(""));
         return la;
     }
 
