@@ -176,7 +176,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         }
 
         private Optional<LipidSpecies> handleTgl(GoslinParser.TglContext tgl) {
-            String headGroup = tgl.hg_tgl().getText();
+            String headGroup = tgl.hg_tgl_full().getText();
             if (tgl.gl_species() != null) { //species level
                 //process species level
                 return visitSpeciesFas(headGroup, tgl.gl_species().fa());
@@ -198,7 +198,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         }
 
         private Optional<LipidSpecies> handleSgl(GoslinParser.SglContext sgl) {
-            String headGroup = sgl.hg_sgl().getText();
+            String headGroup = sgl.hg_sgl_full().getText();
             if (sgl.gl_species() != null) { //species level
                 //process species level
                 return visitSpeciesFas(headGroup, sgl.gl_species().fa());
@@ -227,7 +227,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         }
 
         private Optional<LipidSpecies> handleMgl(GoslinParser.MglContext mgl) {
-            String headGroup = mgl.hg_mgl().getText();
+            String headGroup = mgl.hg_mgl_full().getText();
             if (mgl.fa() != null) {
                 return visitStructuralSubspeciesFas(headGroup, Arrays.asList(mgl.fa()));
             } else {
@@ -236,7 +236,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         }
 
         private Optional<LipidSpecies> handleDgl(GoslinParser.DglContext dgl) {
-            String headGroup = dgl.hg_dgl().getText();
+            String headGroup = dgl.hg_dgl_full().getText();
             if (dgl.gl_species() != null) { //species level
                 //process species level
                 return visitSpeciesFas(headGroup, dgl.gl_species().fa());
@@ -413,7 +413,8 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         }
 
         private Optional<LipidSpeciesInfo> getSpeciesInfo(GoslinParser.FaContext faContext) {
-            if (faContext.fa_pure().heavy() != null) {
+            //fa_pure, ether, heavy
+            if (faContext.fa_pure() != null && faContext.heavy_fa() != null) {
                 throw new RuntimeException("Heavy label in FA_pure context not implemented yet!");
             }
             LipidFaBondType lfbt = getLipidFaBondType(faContext);
@@ -427,25 +428,32 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
         private Optional<LipidSpeciesInfo> getSpeciesInfo(GoslinParser.LcbContext lcbContext) {
             Integer hydroxyl = 0;
-            if (lcbContext.old_hydroxyl() != null) {
-                switch (lcbContext.old_hydroxyl().getText()) {
-                    case "t":
-                        hydroxyl = 3;
-                        break;
-                    case "d":
-                        hydroxyl = 2;
-                        break;
-                    default:
-                        throw new PalinomVisitorException("Unsupported old hydroxyl prefix: " + lcbContext.old_hydroxyl().getText());
-                }
-            } else if (lcbContext.hydroxyl() != null) {
-                hydroxyl = asInt(lcbContext.hydroxyl(), 0);
+            if (lcbContext.lcb_pure()!=null && lcbContext.heavy_lcb()!=null) {
+                throw new RuntimeException("Heavy label in lcb_pure context not implemented yet!");
             }
-            return Optional.of(new LipidSpeciesInfo(
-                    LipidLevel.SPECIES,
-                    asInt(lcbContext.carbon(), 0),
-                    hydroxyl,
-                    asInt(lcbContext.db(), 0), LipidFaBondType.ESTER));
+            if(lcbContext.lcb_pure()!=null) {
+                GoslinParser.Lcb_pureContext pureCtx = lcbContext.lcb_pure();
+                if (pureCtx.old_hydroxyl() != null) {
+                    switch (pureCtx.old_hydroxyl().getText()) {
+                        case "t":
+                            hydroxyl = 3;
+                            break;
+                        case "d":
+                            hydroxyl = 2;
+                            break;
+                        default:
+                            throw new PalinomVisitorException("Unsupported old hydroxyl prefix: " + pureCtx.old_hydroxyl().getText());
+                    }
+                } else if (pureCtx.hydroxyl() != null) {
+                    hydroxyl = asInt(pureCtx.hydroxyl(), 0);
+                }
+                return Optional.of(new LipidSpeciesInfo(
+                        LipidLevel.SPECIES,
+                        asInt(pureCtx.carbon(), 0),
+                        hydroxyl,
+                        asInt(pureCtx.db(), 0), LipidFaBondType.ESTER));
+            }
+            throw new PalinomVisitorException("Uninitialized lcb_pure context!");
         }
     }
 
@@ -520,12 +528,16 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
     }
 
     public static StructuralFattyAcid buildStructuralLcb(GoslinParser.LcbContext ctx, String faName, int position) {
+        if (ctx.lcb_pure()!=null && ctx.heavy_lcb()!=null) {
+                throw new RuntimeException("Heavy label in lcb_pure context not implemented yet!");
+        }
+        GoslinParser.Lcb_pureContext pureCtx = ctx.lcb_pure();
         StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
-        fa.nCarbon(asInt(ctx.carbon(), 0));
-        fa.nHydroxy(asInt(ctx.hydroxyl(), 0));
-        if (ctx.db() != null) {
-            fa.nDoubleBonds(asInt(ctx.db().db_count(), 0));
-            if (ctx.db().db_position() != null) {
+        fa.nCarbon(asInt(pureCtx.carbon(), 0));
+        fa.nHydroxy(asInt(pureCtx.hydroxyl(), 0));
+        if (pureCtx.db() != null) {
+            fa.nDoubleBonds(asInt(pureCtx.db().db_count(), 0));
+            if (pureCtx.db().db_position() != null) {
                 throw new RuntimeException("Support for double bond positions not implemented yet!");
             }
         }

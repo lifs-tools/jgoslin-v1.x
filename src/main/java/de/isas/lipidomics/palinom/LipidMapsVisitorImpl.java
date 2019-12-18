@@ -22,7 +22,6 @@ import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import static de.isas.lipidomics.domain.LipidCategory.GL;
 import static de.isas.lipidomics.domain.LipidCategory.ST;
-import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
@@ -35,6 +34,7 @@ import de.isas.lipidomics.domain.MolecularFattyAcid.MolecularFattyAcidBuilder;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
 import de.isas.lipidomics.domain.StructuralFattyAcid.StructuralFattyAcidBuilder;
 import de.isas.lipidomics.palinom.LipidMapsParser.Fa2Context;
+import de.isas.lipidomics.palinom.LipidMapsParser.Hg_ddplContext;
 import de.isas.lipidomics.palinom.LipidMapsParser.Lipid_pureContext;
 import de.isas.lipidomics.palinom.exceptions.PalinomVisitorException;
 import java.util.Arrays;
@@ -261,18 +261,25 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         }
 
         private Optional<LipidSpecies> handleDpl(LipidMapsParser.DplContext dpl) {
-            String headGroup = dpl.hg_pl().getText();
-            if (dpl.dpl_species() != null) { //species level
-                //process species level
-                return visitSpeciesFas(headGroup, dpl.dpl_species().fa());
-            } else if (dpl.dpl_subspecies() != null) {
-                //process subspecies
-                if (dpl.dpl_subspecies().fa2().fa2_sorted() != null) {
-                    //sorted => StructuralSubspecies
-                    return visitStructuralSubspeciesFas(headGroup, dpl.dpl_subspecies().fa2().fa2_sorted().fa());
-                } else if (dpl.dpl_subspecies().fa2().fa2_unsorted() != null) {
-                    //unsorted => MolecularSubspecies
-                    return visitMolecularSubspeciesFas(headGroup, dpl.dpl_subspecies().fa2().fa2_unsorted().fa());
+            Hg_ddplContext hg_ddplcontext = dpl.hg_ddpl();
+            if(hg_ddplcontext!=null) {
+                String headGroup = hg_ddplcontext.hg_dplc().getText();
+                // TODO implement pip handling
+                //hg_ddplcontext.pip_position().pip_pos().
+                if (dpl.dpl_species() != null) { //species level
+                    //process species level
+                    return visitSpeciesFas(headGroup, dpl.dpl_species().fa());
+                } else if (dpl.dpl_subspecies() != null) {
+                    //process subspecies
+                    if (dpl.dpl_subspecies().fa2().fa2_sorted() != null) {
+                        //sorted => StructuralSubspecies
+                        return visitStructuralSubspeciesFas(headGroup, dpl.dpl_subspecies().fa2().fa2_sorted().fa());
+                    } else if (dpl.dpl_subspecies().fa2().fa2_unsorted() != null) {
+                        //unsorted => MolecularSubspecies
+                        return visitMolecularSubspeciesFas(headGroup, dpl.dpl_subspecies().fa2().fa2_unsorted().fa());
+                    }
+                } else {
+                    throw new PalinomVisitorException("Unhandled context state in PL!");
                 }
             } else {
                 throw new PalinomVisitorException("Unhandled context state in PL!");
@@ -283,10 +290,20 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         private Optional<LipidSpecies> handleLpl(LipidMapsParser.LplContext lpl) {
             String headGroup = lpl.hg_lplc().getText();
             //lyso PL has one FA, Species=MolecularSubSpecies=StructuralSubSpecies
-            if (lpl.fa() != null) {
-                return visitStructuralSubspeciesFas(headGroup, Arrays.asList(lpl.fa()));
+            if (lpl.fa_lpl() != null) {
+                if(lpl.fa_lpl().fa()!=null) {
+                    return visitStructuralSubspeciesFas(headGroup, Arrays.asList(lpl.fa_lpl().fa()));
+                } else if(lpl.fa_lpl().fa2()!=null) {
+                    Fa2Context fa2ctx = lpl.fa_lpl().fa2();
+                    if(fa2ctx.fa2_sorted()!=null) {
+                        return visitStructuralSubspeciesFas(headGroup, fa2ctx.fa2_sorted().fa());
+                    } else if(fa2ctx.fa2_unsorted()!=null) {
+                        throw new PalinomVisitorException("Lyso PL FAs are defined on structural subspecies level, provided FAs were defined on molecular subspecies level!");
+                    }
+                }
+                throw new PalinomVisitorException("Unhandled FA context state in Lyso PL!");
             } else {
-                throw new PalinomVisitorException("Unhandled context state in PL!");
+                throw new PalinomVisitorException("Unhandled context state in Lyso PL!");
             }
         }
 
