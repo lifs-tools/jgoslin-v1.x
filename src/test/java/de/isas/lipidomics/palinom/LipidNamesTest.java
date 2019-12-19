@@ -36,7 +36,7 @@ public class LipidNamesTest {
     @Test
     @FileParameters("classpath:de/isas/lipidomics/palinom/wenk-lipids.txt")
     public void isValidLipidNameForSingaporeanStudy(String lipidName) throws ParsingException {
-        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
+        GoslinVisitorParser parser = new GoslinVisitorParser();
         LipidAdduct la = parser.parse(lipidName);
         LipidSpecies l = la.getLipid();
         log.info("{}\t{} ({})", lipidName, l.getLipidString(l.getInfo().get().getLevel()), l.getInfo().get().getLevel());

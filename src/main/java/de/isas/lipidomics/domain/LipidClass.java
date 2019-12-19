@@ -43,13 +43,17 @@ public enum LipidClass {
      * Triradylglycerols [GL03]
      */
     TG(LipidCategory.GL, "Triradylglycerols [GL03]", "TG", "TAG"),
-    /* TODO: there are some newer categories in LipidMaps, like Glycosylmono/di-radylglycerols, SQMG and SQDG */
     /**
      * Glycerophospholipids [GP]
      *
      */
     BMP(LipidCategory.GP, "Monoacylglycerophosphomonoradylglycerols [GP0410]", "BMP"),
+    CDPDAG(LipidCategory.GP, "CDP-diacylglycerols [GP1301]", "CDP DG", "CDPDAG"),
     CL(LipidCategory.GP, "Glycerophosphoglycerophosphoglycerols [GP12]", "CL"),
+    MGDG(LipidCategory.GP, "Glycosyldiacylglycerols [GL0501]", "MGDG"),
+    DGDG(LipidCategory.GP, "Glycosyldiacylglycerols [GL0501]", "DGDG"),
+    SQMG(LipidCategory.GP, "Glycosylmonoacylglycerols [GL0401]", "SQMG"),
+    SQDG(LipidCategory.GP, "Glycosyldiacylglycerols [GL0501]", "SQDG"),
     MLCL(LipidCategory.GP, "Glycerophosphoglycerophosphoglycerols [GP12]", "CL"),
     PA(LipidCategory.GP, "Glycerophosphates [GP10]", "PA"),
     LPA(LipidCategory.GP, "Glycerophosphates [GP10]", "LPA"),
@@ -59,6 +63,7 @@ public enum LipidClass {
     LPC_O(LipidCategory.GP, "Glycerophosphocholines [GP01]", "LPC O"),
     PE(LipidCategory.GP, "Glycerophosphoethanolamines [GP02]", "PE"),
     PE_O(LipidCategory.GP, "Glycerophosphoethanolamines [GP02]", "PE O"),
+    PET(LipidCategory.GP, "Glycerophosphoethanolamines [GP02]", "PEt"),
     LPE(LipidCategory.GP, "Glycerophosphoethanolamines [GP02]", "LPE"),
     LPE_O(LipidCategory.GP, "Glycerophosphoethanolamines [GP02]", "LPE O"),
     PG(LipidCategory.GP, "Glycerophosphoglycerols [GP04]", "PG"),
@@ -66,6 +71,7 @@ public enum LipidClass {
     PGP(LipidCategory.GP, "Glycerophosphoglycerophosphates [GP05]", "PGP"),
     PI(LipidCategory.GP, "Glycerophosphoinositols [GP06]", "PI"),
     LPI(LipidCategory.GP, "Glycerophosphoinositols [GP06]", "LPI"),
+    LPS(LipidCategory.GP, " Glycerophosphoserines [GP03]", "LPS"),
     PIP(LipidCategory.GP, "Glycerophosphoinositol monophosphates [GP07]", "PIP"),
     PIP_3p(LipidCategory.GP, "Glycerophosphoinositol monophosphates [GP07]", "PIP[3']"),
     PIP_4p(LipidCategory.GP, "Glycerophosphoinositol monophosphates [GP07]", "PIP[4']"),
@@ -88,6 +94,7 @@ public enum LipidClass {
     GALCER(LipidCategory.SP, "Neutral glycosphingolipids [SP05]", "GalCer"),
     HEX2CER(LipidCategory.SP, "Neutral glycosphingolipids [SP05]", "Hex2Cer"),
     HEX3CER(LipidCategory.SP, "Neutral glycosphingolipids [SP05]", "Hex3Cer"),
+    SHEXCER(LipidCategory.SP, "Acidic glycosphingolipids [SP06]", "SHexCer"),
     LACCER(LipidCategory.SP, "Neutral glycosphingolipids [SP05]", "LacCer"),
     /**
      * Sterol lipids

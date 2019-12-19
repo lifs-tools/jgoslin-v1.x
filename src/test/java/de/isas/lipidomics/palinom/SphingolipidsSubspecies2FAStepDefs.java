@@ -30,7 +30,7 @@ public class SphingolipidsSubspecies2FAStepDefs {
 
     @When("I parse {string}")
     public void i_parse(String string) {
-        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
+        GoslinVisitorParser parser = new GoslinVisitorParser();
         try {
             this.lipid = (LipidMolecularSubspecies) parser.parse(string).getLipid();
         } catch (ParsingException pe) {

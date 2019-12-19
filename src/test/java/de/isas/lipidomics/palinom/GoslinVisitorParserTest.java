@@ -313,7 +313,7 @@ public class GoslinVisitorParserTest {
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
-        PaLiNomVisitorParser parser = new PaLiNomVisitorParser();
+        GoslinVisitorParser parser = new GoslinVisitorParser();
         LipidAdduct lipid = parser.parse(ref);
         return lipid;
     }

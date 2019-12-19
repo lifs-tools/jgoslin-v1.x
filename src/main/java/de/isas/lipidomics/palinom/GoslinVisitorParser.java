@@ -5,7 +5,6 @@ package de.isas.lipidomics.palinom;
 
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.LipidAdduct;
-import de.isas.lipidomics.palinom.exceptions.PalinomVisitorException;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -18,15 +17,10 @@ import org.antlr.v4.runtime.TokenStream;
  * @author nilshoffmann
  */
 @Slf4j
-public class PaLiNomVisitorParser {
+public class GoslinVisitorParser {
 
     public LipidAdduct parse(String lipidString, SyntaxErrorListener listener) throws ParsingException {
-//        try {
-//            return parseWithLipidMapsGrammar(lipidString, listener);
-//        } catch (PalinomVisitorException pve) {
-//            log.info("Parsing {} with lipid maps grammar of failed, trying LipidCreator grammar!", lipidString);
         return parseWithModernGrammar(lipidString, listener);
-//        }
     }
 
     private LipidAdduct parseWithModernGrammar(String lipidString, SyntaxErrorListener listener) throws ParsingException, RecognitionException {
