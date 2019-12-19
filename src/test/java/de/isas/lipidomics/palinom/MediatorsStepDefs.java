@@ -8,7 +8,7 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
-import de.isas.lipidomics.domain.LipidStructuralSubspecies;
+import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -21,23 +21,28 @@ import org.junit.Assert;
 public class MediatorsStepDefs {
 
     private String lipidname;
-    private LipidStructuralSubspecies lipid;
+    private LipidSpecies lipid;
 
     @Given("the lipid structural sub species name is {string}")
     public void the_lipid_structural_sub_species_name_is(String string) {
         this.lipidname = string;
-    }
-    
-    @When("I parse {string}")
-    public void i_parse(String string) {
         GoslinVisitorParser parser = new GoslinVisitorParser();
         try {
-            this.lipid = (LipidStructuralSubspecies) parser.parse(string).getLipid();
+            this.lipid = (LipidSpecies) parser.parse(string).getLipid();
         } catch (ParsingException pe) {
             log.error("Caught parsing exception: ", pe);
         }
     }
     
+    @When("I parse a lipid mediator with name {string}")
+    public void i_parse(String string) {
+        GoslinVisitorParser parser = new GoslinVisitorParser();
+        try {
+            this.lipid = (LipidSpecies) parser.parse(string).getLipid();
+        } catch (ParsingException pe) {
+            log.error("Caught parsing exception: ", pe);
+        }
+    }
 
     @Then("I should get a lipid of category {string} and species {string} {string} headgroup.")
     public void i_should_get_a_lipid_of_category_and_species_headgroup(String category, String species, String headgroup) {

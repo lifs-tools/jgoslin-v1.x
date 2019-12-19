@@ -3,7 +3,7 @@ Feature: Is this a valid Mediator name?
 
   Scenario Outline: A Mediator is a fatty acyl. The mediators in this scenario have no defined stereochemistry, they are just classified on structural sub species level.
     Given the lipid structural sub species name is <lipid_structural_sub_species>
-    When I parse <lipid_structural_sub_species>
+    When I parse a lipid mediator with name <lipid_structural_sub_species>
     Then I should get a lipid of category <lipid_category> and species <lipid_species> <headgroup> headgroup.
 
     Examples:

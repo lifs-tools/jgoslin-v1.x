@@ -36,7 +36,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <cucumber.version>4.3.1</cucumber.version>
+        <!--<cucumber.version>4.3.1</cucumber.version>-->
+        <cucumber.version>4.7.4</cucumber.version>
         <java.version>1.8</java.version>
     </properties>
     <build>
@@ -147,7 +148,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.0.0-M4</version>
                     <configuration>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <parallel>classes</parallel>

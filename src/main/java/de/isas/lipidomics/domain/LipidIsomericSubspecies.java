@@ -79,7 +79,19 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
             nHydroxy += fattyAcid.getNHydroxy();
             faStrings.add(nCarbon + ":" + nDB + dbPos + (nHydroxy > 0 ? ";" + nHydroxy : "") + fattyAcid.getLipidFaBondType().suffix());
         }
-        return getHeadGroup() + " " + faStrings.stream().collect(Collectors.joining("/"));
+        String hgToFaSep = " ";
+        switch(this.getHeadGroup()) {
+            case "PC O":
+            case "LPC O":
+            case "PE O":
+            case "LPE O":
+                hgToFaSep = "-";
+                break;
+        }
+        if(this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMENYL) {
+            hgToFaSep = "-";
+        }
+        return getHeadGroup() + hgToFaSep + faStrings.stream().collect(Collectors.joining("/"));
     }
 
     @Override

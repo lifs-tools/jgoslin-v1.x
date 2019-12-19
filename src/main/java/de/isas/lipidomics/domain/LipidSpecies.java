@@ -65,7 +65,19 @@ public class LipidSpecies {
                 lipidString.append(headGroup);
                 if (this.info.isPresent() && this.info.get().getNCarbon() > 0) {
                     int nCarbon = info.get().getNCarbon();
-                    lipidString.append(" ").append(nCarbon);
+                    String hgToFaSep = " ";
+                    switch(headGroup) {
+                        case "PC O":
+                        case "LPC O":
+                        case "PE O":
+                        case "LPE O":
+                            hgToFaSep = "-";
+                            break;
+                    }
+                    if(this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMENYL) {
+                        hgToFaSep = "-";
+                    }
+                    lipidString.append(hgToFaSep).append(nCarbon);
                     int nDB = info.get().getNDoubleBonds();
                     lipidString.append(":").append(nDB);
                     int nHydroxy = info.get().getNHydroxy();

@@ -28,7 +28,7 @@ public class SphingolipidsSubspecies2FAStepDefs {
         this.lipidname = string;
     }
 
-    @When("I parse {string}")
+    @When("I parse a sphingolipid with name {string}")
     public void i_parse(String string) {
         GoslinVisitorParser parser = new GoslinVisitorParser();
         try {
@@ -58,11 +58,13 @@ public class SphingolipidsSubspecies2FAStepDefs {
 
     @Then("the second fatty acid at position {int} with {int} carbon atoms, {int} double bonds and {int} hydroxy groups.")
         public void the_second_fatty_acid_FA_with_carbon_atoms_double_bonds_and_hydroxy_groups(Integer position, Integer nCarbon, Integer nDoubleBonds, Integer nHydroxy) {
-        FattyAcid fa2 = this.lipid.getFa().get("FA2");
-        Assert.assertEquals(position.intValue(), fa2.getPosition());
-        Assert.assertEquals(nCarbon.intValue(), fa2.getNCarbon());
-        Assert.assertEquals(nDoubleBonds.intValue(), fa2.getNDoubleBonds());
-        Assert.assertEquals(nHydroxy.intValue(), fa2.getNHydroxy());
+        if(this.lipid.getFa().containsKey("FA2")) {
+            FattyAcid fa2 = this.lipid.getFa().get("FA2");
+            Assert.assertEquals(position.intValue(), fa2.getPosition());
+            Assert.assertEquals(nCarbon.intValue(), fa2.getNCarbon());
+            Assert.assertEquals(nDoubleBonds.intValue(), fa2.getNDoubleBonds());
+            Assert.assertEquals(nHydroxy.intValue(), fa2.getNHydroxy());
+        }
     }
 
     protected String toString(LipidMolecularSubspecies referenceLipid) {

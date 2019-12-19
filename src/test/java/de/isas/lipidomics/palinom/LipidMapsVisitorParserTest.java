@@ -126,6 +126,8 @@ public class LipidMapsVisitorParserTest {
             getNHydroxy());
     }
     
+    //LPE O-16:1p/12:0
+    
     @Test(expected=ConstraintViolationException.class)
     public void testFailForImplicitLyso() throws ParsingException {
         String ref2 = "PE 18:0-0:0";
