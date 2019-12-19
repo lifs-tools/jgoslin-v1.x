@@ -30,7 +30,19 @@ public enum LipidClass {
     /**
      * Fatty acyls [FA] Fatty acids and conjugates [FA01]
      */
-    FA(LipidCategory.FA, "Fatty acids and conjugates [FA01]", "FA"),
+    FA(LipidCategory.FA, "Fatty acids and conjugates [FA01]", "FA", "10-HDoHE",
+            "11-HDoHE", "11-HETE", "11,12-DHET", "11(12)-EET", "12-HEPE",
+            "12-HETE", "12-HHTrE", "12-OxoETE", "12(13)-EpOME", "13-HODE",
+            "13-HOTrE", "14,15-DHET", "14(15)-EET", "14(15)-EpETE", "15-HEPE",
+            "15-HETE", "15d-PGJ2", "16-HDoHE", "16-HETE", "18-HEPE", "5-HEPE",
+            "5-HETE", "5-HpETE", "5-OxoETE", "5,12-DiHETE", "5,6-DiHETE",
+            "5,6,15-LXA4", "5(6)-EET", "8-HDoHE", "8-HETE", "8,9-DHET",
+            "8(9)-EET", "9-HEPE", "9-HETE", "9-HODE", "9-HOTrE", "9(10)-EpOME",
+            "AA", "alpha-LA", "DHA", "EPA", "Linoleic acid", "LTB4", "LTC4",
+            "LTD4", "Maresin 1", "Palmitic acid", "PGB2", "PGD2", "PGE2",
+            "PGF2alpha", "PGI2", "Resolvin D1", "Resolvin D2", "Resolvin D3",
+            "Resolvin D5", "tetranor-12-HETE", "TXB1", "TXB2", "TXB3"
+    ),
     /**
      * Glycerolipids [GL] Monoradylglycerols [GL01]
      */
@@ -101,7 +113,7 @@ public enum LipidClass {
      */
     ST(LipidCategory.ST, "Sterols [ST01]", "ST"),
     SE(LipidCategory.ST, "Steryl esters [ST0102]", "SE"),
-//    FC(LipidCategory.ST, "Cholesterol [LMST01010001]", "FC"),
+    //    FC(LipidCategory.ST, "Cholesterol [LMST01010001]", "FC"),
     CH(LipidCategory.ST, "Cholesterol [LMST01010001]", "FC", "Ch", "Cholesterol"),
     CHE(LipidCategory.ST, "Cholesteryl esters [ST0102]", "ChE", "CE");
 
@@ -112,7 +124,7 @@ public enum LipidClass {
     private LipidClass(LipidCategory category, String lipidMapsClassName, String... synonyms) {
         this.category = category;
         this.lipidMapsClassName = lipidMapsClassName;
-        if(synonyms.length==0) {
+        if (synonyms.length == 0) {
             throw new IllegalArgumentException("Must supply at least one synonym!");
         }
         this.synonyms = Arrays.asList(synonyms);
@@ -129,11 +141,11 @@ public enum LipidClass {
     public String getLipidMapsClassName() {
         return this.lipidMapsClassName;
     }
-    
+
     public List<String> getSynonyms() {
         return this.synonyms;
     }
-    
+
     public boolean matchesAbbreviation(String headGroup) {
         return this.synonyms.stream().anyMatch((synonym) -> {
             return synonym.equals(headGroup);

@@ -108,7 +108,10 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     lipid = handleGlycerolipid(ctx).orElse(LipidSpecies.NONE);
                     break;
                 case FA:
-                    lipid = new LipidSpecies(ctx.mediatorc().getText(), LipidCategory.FA, Optional.empty(), Optional.empty());
+                    lipid = new LipidSpecies(ctx.mediatorc().getText(), LipidCategory.FA, 
+                            Optional.of(LipidClass.FA), 
+                            Optional.of(new LipidSpeciesInfo(LipidLevel.STRUCTURAL_SUBSPECIES, 0, 0, 0, LipidFaBondType.UNDEFINED))
+                    );
                     break;
                 case GP:
                     lipid = handleGlyceroPhospholipid(ctx).orElse(LipidSpecies.NONE);
