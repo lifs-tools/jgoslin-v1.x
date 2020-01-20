@@ -22,6 +22,7 @@ import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import static de.isas.lipidomics.domain.LipidCategory.GL;
 import static de.isas.lipidomics.domain.LipidCategory.ST;
+import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
@@ -114,7 +115,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     lipid = handleGlycerolipid(ctx).orElse(LipidSpecies.NONE);
                     break;
                 case FA:
-                    lipid = new LipidSpecies(ctx.mediator().getText(), LipidCategory.FA, Optional.empty(), Optional.empty());
+                    lipid = new LipidSpecies(ctx.mediator().getText(), LipidCategory.FA, Optional.of(LipidClass.FA), Optional.empty());
                     break;
                 case GP:
                     lipid = handleGlyceroPhospholipid(ctx).orElse(LipidSpecies.NONE);
