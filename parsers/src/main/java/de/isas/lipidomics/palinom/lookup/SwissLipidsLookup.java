@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SwissLipidsLookup {
 
     public static void main(String[] args) throws IOException {
-        URL swissLipidsTable = SwissLipidsLookup.class.getClassLoader().getResource("antlr4/de/isas/lipidomics/palinom/swisslipids-names-Feb-10-2020.tsv");
+        URL swissLipidsTable = SwissLipidsLookup.class.getClassLoader().getResource("de/isas/lipidomics/palinom/swisslipids-names-Feb-10-2020.tsv");
         try (InputStream is = swissLipidsTable.openStream()) {
             try (InputStreamReader isr = new InputStreamReader(is, "UTF-8")) {
                 try (BufferedReader br = new BufferedReader(isr)) {
