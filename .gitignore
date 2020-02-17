@@ -6,3 +6,5 @@ target/
 .vscode/
 **/.antlr/
 nb-configuration.xml
+lipidmaps-normalized.tsv
+swiss-lipids-normalized.tsv
