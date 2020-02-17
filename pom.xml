@@ -152,6 +152,7 @@
                     <configuration>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <parallel>classes</parallel>
+                        <argLine>-Xmx2048m -XX:MaxPermSize=256m</argLine>
                         <threadCount>2</threadCount>
                         <trimStackTrace>false</trimStackTrace>
                         <workingDirectory>${project.build.directory}/surefire-files</workingDirectory>
