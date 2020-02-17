@@ -49,7 +49,7 @@ public class SwissLipidsCompleteTest {
     ) throws ParsingException, IOException {
         String lipidName = swissLipidsAbbreviation;//.replaceAll("\\(", " ").replaceAll("\\)", "").replaceAll("TG", "TAG").replaceAll("DG", "DAG").replaceAll("MG", "MAG");
 //        log.info("Parsing current SwissLipids identifier: {}", lipidName);
-        GoslinVisitorParser parser = new GoslinVisitorParser();
+        LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
         LipidAdduct lipidAdduct;
         try {
             lipidAdduct = parser.parse(lipidName);

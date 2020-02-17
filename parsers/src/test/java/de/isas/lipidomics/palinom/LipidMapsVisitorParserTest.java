@@ -45,6 +45,19 @@ public class LipidMapsVisitorParserTest {
         assertEquals(LipidCategory.ST, lipidAdduct.getLipid().getLipidCategory());
         assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
     }
+    
+    @Test
+    public void testFas() throws ParsingException {
+        String ref = "FA(18:4)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertNotNull(lipidAdduct);
+        System.out.println(lipidAdduct);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("FA", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+    }
 
     @Test
     public void testMediators() throws ParsingException {

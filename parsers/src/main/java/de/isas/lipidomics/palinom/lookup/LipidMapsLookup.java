@@ -17,6 +17,7 @@ package de.isas.lipidomics.palinom.lookup;
 
 import de.isas.lipidomics.domain.ExternalDatabaseReference;
 import de.isas.lipidomics.domain.LipidAdduct;
+import de.isas.lipidomics.palinom.GoslinVisitorParser;
 import de.isas.lipidomics.palinom.LipidMapsVisitorParser;
 import de.isas.lipidomics.palinom.exceptions.PalinomVisitorException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
@@ -36,27 +37,28 @@ import lombok.extern.slf4j.Slf4j;
  * @author nilshoffmann
  */
 @Slf4j
-public class SwissLipidsLookup {
+public class LipidMapsLookup {
 
     public static void main(String[] args) throws IOException {
-        URL swissLipidsTable = SwissLipidsLookup.class.getClassLoader().getResource("swisslipids-names-Feb-10-2020.tsv");
-        try (InputStream is = swissLipidsTable.openStream()) {
+        URL lipidMapsTable = LipidMapsLookup.class.getClassLoader().getResource("lipidmaps-names-Feb-10-2020.tsv");
+        try (InputStream is = lipidMapsTable.openStream()) {
             try (InputStreamReader isr = new InputStreamReader(is, "UTF-8")) {
                 try (BufferedReader br = new BufferedReader(isr)) {
-                    File outputFile = new File("swiss-lipids-normalized.tsv");
+                    File outputFile = new File("lipidmaps-normalized.tsv");
                     try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile))) {
                         // SLID	LEVEL	NAME	ABBREVIATION	SYNONYMS1	SYNONYMS2	SYNONYMS3	SYNONYMS4	SYNONYMS5
+                        // LM_ID	NAME	SYSTEMATIC_NAME	ABBREVIATION	CATEGORY	MAIN_CLASS	SUB_CLASS
                         bw.write("databaseUrl\tdatabaseElementId\tlipidLevel\tnativeAbbreviation\tnativeName\tnormalizedName");
                         bw.newLine();
-                        br.lines().skip(1).map((swissLipidsEntry) -> {
-                            String[] elements = swissLipidsEntry.split("\t", -1);
+                        br.lines().skip(1).map((lipidMapsEntry) -> {
+                            String[] elements = lipidMapsEntry.split("\t", -1);
                             System.out.println(Arrays.deepToString(elements));
                             return new ExternalDatabaseReference(
-                                    "https://www.swisslipids.org/#/entity/",
+                                    "https://www.lipidmaps.org/data/LMSDRecord.php?LMID=",
                                     elements[0],
-                                    elements[1],
+                                    String.join(" | ", elements[4], elements[5], elements[6]),
                                     elements[3],
-                                    elements[2],
+                                    elements[1],
                                     parseAbbreviation(elements[3])
                             );
                         }).forEach((edr) -> {
@@ -91,7 +93,7 @@ public class SwissLipidsLookup {
             log.error("Exception while parsing " + abbreviation, ex);
             result = "N.D.";
         } catch (PalinomVisitorException pve) {
-            log.error("Exception in GoslinVisitorParser " + abbreviation, pve);
+            log.error("Exception in LipidMapsVisitorParser " + abbreviation, pve);
             result = "N.I.";
         }
         return result;

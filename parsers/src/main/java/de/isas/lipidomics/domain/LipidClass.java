@@ -44,6 +44,10 @@ public enum LipidClass {
             "Resolvin D5", "tetranor-12-HETE", "TXB1", "TXB2", "TXB3"
     ),
     /**
+     * Fatty acyls [FA] Fatty esters [FA07]
+     */
+    WE(LipidCategory.FA, "Fatty esters [FA07]", "WE"),
+    /**
      * Glycerolipids [GL] Monoradylglycerols [GL01]
      */
     MG(LipidCategory.GL, "Monoradylglycerols [GL01]", "MG", "MAG"),

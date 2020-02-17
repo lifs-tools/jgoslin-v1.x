@@ -23,8 +23,8 @@ public abstract class FattyAcid {
 
     public FattyAcid(String name, int position, int nCarbon, int nHydroxy, LipidFaBondType lipidFaBondType, boolean lcb) {
         this.name = name;
-        if (nCarbon < 2) {
-            throw new ConstraintViolationException("FattyAcid must have at least 2 carbons!");
+        if (nCarbon < 0) {
+            throw new ConstraintViolationException("FattyAcid must have at least 0 carbons!");
         }
         this.position = position;
         if (position < -1) {

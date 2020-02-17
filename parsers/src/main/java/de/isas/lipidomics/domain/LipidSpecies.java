@@ -71,11 +71,11 @@ public class LipidSpecies {
                         case "LPC O":
                         case "PE O":
                         case "LPE O":
-                            hgToFaSep = "-";
+                            hgToFaSep = " O-";
                             break;
                     }
                     if(this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMENYL) {
-                        hgToFaSep = "-";
+                        hgToFaSep = " O-";
                     }
                     lipidString.append(hgToFaSep).append(nCarbon);
                     int nDB = info.get().getNDoubleBonds();

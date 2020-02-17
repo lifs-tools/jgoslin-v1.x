@@ -85,11 +85,11 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
             case "LPC O":
             case "PE O":
             case "LPE O":
-                hgToFaSep = "-";
+                hgToFaSep = " O-";
                 break;
         }
         if(this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMENYL) {
-            hgToFaSep = "-";
+            hgToFaSep = " O-";
         }
         return getHeadGroup() + hgToFaSep + faStrings.stream().collect(Collectors.joining("/"));
     }
