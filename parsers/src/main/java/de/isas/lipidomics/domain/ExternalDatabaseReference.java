@@ -15,13 +15,15 @@
  */
 package de.isas.lipidomics.domain;
 
-import lombok.Value;
+import lombok.Data;
+import lombok.AllArgsConstructor;
 
 /**
  *
  * @author nilshoffmann
  */
-@Value
+@Data
+@AllArgsConstructor
 public class ExternalDatabaseReference {
     private String databaseUrl;
     private String databaseElementId;
@@ -29,4 +31,6 @@ public class ExternalDatabaseReference {
     private String nativeAbbreviation;
     private String nativeName;
     private String normalizedName;
+    
+    public ExternalDatabaseReference() {};
 }

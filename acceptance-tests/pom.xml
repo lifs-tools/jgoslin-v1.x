@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.isas.lipidomics</groupId>
         <artifactId>palinom</artifactId>
-        <version>0.9.9.2-SNAPSHOT</version>
+        <version>0.9.9.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>palinom-acceptance-tests</artifactId>
@@ -49,11 +49,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>palinom</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
