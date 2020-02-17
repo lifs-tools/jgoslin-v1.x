@@ -29,6 +29,24 @@
                 <version>3.0.0</version>
                 <executions>
                     <execution>
+                        <id>add-db-resource</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/antlr4/de/isas/lipidomics/palinom</directory>
+                                    <includes>
+                                        <include>*.tsv</include>
+                                        <!--<include>**/*.g4</include>-->
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution> 
+                    <execution>
                         <id>add-test-resource</id>
                         <phase>generate-test-sources</phase>
                         <goals>
