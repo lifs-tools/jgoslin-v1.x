@@ -5,3 +5,4 @@ target/
 .settings/
 .vscode/
 **/.antlr/
+nb-configuration.xml
