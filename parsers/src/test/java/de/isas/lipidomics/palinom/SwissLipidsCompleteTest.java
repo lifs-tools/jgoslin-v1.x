@@ -17,12 +17,10 @@ package de.isas.lipidomics.palinom;
 
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.palinom.exceptions.PalinomVisitorException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -51,7 +49,7 @@ public class SwissLipidsCompleteTest {
     ) throws ParsingException, IOException {
         String lipidName = swissLipidsAbbreviation;//.replaceAll("\\(", " ").replaceAll("\\)", "").replaceAll("TG", "TAG").replaceAll("DG", "DAG").replaceAll("MG", "MAG");
 //        log.info("Parsing current SwissLipids identifier: {}", lipidName);
-        LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
+        GoslinVisitorParser parser = new GoslinVisitorParser();
         LipidAdduct lipidAdduct;
         try {
             lipidAdduct = parser.parse(lipidName);
