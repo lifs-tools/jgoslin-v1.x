@@ -281,5 +281,6 @@
     <modules>
         <module>parsers</module>
         <module>acceptance-tests</module>
+        <module>integration-tests</module>
     </modules>
 </project>
