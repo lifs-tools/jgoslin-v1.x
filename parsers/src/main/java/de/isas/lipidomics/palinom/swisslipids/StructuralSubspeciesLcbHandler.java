@@ -32,9 +32,11 @@ import java.util.Optional;
  */
 public class StructuralSubspeciesLcbHandler {
 
-    private final FaHelperFunctions faHelperFunctions;
+    private final StructuralSubspeciesFasHandler ssfh;
+    private final FattyAcylHandler faHelperFunctions;
 
-    public StructuralSubspeciesLcbHandler(FaHelperFunctions faBondTypeResolver) {
+    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh, FattyAcylHandler faBondTypeResolver) {
+        this.ssfh = ssfh;
         this.faHelperFunctions = faBondTypeResolver;
     }
 
@@ -43,7 +45,7 @@ public class StructuralSubspeciesLcbHandler {
         StructuralFattyAcid lcbA = buildStructuralLcb(lcbContext, "LCB", 1);
         fas.add(lcbA);
         for (int i = 0; i < faContexts.size(); i++) {
-            StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 2);
+            StructuralFattyAcid fa = ssfh.buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 2);
             fas.add(fa);
         }
         StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
@@ -57,16 +59,13 @@ public class StructuralSubspeciesLcbHandler {
     }
 
     public StructuralFattyAcid buildStructuralLcb(SwissLipidsParser.LcbContext ctx, String faName, int position) {
-        if (ctx.lcb_pure() != null && ctx.heavy_lcb() != null) {
-            throw new RuntimeException("Heavy label in lcb_pure context not implemented yet!");
-        }
-        SwissLipidsParser.Lcb_pureContext pureCtx = ctx.lcb_pure();
+        SwissLipidsParser.Lcb_coreContext pureCtx = ctx.lcb_core();
         StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
         fa.nCarbon(faHelperFunctions.asInt(pureCtx.carbon(), 0));
 //        fa.nHydroxy(faHelperFunctions.asInt(pureCtx.hydroxyl(), 0));
         if (pureCtx.db() != null) {
             fa.nDoubleBonds(faHelperFunctions.asInt(pureCtx.db().db_count(), 0));
-            if (pureCtx.db().db_position() != null) {
+            if (pureCtx.db().db_positions() != null) {
                 throw new RuntimeException("Support for double bond positions not implemented yet!");
             }
         }

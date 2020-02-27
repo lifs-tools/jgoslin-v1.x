@@ -37,6 +37,20 @@ public class GoslinVisitorParserTest {
     }
 
     @Test
+    public void testChE() throws ParsingException {
+        String ref = "ChE 12:1";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("ChE", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.ST, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(12, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
+
+    @Test
     public void testMediators() throws ParsingException {
         String ref1 = "11,12-DHET";
         String ref2 = "5(6)-EET";
@@ -133,39 +147,39 @@ public class GoslinVisitorParserTest {
     @Test
     public void testFailForImplicitLyso() throws ParsingException {
 //        assertThrows(ConstraintViolationException.class, () -> {
-            String ref2 = "PE 18:0-0:0";
-            System.out.println("Testing implicit lysolipid name " + ref2);
-            LipidAdduct lipidAdduct2 = parseLipidName(ref2);
-            assertNotNull(lipidAdduct2);
-            LipidMolecularSubspecies lipid2 = (LipidMolecularSubspecies) lipidAdduct2.getLipid();
-            assertNotNull(lipid2);
-            System.out.println(lipid2);
-            assertEquals("PE", lipid2.getHeadGroup());
-            assertEquals("FA1", lipid2.getFa().
-                    get("FA1").
-                    getName());
-            assertEquals(18, lipid2.getFa().
-                    get("FA1").
-                    getNCarbon());
-            assertEquals(0, lipid2.getFa().
-                    get("FA1").
-                    getNDoubleBonds());
-            assertEquals(0, lipid2.getFa().
-                    get("FA1").
-                    getNHydroxy());
-            assertEquals(2, lipid2.getFa().size());
-            assertEquals("FA2", lipid2.getFa().
-                    get("FA2").
-                    getName());
-            assertEquals(0, lipid2.getFa().
-                    get("FA2").
-                    getNCarbon());
-            assertEquals(0, lipid2.getFa().
-                    get("FA2").
-                    getNDoubleBonds());
-            assertEquals(0, lipid2.getFa().
-                    get("FA2").
-                    getNHydroxy());
+        String ref2 = "PE 18:0-0:0";
+        System.out.println("Testing implicit lysolipid name " + ref2);
+        LipidAdduct lipidAdduct2 = parseLipidName(ref2);
+        assertNotNull(lipidAdduct2);
+        LipidMolecularSubspecies lipid2 = (LipidMolecularSubspecies) lipidAdduct2.getLipid();
+        assertNotNull(lipid2);
+        System.out.println(lipid2);
+        assertEquals("PE", lipid2.getHeadGroup());
+        assertEquals("FA1", lipid2.getFa().
+                get("FA1").
+                getName());
+        assertEquals(18, lipid2.getFa().
+                get("FA1").
+                getNCarbon());
+        assertEquals(0, lipid2.getFa().
+                get("FA1").
+                getNDoubleBonds());
+        assertEquals(0, lipid2.getFa().
+                get("FA1").
+                getNHydroxy());
+        assertEquals(2, lipid2.getFa().size());
+        assertEquals("FA2", lipid2.getFa().
+                get("FA2").
+                getName());
+        assertEquals(0, lipid2.getFa().
+                get("FA2").
+                getNCarbon());
+        assertEquals(0, lipid2.getFa().
+                get("FA2").
+                getNDoubleBonds());
+        assertEquals(0, lipid2.getFa().
+                get("FA2").
+                getNHydroxy());
 //        });
     }
 

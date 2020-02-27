@@ -21,7 +21,7 @@ import org.antlr.v4.runtime.TokenStream;
  * @author nils.hoffmann
  */
 @Slf4j
-public class SwissLipidVisitorParser {
+public class SwissLipidsVisitorParser {
 
     public LipidAdduct parse(String lipidString, SyntaxErrorListener listener) throws ParsingException {
         return parseWithSwissLipidsGrammar(lipidString, listener);

@@ -88,18 +88,19 @@ public class SwissLipidsVisitorImpl extends SwissLipidsBaseVisitor<LipidAdduct> 
             switch (contextCategory) {
                 case ST:
                     lipid = new SterolHandler(
-                            new MolecularSubspeciesFasHandler(new FaHelperFunctions()), 
-                            new StructuralSubspeciesFasHandler(new FaHelperFunctions())
-                    ).handleSterol(ctx);
+                            new MolecularSubspeciesFasHandler(new FattyAcylHandler()),
+                            new StructuralSubspeciesFasHandler(new FattyAcylHandler())
+                    ).handle(ctx);
                     break;
                 case GL:
                     lipid = new GlycerolipidHandler(
-                            new MolecularSubspeciesFasHandler(new FaHelperFunctions()), 
-                            new StructuralSubspeciesFasHandler(new FaHelperFunctions())
-                    ).handleGlycerolipid(ctx);
+                            new MolecularSubspeciesFasHandler(new FattyAcylHandler()),
+                            new StructuralSubspeciesFasHandler(new FattyAcylHandler()),
+                            new FattyAcylHandler()
+                    ).handle(ctx);
                     break;
                 case FA:
-                    lipid = new LipidSpecies(ctx.fatty_acid().getText());
+                    lipid = new FattyAcylHandler().handle(ctx);
                     break;
 //                case GP:
 //                    lipid = handleGlyceroPhospholipid(ctx).orElse(LipidSpecies.NONE);
@@ -349,49 +350,19 @@ public class SwissLipidsVisitorImpl extends SwissLipidsBaseVisitor<LipidAdduct> 
 //            StructuralFattyAcid fa = buildStructuralLcb(lcbContext, "LCB", 1);
 //            return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
 //        }
-        private Optional<LipidSpeciesInfo> getSpeciesInfo(SwissLipidsParser.FaContext faContext) {
-            //fa_pure, ether, heavy
-            if (faContext.fa_pure() != null && faContext.heavy_fa() != null) {
-                throw new RuntimeException("Heavy label in FA_pure context not implemented yet!");
-            }
-            LipidFaBondType lfbt = getLipidFaBondType(faContext);
-            return Optional.of(new LipidSpeciesInfo(
-                    LipidLevel.SPECIES,
-                    asInt(faContext.fa_pure().carbon(), 0),
-                    asInt(faContext.fa_pure().hydroxyl(), 0),
-                    asInt(faContext.fa_pure().db(), 0),
-                    lfbt));
-        }
-
-        private Optional<LipidSpeciesInfo> getSpeciesInfo(SwissLipidsParser.LcbContext lcbContext) {
-            Integer hydroxyl = 0;
-            if (lcbContext.lcb_pure() != null && lcbContext.heavy_lcb() != null) {
-                throw new RuntimeException("Heavy label in lcb_pure context not implemented yet!");
-            }
-            if (lcbContext.lcb_pure() != null) {
-                SwissLipidsParser.Lcb_pureContext pureCtx = lcbContext.lcb_pure();
-                if (pureCtx.old_hydroxyl() != null) {
-                    switch (pureCtx.old_hydroxyl().getText()) {
-                        case "t":
-                            hydroxyl = 3;
-                            break;
-                        case "d":
-                            hydroxyl = 2;
-                            break;
-                        default:
-                            throw new ParseTreeVisitorException("Unsupported old hydroxyl prefix: " + pureCtx.old_hydroxyl().getText());
-                    }
-                } else if (pureCtx.hydroxyl() != null) {
-                    hydroxyl = asInt(pureCtx.hydroxyl(), 0);
-                }
-                return Optional.of(new LipidSpeciesInfo(
-                        LipidLevel.SPECIES,
-                        asInt(pureCtx.carbon(), 0),
-                        hydroxyl,
-                        asInt(pureCtx.db(), 0), LipidFaBondType.ESTER));
-            }
-            throw new ParseTreeVisitorException("Uninitialized lcb_pure context!");
-        }
+//        private Optional<LipidSpeciesInfo> getSpeciesInfo(SwissLipidsParser.FaContext faContext) {
+//            //fa_pure, ether, heavy
+//            if (faContext.fa_pure() != null && faContext.heavy_fa() != null) {
+//                throw new RuntimeException("Heavy label in FA_pure context not implemented yet!");
+//            }
+//            LipidFaBondType lfbt = getLipidFaBondType(faContext);
+//            return Optional.of(new LipidSpeciesInfo(
+//                    LipidLevel.SPECIES,
+//                    asInt(faContext.fa_pure().carbon(), 0),
+//                    asInt(faContext.fa_pure().hydroxyl(), 0),
+//                    asInt(faContext.fa_pure().db(), 0),
+//                    lfbt));
+//        }
     }
 
 //    private static class AdductVisitor extends SwissLipidsBaseVisitor<Adduct> {
@@ -415,7 +386,6 @@ public class SwissLipidsVisitorImpl extends SwissLipidsBaseVisitor<LipidAdduct> 
 //            return adduct;
 //        }
 //    }
-
 //    private static LipidFaBondType getLipidFaBondType(SwissLipidsParser.FaContext faContext) throws ParseTreeVisitorException {
 //        LipidFaBondType lfbt = LipidFaBondType.ESTER;
 //        if (faContext.ether() != null) {

@@ -16,8 +16,8 @@
 package de.isas.lipidomics.palinom.swisslipids;
 
 import de.isas.lipidomics.domain.LipidFaBondType;
-import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -31,25 +31,25 @@ import java.util.Optional;
  */
 public class StructuralSubspeciesFasHandler {
 
-    private final FaHelperFunctions faHelperFunctions;
+    private final FattyAcylHandler faHelperFunctions;
     
-    public StructuralSubspeciesFasHandler(FaHelperFunctions faBondTypeResolver) {
+    public StructuralSubspeciesFasHandler(FattyAcylHandler faBondTypeResolver) {
         this.faHelperFunctions = faBondTypeResolver;
     }
     
-    public Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<SwissLipidsParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<SwissLipidsParser.FaContext> faContexts) {
         List<StructuralFattyAcid> fas = new LinkedList<>();
         for (int i = 0; i < faContexts.size(); i++) {
-            StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1));
+            StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i+1);
             fas.add(fa);
         }
         StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
         fas.toArray(arrs);
-        return Optional.of(new LipidMolecularSubspecies(headGroup, arrs));
+        return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
     }
    
 
-    public StructuralFattyAcid buildStructuralFa(SwissLipidsParser.FaContext ctx, String faName) {
+    public StructuralFattyAcid buildStructuralFa(SwissLipidsParser.FaContext ctx, String faName, int position) {
         StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
         LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {
@@ -62,7 +62,7 @@ public class StructuralSubspeciesFasHandler {
                 }
             }
             fa.lipidFaBondType(lfbt);
-            return fa.name(faName).build();
+            return fa.name(faName).position(position).build();
         } else if(ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() !=null) { //handling of lcbs
             throw new ParseTreeVisitorException("LCBs currently not handled!");
         } else {

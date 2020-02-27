@@ -19,7 +19,6 @@ import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.SwissLipidsParser.Lipid_pureContext;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
-import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -30,62 +29,87 @@ public class GlycerolipidHandler implements ParserRuleContextHandler<Lipid_pureC
 
     private final MolecularSubspeciesFasHandler msfh;
     private final StructuralSubspeciesFasHandler ssfh;
-    
-    public GlycerolipidHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh) {
+    private final FattyAcylHandler fhf;
+
+    public GlycerolipidHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh, FattyAcylHandler fhf) {
         this.msfh = msfh;
         this.ssfh = ssfh;
+        this.fhf = fhf;
     }
-    
+
     @Override
     public LipidSpecies handle(Lipid_pureContext t) {
         return handleGlycerolipid(t).orElse(LipidSpecies.NONE);
     }
 
-        private Optional<LipidSpecies> handleGlycerolipid(SwissLipidsParser.Lipid_pureContext ctx) throws RuntimeException {
+    private Optional<LipidSpecies> handleGlycerolipid(SwissLipidsParser.Lipid_pureContext ctx) throws RuntimeException {
+        if (ctx.gl() != null) {
             //glycerophospholipids
             //cardiolipin
-            if (ctx.gl().gl_regular()!= null) {
+            if (ctx.gl().gl_regular() != null) {
                 return handleGlRegular(ctx.gl().gl_regular());
             } else if (ctx.gl().gl_mono() != null) {
                 return handleGlMono(ctx.gl().gl_mono());
             } else if (ctx.gl().gl_molecular() != null) {
-                return handleSgl(ctx.gl().gl_molecular());
+                return handleGlMolecular(ctx.gl().gl_molecular());
             } else {
                 throw new ParseTreeVisitorException("Unhandled context state in GL!");
             }
+        } else {
+            throw new ParseTreeVisitorException("Context for GL was null!");
         }
+    }
 
-        private Optional<LipidSpecies> handleGlRegular(SwissLipidsParser.Gl_regularContext dsl) {
-            String headGroup = dsl.gl_hg().getText();
-            if (dsl.gl_fa().fa_species() != null) { //species level
-                //process single fa
-                return visitSpeciesFas(headGroup, dsl.gl_fa().fa_species().fa());
-            } else if (dsl.gl_fa().fa3() != null) {
-                //process triple fa
-                if(dsl.gl_fa().fa3().fa3_unsorted()!=null) {
-                    return visitMolecularSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_unsorted().fa());
-                } else if(dsl.gl_fa().fa3().fa3_sorted()!=null) {
-                    return visitStructuralSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_sorted().fa());
+    private Optional<LipidSpecies> handleGlRegular(SwissLipidsParser.Gl_regularContext dsl) {
+        String headGroup = dsl.gl_hg().getText();
+        if (dsl.gl_fa().fa_species() != null) { //species level
+            //process single fa
+            return fhf.visitSpeciesFas(headGroup, dsl.gl_fa().fa_species().fa());
+        } else if (dsl.gl_fa().fa3() != null) {
+            //process triple fa
+            if (dsl.gl_fa().fa3().fa3_unsorted() != null) {
+                return msfh.visitMolecularSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_unsorted().fa());
+            } else if (dsl.gl_fa().fa3().fa3_sorted() != null) {
+                return ssfh.visitStructuralSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_sorted().fa());
+            } else {
+                throw new ParseTreeVisitorException("Unhandled context state in GL regular FA3!");
+            }
+        } else {
+            throw new ParseTreeVisitorException("Unhandled context state in GL regular!");
+        }
+    }
+
+    private Optional<LipidSpecies> handleGlMono(SwissLipidsParser.Gl_monoContext lsl) {
+        String headGroup = lsl.gl_mono_hg().getText();
+        if (lsl.gl_mono_fa() != null) {
+            if (lsl.gl_mono_fa().fa_species() != null) {
+                return fhf.visitSpeciesFas(headGroup, lsl.gl_mono_fa().fa_species().fa());
+            } else if (lsl.gl_mono_fa().fa2() != null) {
+                throw new ParseTreeVisitorException("Unhandled context state in Gl mono FA2!");
+            } else {
+                throw new ParseTreeVisitorException("Unhandled context state in Gl mono FA!");
+            }
+        } else {
+            throw new ParseTreeVisitorException("Unhandled context state in Gl mono!");
+        }
+    }
+
+    private Optional<LipidSpecies> handleGlMolecular(SwissLipidsParser.Gl_molecularContext lsl) {
+        String headGroup = lsl.gl_molecular_hg().getText();
+        if (lsl.gl_molecular_fa() != null) {
+            if (lsl.gl_molecular_fa().fa2() != null) {
+                if (lsl.gl_molecular_fa().fa2().fa2_unsorted() != null) {
+                    return msfh.visitMolecularSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_unsorted().fa());
+                } else if (lsl.gl_molecular_fa().fa2().fa2_sorted() != null) {
+                    return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_sorted().fa());
                 } else {
-                    throw new ParseTreeVisitorException("Unhandled context state in GL regular FA3!");
+                    throw new ParseTreeVisitorException("Unhandled context state in GL regular FA2!");
                 }
             } else {
-                throw new ParseTreeVisitorException("Unhandled context state in GL regular!");
+                throw new ParseTreeVisitorException("Unhandled context state in Gl mono FA!");
             }
+        } else {
+            throw new ParseTreeVisitorException("Unhandled context state in Gl mono!");
         }
-
-//        private Optional<LipidSpecies> handleGlMono(SwissLipidsParser.Gl_monoContext lsl) {
-//            String headGroup = lsl.gl_mono_hg().getText();
-//            if (lsl.gl_mono_fa() != null) { 
-//                if(lsl.gl_mono_fa().fa_species() != null) {
-//                    return visitSpeciesFas(headGroup, lsl.gl_mono_fa().fa_species().fa());
-//                } else if (lsl.gl_mono_fa().fa2() != null) {
-//                    
-//                } else {
-//                    throw new ParseTreeVisitorException("Unhandled context state in Gl mono FA!");    
-//                }
-//            } else {
-//                throw new ParseTreeVisitorException("Unhandled context state in Gl mono!");
-//            }
-//        }
+    }
 }

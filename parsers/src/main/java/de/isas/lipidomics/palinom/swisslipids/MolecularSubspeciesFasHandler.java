@@ -31,9 +31,9 @@ import java.util.Optional;
  */
 public class MolecularSubspeciesFasHandler {
 
-    private final FaHelperFunctions faHelperFunctions;
+    private final FattyAcylHandler faHelperFunctions;
     
-    public MolecularSubspeciesFasHandler(FaHelperFunctions faBondTypeResolver) {
+    public MolecularSubspeciesFasHandler(FattyAcylHandler faBondTypeResolver) {
         this.faHelperFunctions = faBondTypeResolver;
     }
     
