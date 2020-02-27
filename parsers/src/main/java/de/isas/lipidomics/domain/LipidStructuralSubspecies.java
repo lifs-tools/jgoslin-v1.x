@@ -20,7 +20,7 @@ import java.util.Optional;
 import lombok.Data;
 
 /**
- *
+ * Example: Phosphatidylinositol (8:0/8:0) or PI(8:0/8:0)
  * @author nils.hoffmann
  */
 @Data

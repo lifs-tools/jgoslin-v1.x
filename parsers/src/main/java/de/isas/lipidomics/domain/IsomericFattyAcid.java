@@ -8,13 +8,15 @@ import java.util.TreeMap;
 import lombok.Data;
 
 /**
- * A structural fatty acid has a determined position.
- * @author nilshoffmann
+ * Part of a {@link LipidIsomericSubspecies}.
+ * An isomeric fatty acid has a determined position, defined number of carbons, hydroxylations,
+ * bond type to the head group, and its double bond positions defined.
+ * @author nils.hoffmann
  */
 @Data
 public class IsomericFattyAcid extends StructuralFattyAcid {
 
-    private final Map<Integer, String> doubleBondPositions = new TreeMap<Integer, String>();
+    private final Map<Integer, String> doubleBondPositions = new TreeMap<>();
     
     public IsomericFattyAcid(String name, int position, int nCarbon, int nHydroxy, LipidFaBondType lipidFaBondType, boolean lcb, Map<Integer, String> doubleBondPositions) {
         super(name, position, nCarbon, nHydroxy, doubleBondPositions.size(), lipidFaBondType, lcb);

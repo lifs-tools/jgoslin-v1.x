@@ -9,13 +9,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * This nomenclature follows the shorthand notation of 
+ * The lipid category nomenclature follows the shorthand notation of
  * <pre>Liebisch, G., Vizcaíno,
  * J.A., Köfeler, H., Trötzmüller, M., Griffiths, W.J., Schmitz, G., Spener, F.,
  * and Wakelam, M.J.O. (2013). Shorthand notation for lipid structures derived
  * from mass spectrometry. J. Lipid Res. 54, 1523–1530.</pre>
  *
- * @author nilshoffmann
+ * We use the associations to either LipidMAPS or SwissLipids (Saccharolipids),
+ * where appropriate.
+ * 
+ * Example: Category=Glyerophospholipids (GP)
+ *
+ * @author nils.hoffmann
  */
 public enum LipidCategory {
 
@@ -29,7 +34,9 @@ public enum LipidCategory {
     /* SLM:000500463 Steroids and derivatives */
     ST("Sterollipid"),
     /* SLM:000390054 Fatty acyls and derivatives */
-    FA("Fattyacyls");
+    FA("Fattyacyls"),
+    /* Swiss lipids*/
+    SL("Saccharolipids");
 
     private final String fullName;
 

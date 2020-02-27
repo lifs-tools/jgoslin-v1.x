@@ -9,7 +9,7 @@ import lombok.Data;
 
 /**
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @Data
 public abstract class FattyAcid {

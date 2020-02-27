@@ -19,8 +19,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
+ * Base class for lipid names parsed using the different grammars. This can
+ * contain a lipid, an adduct, a sum formula and a fragment.
  *
  * @author nils.hoffmann
+ * @see LipidSpecies
+ * @see Adduct
+ * @see Fragment
  */
 @AllArgsConstructor
 @Data

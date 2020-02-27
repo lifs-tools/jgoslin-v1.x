@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom;
+package de.isas.lipidomics.palinom.swisslipids;
+
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  *
- * @author nils.hoffmann
+ * @author nilshoffmann
+ * @param <T>
+ * @param <U>
  */
-public class CmdLineParser {
-    
+public interface ParserRuleContextHandler<T extends ParserRuleContext, U> {
+    U handle(T t);
 }

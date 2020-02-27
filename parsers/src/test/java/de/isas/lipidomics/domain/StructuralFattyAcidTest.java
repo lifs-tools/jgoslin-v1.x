@@ -69,7 +69,7 @@ public class StructuralFattyAcidTest {
     @Test
     public void testGetNCarbonException() {
         Assertions.assertThrows(ConstraintViolationException.class, () -> {
-            StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, 1, 0, 0, LipidFaBondType.UNDEFINED, false);
+            StructuralFattyAcid instance = new StructuralFattyAcid("FAX", 1, -1, 0, 0, LipidFaBondType.UNDEFINED, false);
         });
     }
 

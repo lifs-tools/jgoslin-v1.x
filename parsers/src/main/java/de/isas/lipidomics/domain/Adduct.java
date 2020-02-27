@@ -7,19 +7,22 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
+ * An adduct, generally, consists of a sum formula part, an adduct string, the
+ * charge and the charge sign. An example for a valid adduct is : [M+H]1+.
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @AllArgsConstructor
 @Data
 public class Adduct {
-    
+
     private static final class None extends Adduct {
+
         private None() {
             super("", "", 0, 0);
         }
     }
-    
+
     public static final Adduct NONE = new None();
 
     private String sumFormula;

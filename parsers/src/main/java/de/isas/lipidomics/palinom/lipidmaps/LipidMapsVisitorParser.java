@@ -1,10 +1,13 @@
 /*
  * 
  */
-package de.isas.lipidomics.palinom;
+package de.isas.lipidomics.palinom.lipidmaps;
 
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.LipidAdduct;
+import de.isas.lipidomics.palinom.LipidMapsLexer;
+import de.isas.lipidomics.palinom.LipidMapsParser;
+import de.isas.lipidomics.palinom.SyntaxErrorListener;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -15,7 +18,7 @@ import org.antlr.v4.runtime.TokenStream;
 
 /**
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @Slf4j
 public class LipidMapsVisitorParser {

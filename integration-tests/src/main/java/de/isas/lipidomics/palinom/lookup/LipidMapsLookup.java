@@ -17,10 +17,9 @@ package de.isas.lipidomics.palinom.lookup;
 
 import de.isas.lipidomics.domain.ExternalDatabaseReference;
 import de.isas.lipidomics.domain.LipidAdduct;
-import de.isas.lipidomics.palinom.GoslinVisitorParser;
 import de.isas.lipidomics.palinom.LipidMapsVisitorParser;
-import de.isas.lipidomics.palinom.exceptions.PalinomVisitorException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @Slf4j
 public class LipidMapsLookup {
@@ -92,7 +91,7 @@ public class LipidMapsLookup {
         } catch (ParsingException ex) {
             log.error("Exception while parsing " + abbreviation, ex);
             result = "N.D.";
-        } catch (PalinomVisitorException pve) {
+        } catch (ParseTreeVisitorException pve) {
             log.error("Exception in LipidMapsVisitorParser " + abbreviation, pve);
             result = "N.I.";
         }

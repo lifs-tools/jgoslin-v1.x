@@ -16,6 +16,8 @@
 package de.isas.lipidomics.domain;
 
 /**
+ * The lipid fatty acyl bond types define how the FA is connected to the head
+ * group or which variant of a particular bond type it is.
  *
  * @author nils.hoffmann
  */

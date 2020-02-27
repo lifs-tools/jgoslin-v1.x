@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom;
 
+import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;

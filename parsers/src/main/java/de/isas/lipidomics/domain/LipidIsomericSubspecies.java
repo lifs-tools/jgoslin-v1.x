@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import lombok.Data;
 
 /**
- *
+ * Example: PE(P-18:0/22:6(4Z,7Z,10Z,13Z,16Z,19Z))
  * @author nils.hoffmann
  */
 @Data
@@ -80,16 +80,8 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
             faStrings.add(nCarbon + ":" + nDB + dbPos + (nHydroxy > 0 ? ";" + nHydroxy : "") + fattyAcid.getLipidFaBondType().suffix());
         }
         String hgToFaSep = " ";
-        switch(this.getHeadGroup()) {
-            case "PC O":
-            case "LPC O":
-            case "PE O":
-            case "LPE O":
-                hgToFaSep = " O-";
-                break;
-        }
-        if(this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMENYL) {
-            hgToFaSep = " O-";
+        if (isEsterLipid()) {
+            hgToFaSep = "-";
         }
         return getHeadGroup() + hgToFaSep + faStrings.stream().collect(Collectors.joining("/"));
     }

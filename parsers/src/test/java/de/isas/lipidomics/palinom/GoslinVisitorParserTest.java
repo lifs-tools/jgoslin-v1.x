@@ -3,6 +3,7 @@
  */
 package de.isas.lipidomics.palinom;
 
+import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.LipidAdduct;
@@ -21,7 +22,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 public class GoslinVisitorParserTest {
 
@@ -131,7 +132,7 @@ public class GoslinVisitorParserTest {
 
     @Test
     public void testFailForImplicitLyso() throws ParsingException {
-        assertThrows(ConstraintViolationException.class, () -> {
+//        assertThrows(ConstraintViolationException.class, () -> {
             String ref2 = "PE 18:0-0:0";
             System.out.println("Testing implicit lysolipid name " + ref2);
             LipidAdduct lipidAdduct2 = parseLipidName(ref2);
@@ -165,7 +166,7 @@ public class GoslinVisitorParserTest {
             assertEquals(0, lipid2.getFa().
                     get("FA2").
                     getNHydroxy());
-        });
+//        });
     }
 
     @Test

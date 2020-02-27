@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom;
+package de.isas.lipidomics.palinom.lipidmaps;
 
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.FattyAcid;
@@ -34,10 +34,12 @@ import de.isas.lipidomics.domain.MolecularFattyAcid;
 import de.isas.lipidomics.domain.MolecularFattyAcid.MolecularFattyAcidBuilder;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
 import de.isas.lipidomics.domain.StructuralFattyAcid.StructuralFattyAcidBuilder;
+import de.isas.lipidomics.palinom.LipidMapsBaseVisitor;
+import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.LipidMapsParser.Fa2Context;
 import de.isas.lipidomics.palinom.LipidMapsParser.Hg_ddplContext;
 import de.isas.lipidomics.palinom.LipidMapsParser.Lipid_pureContext;
-import de.isas.lipidomics.palinom.exceptions.PalinomVisitorException;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.LinkedList;
@@ -48,7 +50,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.RuleNode;
 
 /**
- *
+ * Overriding implementation of {@link LipidMapsBaseVisitor}.
+ * Creates {@link LipidAdduct} instances from the provided context.
+ * 
+ * @see SwissLipidsVisitorParser 
  * @author nils.hoffmann
  */
 @Slf4j
@@ -56,7 +61,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
 
     /**
      *
-     * @throws PalinomVisitorException for structural or state-related issues
+     * @throws ParseTreeVisitorException for structural or state-related issues
      * while trying to process a parsing context.
      * @throws RuntimeException
      * @param ctx
@@ -66,10 +71,10 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
     public LipidAdduct visitLipid(LipidMapsParser.LipidContext ctx) {
         LipidMapsParser.Lipid_ruleContext lipid = ctx.lipid_rule();
         if (lipid.isotope() != null) {
-            throw new PalinomVisitorException("Support for isotopes in LipidMaps names not implemented yet!");
+            throw new ParseTreeVisitorException("Support for isotopes in LipidMaps names not implemented yet!");
         }
         if (lipid.lipid_mono() != null && lipid.lipid_mono().isoform() != null) {
-            throw new PalinomVisitorException("Support for isoforms in LipidMaps names not implemented yet!");
+            throw new ParseTreeVisitorException("Support for isoforms in LipidMaps names not implemented yet!");
         }
         Optional<Lipid_pureContext> categoryContext = Optional.ofNullable(lipid.lipid_mono().lipid_pure());
 
@@ -94,7 +99,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                 LipidSpecies ls = new LipidSpecies(
                         ctx.hg_fa().getText(),
                         LipidCategory.valueOf("FA"),
-                        Optional.of(LipidClass.FA),
+                        LipidClass.forHeadGroup(ctx.hg_fa().getText()),
                         Optional.of(lsi)
                 );
                 return ls;
@@ -117,10 +122,10 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     );
                     return ls;
                 } else {
-                    throw new PalinomVisitorException("Unhandled pure FA species context: " + ctx.pure_fa_species());
+                    throw new ParseTreeVisitorException("Unhandled pure FA species context: " + ctx.pure_fa_species());
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled pure FA: " + ctx.getText());
+                throw new ParseTreeVisitorException("Unhandled pure FA: " + ctx.getText());
             }
         }
 
@@ -136,12 +141,12 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             LipidCategory contextCategory = LipidCategory.UNDEFINED;
             switch (bs.cardinality()) {
                 case 0:
-                    throw new PalinomVisitorException("Parsing context did not contain content for any lipid category. Must contain exactly one of " + Arrays.toString(LipidCategory.values()));
+                    throw new ParseTreeVisitorException("Parsing context did not contain content for any lipid category. Must contain exactly one of " + Arrays.toString(LipidCategory.values()));
                 case 1:
                     contextCategory = LipidCategory.values()[bs.nextSetBit(0)];
                     break;
                 default:
-                    throw new PalinomVisitorException("Parsing context contained content for more than one lipid category. Must contain exactly one of " + Arrays.toString(LipidCategory.values()));
+                    throw new ParseTreeVisitorException("Parsing context contained content for more than one lipid category. Must contain exactly one of " + Arrays.toString(LipidCategory.values()));
             }
             switch (contextCategory) {
                 case ST:
@@ -152,7 +157,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                         lipid = handleChe(ctx.cholesterol().chec()).orElse(LipidSpecies.NONE);
                         break;
                     } else {
-                        throw new PalinomVisitorException("Unhandled sterol lipid: " + ctx.cholesterol().getText());
+                        throw new ParseTreeVisitorException("Unhandled sterol lipid: " + ctx.cholesterol().getText());
                     }
                 case GL:
                     lipid = handleGlycerolipid(ctx).orElse(LipidSpecies.NONE);
@@ -160,7 +165,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                 case FA:
                     if (ctx.mediator() != null) {
                         LipidSpeciesInfo lsi = new LipidSpeciesInfo(LipidLevel.ISOMERIC_SUBSPECIES, -1 , -1, -1, LipidFaBondType.UNDEFINED);
-                        lipid = new LipidSpecies(ctx.mediator().getText(), LipidCategory.FA, Optional.of(LipidClass.FA), Optional.of(lsi));
+                        lipid = new LipidSpecies(ctx.mediator().getText(), LipidCategory.FA, LipidClass.forHeadGroup(ctx.mediator().getText()), Optional.of(lsi));
                     } else if (ctx.pure_fa() != null) {
                         lipid = handlePureFaContext(ctx.pure_fa());
                     }
@@ -178,7 +183,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     }
                     break;
                 default:
-                    throw new PalinomVisitorException("Unhandled contextCategory: " + contextCategory);
+                    throw new ParseTreeVisitorException("Unhandled contextCategory: " + contextCategory);
             }
             return lipid;
         }
@@ -187,7 +192,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             if (ctx.cholesterol() != null && ctx.cholesterol().chc().ch() != null) {
                 return new LipidIsomericSubspecies(ctx.cholesterol().chc().ch().getText());
             } else {
-                throw new PalinomVisitorException("Unhandled context state in Cholesterol!");
+                throw new ParseTreeVisitorException("Unhandled context state in Cholesterol!");
             }
         }
 
@@ -197,7 +202,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             } else if (ctx.gl().tgl() != null) {
                 return handleTgl(ctx.gl().tgl());
             } else {
-                throw new PalinomVisitorException("Unhandled context state in GL!");
+                throw new ParseTreeVisitorException("Unhandled context state in GL!");
             }
         }
 
@@ -213,7 +218,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     return visitStructuralSubspeciesLcb(headGroup, dsl.dsl_subspecies().lcb_fa_sorted().lcb(), Arrays.asList(dsl.dsl_subspecies().lcb_fa_sorted().fa()));
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in DSL!");
+                throw new ParseTreeVisitorException("Unhandled context state in DSL!");
             }
             return Optional.empty();
         }
@@ -224,7 +229,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                 //process structural sub species level
                 return visitStructuralSubspeciesLcb(headGroup, lsl.lcb());
             } else {
-                throw new PalinomVisitorException("Unhandled context state in LSL!");
+                throw new ParseTreeVisitorException("Unhandled context state in LSL!");
             }
         }
 
@@ -242,7 +247,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     return visitMolecularSubspeciesFas(headGroup, tgl.tgl_subspecies().fa3().fa3_unsorted().fa());
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in TGL!");
+                throw new ParseTreeVisitorException("Unhandled context state in TGL!");
             }
             return Optional.empty();
         }
@@ -262,7 +267,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     return visitMolecularSubspeciesFas(headGroup, sgl.sgl_subspecies().fa2().fa2_unsorted().fa());
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in SGL!");
+                throw new ParseTreeVisitorException("Unhandled context state in SGL!");
             }
             return Optional.empty();
         }
@@ -273,7 +278,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             } else if (che.che() != null) {
                 return visitStructuralSubspeciesFas(che.che().hg_che().getText(), Arrays.asList(che.che().fa()));
             } else {
-                throw new PalinomVisitorException("Unhandled context state in ChE!");
+                throw new ParseTreeVisitorException("Unhandled context state in ChE!");
             }
         }
 
@@ -289,7 +294,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             } else if (ctx.pl().fourpl() != null) {
                 throw new RuntimeException("Support for PAT16 / PAT18 not implemented yet!");
             } else {
-                throw new PalinomVisitorException("Unhandled context state in PL!");
+                throw new ParseTreeVisitorException("Unhandled context state in PL!");
             }
         }
 
@@ -304,10 +309,10 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     //sorted => StructuralSubspecies
                     return visitSubspeciesFas2(headGroup, cl.cl_subspecies().fa2());
                 } else {
-                    throw new PalinomVisitorException("CL had not fatty acids defined!");
+                    throw new ParseTreeVisitorException("CL had not fatty acids defined!");
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in CL!");
+                throw new ParseTreeVisitorException("Unhandled context state in CL!");
             }
         }
 
@@ -330,10 +335,10 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                         return visitMolecularSubspeciesFas(headGroup, dpl.dpl_subspecies().fa2().fa2_unsorted().fa());
                     }
                 } else {
-                    throw new PalinomVisitorException("Unhandled context state in PL!");
+                    throw new ParseTreeVisitorException("Unhandled context state in PL!");
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in PL!");
+                throw new ParseTreeVisitorException("Unhandled context state in PL!");
             }
             return Optional.empty();
         }
@@ -349,12 +354,12 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     if (fa2ctx.fa2_sorted() != null) {
                         return visitStructuralSubspeciesFas(headGroup, fa2ctx.fa2_sorted().fa());
                     } else if (fa2ctx.fa2_unsorted() != null) {
-                        throw new PalinomVisitorException("Lyso PL FAs are defined on structural subspecies level, provided FAs were defined on molecular subspecies level!");
+                        throw new ParseTreeVisitorException("Lyso PL FAs are defined on structural subspecies level, provided FAs were defined on molecular subspecies level!");
                     }
                 }
-                throw new PalinomVisitorException("Unhandled FA context state in Lyso PL!");
+                throw new ParseTreeVisitorException("Unhandled FA context state in Lyso PL!");
             } else {
-                throw new PalinomVisitorException("Unhandled context state in Lyso PL!");
+                throw new ParseTreeVisitorException("Unhandled context state in Lyso PL!");
             }
         }
 
@@ -409,7 +414,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                 Fa2Context fa2Ctx = fa2Contexts.get(i);
                 if (fa2Ctx.fa2_sorted() != null) {
                     if (level == LipidLevel.MOLECULAR_SUBSPECIES) {
-                        throw new PalinomVisitorException("CL second FAs group can not be on molecular level, first group was on structural level!");
+                        throw new ParseTreeVisitorException("CL second FAs group can not be on molecular level, first group was on structural level!");
                     }
                     level = LipidLevel.STRUCTURAL_SUBSPECIES;
                     for (int j = 0; j < fa2Ctx.fa2_sorted().fa().size(); j++) {
@@ -418,7 +423,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     }
                 } else if (fa2Ctx.fa2_unsorted() != null) {
                     if (level == LipidLevel.STRUCTURAL_SUBSPECIES) {
-                        throw new PalinomVisitorException("CL second FAs group can not be on molecular level, first group was on structural level!");
+                        throw new ParseTreeVisitorException("CL second FAs group can not be on molecular level, first group was on structural level!");
                     }
                     level = LipidLevel.MOLECULAR_SUBSPECIES;
                     for (int j = 0; j < fa2Ctx.fa2_unsorted().fa().size(); j++) {
@@ -437,7 +442,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     fas.toArray(sarrs);
                     return Optional.of(new LipidMolecularSubspecies(headGroup, sarrs));
                 default:
-                    throw new PalinomVisitorException("Unhandled lipid level for CL: " + level);
+                    throw new ParseTreeVisitorException("Unhandled lipid level for CL: " + level);
             }
         }
 
@@ -465,7 +470,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             } else if (faContext.fa_mod() != null) {
                 throw new RuntimeException("Modified FA handling not implemented yet for " + faContext.getText());
             }
-            throw new PalinomVisitorException("Unknown fa context value: " + faContext.getText());
+            throw new ParseTreeVisitorException("Unknown fa context value: " + faContext.getText());
         }
 
         private Optional<LipidSpeciesInfo> getSpeciesInfo(LipidMapsParser.LcbContext lcbContext) {
@@ -482,11 +487,11 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         }
     }
 
-    public static LipidFaBondType getLipidFaBondTypeUnmod(LipidMapsParser.FaContext faContext) throws PalinomVisitorException {
+    public static LipidFaBondType getLipidFaBondTypeUnmod(LipidMapsParser.FaContext faContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         if (faContext.fa_unmod().ether() != null) {
             if (null == faContext.fa_unmod().ether().getText()) {
-                throw new PalinomVisitorException("Undefined ether context value!");
+                throw new ParseTreeVisitorException("Undefined ether context value!");
             } else {
                 switch (faContext.fa_unmod().ether().getText()) {
                     case "O-":
@@ -496,7 +501,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                         lfbt = LipidFaBondType.ETHER_PLASMENYL;
                         break;
                     default:
-                        throw new PalinomVisitorException("Unknown ether context value: " + faContext.fa_unmod().ether());
+                        throw new ParseTreeVisitorException("Unknown ether context value: " + faContext.fa_unmod().ether());
                 }
             }
         }
@@ -528,7 +533,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         } else if (ctx.fa_mod() != null) {
             throw new RuntimeException("Support for modified FA handling not implemented!");
         } else {
-            throw new PalinomVisitorException("No FaContext!");
+            throw new ParseTreeVisitorException("No FaContext!");
         }
     }
 
@@ -601,7 +606,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         } else if (ctx.fa_mod() != null) {
             throw new RuntimeException("Support for modified FA handling not implemented!");
         } else {
-            throw new PalinomVisitorException("No FaContext!");
+            throw new ParseTreeVisitorException("No FaContext!");
         }
     }
 }

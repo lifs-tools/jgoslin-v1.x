@@ -17,7 +17,7 @@ package de.isas.lipidomics.palinom;
 
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.palinom.exceptions.PalinomVisitorException;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 
 /**
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @Slf4j
 public class LipidMapsCompleteIT {
@@ -56,7 +56,7 @@ public class LipidMapsCompleteIT {
             assertNotNull(ls);
         } catch (ParsingException ex) {
             fail("Parsing current LipidMAPS identifier: " + abbreviation + " failed - name unsupported in grammar!");
-        } catch (PalinomVisitorException pve) {
+        } catch (ParseTreeVisitorException pve) {
             fail("Parsing current LipidMAPS identifier: " + abbreviation + " failed - missing implementation!");
         }
     }

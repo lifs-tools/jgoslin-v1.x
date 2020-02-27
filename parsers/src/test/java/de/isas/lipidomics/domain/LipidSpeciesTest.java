@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 public class LipidSpeciesTest {
 

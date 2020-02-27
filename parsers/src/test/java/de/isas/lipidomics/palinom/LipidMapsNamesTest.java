@@ -16,11 +16,6 @@
 package de.isas.lipidomics.palinom;
 
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;

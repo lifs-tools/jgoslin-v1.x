@@ -7,8 +7,10 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * A structural fatty acid has a determined position.
- * @author nilshoffmann
+ * Part of a {@link LipidStructuralSubspecies}. This FA has a defined SN
+ * position with regard to its head group.
+ *
+ * @author nils.hoffmann
  */
 @Data
 public class StructuralFattyAcid extends MolecularFattyAcid {

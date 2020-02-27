@@ -1,7 +1,7 @@
 /*
  * 
  */
-package de.isas.lipidomics.palinom;
+package de.isas.lipidomics.palinom.goslin;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -14,7 +14,7 @@ import org.junit.Assert;
 
 /**
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @Slf4j
 public class MediatorsStepDefs {

@@ -19,8 +19,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
+ * A generic lipid fragment. There is currently no further specialization in
+ * fragment handling available, since the nomenclature is still not standardized
+ * in a way that would allow for generic detection of fragment-specific
+ * features.
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @AllArgsConstructor
 @Data

@@ -19,18 +19,24 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 
 /**
+ * An external database reference for a lipid encodes the link to identify the
+ * referenced lipid, contains its native abbreviation and name, the database's
+ * element id and the name as normalized by Goslin / PaLiNom.
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @Data
 @AllArgsConstructor
 public class ExternalDatabaseReference {
+
     private String databaseUrl;
     private String databaseElementId;
     private String lipidLevel;
     private String nativeAbbreviation;
     private String nativeName;
     private String normalizedName;
-    
-    public ExternalDatabaseReference() {};
+
+    public ExternalDatabaseReference() {
+    }
+;
 }

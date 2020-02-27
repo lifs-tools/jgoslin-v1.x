@@ -27,7 +27,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- *
+ * Example: Phosphatidylinositol (8:0-8:0) or PI(8:0-8:0)
  * @author nils.hoffmann
  */
 @Slf4j
@@ -65,7 +65,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         }
         super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.MOLECULAR_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, lipidFaBondType));
     }
-    
+
     public Map<String, FattyAcid> getFa() {
         return Collections.unmodifiableMap(fa);
     }
@@ -85,23 +85,15 @@ public class LipidMolecularSubspecies extends LipidSpecies {
             faStrings.add(nCarbon + ":" + nDB + (nHydroxy > 0 ? ";" + nHydroxy : "") + fattyAcid.getLipidFaBondType().suffix());
         }
         String hgToFaSep = " ";
-        switch(this.getHeadGroup()) {
-            case "PC O":
-            case "LPC O":
-            case "PE O":
-            case "LPE O":
-                hgToFaSep = " O-";
-                break;
+        if (isEsterLipid()) {
+            hgToFaSep = "-";
         }
-        if(this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType()==LipidFaBondType.ETHER_PLASMENYL) {
-            hgToFaSep = " O-";
-        }
-        return getHeadGroup() + (faStrings.isEmpty()?"":hgToFaSep) + faStrings.stream().collect(Collectors.joining(faSeparator));
+        return getHeadGroup() + (faStrings.isEmpty() ? "" : hgToFaSep) + faStrings.stream().collect(Collectors.joining(faSeparator));
     }
 
     @Override
     public String getLipidString(LipidLevel level) {
-        switch(level) {
+        switch (level) {
             case MOLECULAR_SUBSPECIES:
                 return buildLipidSubspeciesName("_");
             case CATEGORY:

@@ -13,14 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom;
-
-import de.isas.lipidomics.domain.LipidAdduct;
-
-/**
- *
- * @author nilshoffmann
- */
-public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<LipidAdduct>{
-    
-}
+package de.isas.lipidomics.domain;

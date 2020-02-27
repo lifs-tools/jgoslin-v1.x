@@ -1,7 +1,7 @@
 /*
  * 
  */
-package de.isas.lipidomics.palinom.molecularsubspecies;
+package de.isas.lipidomics.palinom.goslin.molecularsubspecies;
 
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import io.cucumber.java.en.Given;
@@ -11,13 +11,13 @@ import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.palinom.GoslinVisitorParser;
+import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 
 /**
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @Slf4j
 public class MagStepDefs {

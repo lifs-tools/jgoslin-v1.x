@@ -1,14 +1,14 @@
 /*
  * 
  */
-package de.isas.lipidomics.palinom.molecularsubspecies;
+package de.isas.lipidomics.palinom.goslin.molecularsubspecies;
 
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.palinom.GoslinVisitorParser;
+import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -17,7 +17,7 @@ import org.junit.Assert;
 
 /**
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @Slf4j
 public class SphingolipidsSubspecies2FAStepDefs {

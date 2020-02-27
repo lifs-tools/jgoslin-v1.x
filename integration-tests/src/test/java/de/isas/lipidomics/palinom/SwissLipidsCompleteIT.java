@@ -17,7 +17,7 @@ package de.isas.lipidomics.palinom;
 
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.palinom.exceptions.PalinomVisitorException;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 
 /**
  *
- * @author nilshoffmann
+ * @author nils.hoffmann
  */
 @Slf4j
 public class SwissLipidsCompleteIT {
@@ -56,7 +56,7 @@ public class SwissLipidsCompleteIT {
             assertNotNull(ls);
         } catch (ParsingException ex) {
             fail("Parsing current SwissLipids identifier: " + swissLipidsAbbreviation + " with transformed name " + lipidName + " failed - name unsupported in grammar!");
-        } catch (PalinomVisitorException pve) {
+        } catch (ParseTreeVisitorException pve) {
             fail("Parsing current SwissLipids identifier: " + swissLipidsAbbreviation + " with transformed name " + lipidName + " failed - missing implementation!");
         }
     }

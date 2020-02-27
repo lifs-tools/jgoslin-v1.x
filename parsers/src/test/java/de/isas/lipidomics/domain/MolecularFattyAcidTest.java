@@ -69,7 +69,7 @@ public class MolecularFattyAcidTest {
     @Test
     public void testGetNCarbonException() {
         Assertions.assertThrows(ConstraintViolationException.class, () -> {
-            MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, 1, 0, 0, LipidFaBondType.UNDEFINED, false);
+            MolecularFattyAcid instance = new MolecularFattyAcid("FAX", 1, -1, 0, 0, LipidFaBondType.UNDEFINED, false);
         });
     }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom;
+package de.isas.lipidomics.palinom.goslin;
 
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.Fragment;
@@ -30,9 +30,11 @@ import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.MolecularFattyAcid.MolecularFattyAcidBuilder;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
 import de.isas.lipidomics.domain.StructuralFattyAcid.StructuralFattyAcidBuilder;
+import de.isas.lipidomics.palinom.GoslinBaseVisitor;
+import de.isas.lipidomics.palinom.GoslinParser;
 import de.isas.lipidomics.palinom.GoslinParser.Adduct_infoContext;
 import de.isas.lipidomics.palinom.GoslinParser.Lipid_pureContext;
-import de.isas.lipidomics.palinom.exceptions.PalinomVisitorException;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.LinkedList;
@@ -51,7 +53,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
     /**
      *
-     * @throws PalinomVisitorException for structural or state-related issues
+     * @throws ParseTreeVisitorException for structural or state-related issues
      * while trying to process a parsing context.
      * @throws RuntimeException
      * @param ctx
@@ -85,12 +87,12 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             LipidCategory contextCategory = LipidCategory.UNDEFINED;
             switch (bs.cardinality()) {
                 case 0:
-                    throw new PalinomVisitorException("Parsing context did not contain content for any lipid category. Must contain exactly one of " + Arrays.toString(LipidCategory.values()));
+                    throw new ParseTreeVisitorException("Parsing context did not contain content for any lipid category. Must contain exactly one of " + Arrays.toString(LipidCategory.values()));
                 case 1:
                     contextCategory = LipidCategory.values()[bs.nextSetBit(0)];
                     break;
                 default:
-                    throw new PalinomVisitorException("Parsing context contained content for more than one lipid category. Must contain exactly one of " + Arrays.toString(LipidCategory.values()));
+                    throw new ParseTreeVisitorException("Parsing context contained content for more than one lipid category. Must contain exactly one of " + Arrays.toString(LipidCategory.values()));
             }
             switch (contextCategory) {
                 case ST:
@@ -102,14 +104,14 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                         lipid = handleChe(ctx.cholesterol().che()).orElse(LipidSpecies.NONE);
                         break;
                     } else {
-                        throw new PalinomVisitorException("Unhandled sterol lipid: " + ctx.cholesterol().getText());
+                        throw new ParseTreeVisitorException("Unhandled sterol lipid: " + ctx.cholesterol().getText());
                     }
                 case GL:
                     lipid = handleGlycerolipid(ctx).orElse(LipidSpecies.NONE);
                     break;
                 case FA:
                     lipid = new LipidSpecies(ctx.mediatorc().getText(), LipidCategory.FA, 
-                            Optional.of(LipidClass.FA), 
+                            LipidClass.forHeadGroup(ctx.mediatorc().getText()), 
                             Optional.empty()
                     );
                     break;
@@ -126,7 +128,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     }
                     break;
                 default:
-                    throw new PalinomVisitorException("Unhandled contextCategory: " + contextCategory);
+                    throw new ParseTreeVisitorException("Unhandled contextCategory: " + contextCategory);
             }
             return lipid;
         }
@@ -143,7 +145,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             } else if (ctx.gl().tgl() != null) {
                 return handleTgl(ctx.gl().tgl());
             } else {
-                throw new PalinomVisitorException("Unhandled context state in GL!");
+                throw new ParseTreeVisitorException("Unhandled context state in GL!");
             }
         }
 
@@ -159,7 +161,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     return visitStructuralSubspeciesLcb(headGroup, dsl.sl_subspecies().lcb(), Arrays.asList(dsl.sl_subspecies().fa()));
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in DSL!");
+                throw new ParseTreeVisitorException("Unhandled context state in DSL!");
             }
             return Optional.empty();
         }
@@ -170,7 +172,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 //process structural sub species level
                 return visitStructuralSubspeciesLcb(headGroup, lsl.lcb());
             } else {
-                throw new PalinomVisitorException("Unhandled context state in LSL!");
+                throw new ParseTreeVisitorException("Unhandled context state in LSL!");
             }
         }
 
@@ -195,7 +197,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     return visitMolecularSubspeciesFas(headGroup, tgl.tgl_subspecies().fa3().fa3_unsorted().fa());
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in TGL!");
+                throw new ParseTreeVisitorException("Unhandled context state in TGL!");
             }
             return Optional.empty();
         }
@@ -215,7 +217,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     return visitMolecularSubspeciesFas(headGroup, sgl.dgl_subspecies().fa2().fa2_unsorted().fa());
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in SGL!");
+                throw new ParseTreeVisitorException("Unhandled context state in SGL!");
             }
             return Optional.empty();
         }
@@ -225,7 +227,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             if (che.fa() != null) {
                 return visitStructuralSubspeciesFas(headGroup, Arrays.asList(che.fa()));
             } else {
-                throw new PalinomVisitorException("Unhandled context state in ChE!");
+                throw new ParseTreeVisitorException("Unhandled context state in ChE!");
             }
         }
 
@@ -234,7 +236,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             if (mgl.fa() != null) {
                 return visitStructuralSubspeciesFas(headGroup, Arrays.asList(mgl.fa()));
             } else {
-                throw new PalinomVisitorException("Unhandled context state in MGL!");
+                throw new ParseTreeVisitorException("Unhandled context state in MGL!");
             }
         }
 
@@ -253,7 +255,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     return visitMolecularSubspeciesFas(headGroup, dgl.dgl_subspecies().fa2().fa2_unsorted().fa());
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in DGL!");
+                throw new ParseTreeVisitorException("Unhandled context state in DGL!");
             }
             return Optional.empty();
         }
@@ -272,7 +274,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             } else if (ctx.pl().pl_o() != null) {
                 return handlePlo(ctx.pl().pl_o());
             } else {
-                throw new PalinomVisitorException("Unhandled context state in PL!");
+                throw new ParseTreeVisitorException("Unhandled context state in PL!");
             }
         }
 
@@ -280,11 +282,15 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             if (ploc.dpl_o() != null) {
                 String headGroup = ploc.dpl_o().hg_pl_oc().getText();
                 if (ploc.dpl_o().pl_species() != null) {
+                    //process species
                     return visitSpeciesFas(headGroup, ploc.dpl_o().pl_species().fa());
                 } else if (ploc.dpl_o().pl_subspecies() != null) {
+                    //process subspecies
                     if (ploc.dpl_o().pl_subspecies().fa2().fa2_sorted() != null) {
+                        //sorted => StructuralSubspecies
                         return visitStructuralSubspeciesFas(headGroup, ploc.dpl_o().pl_subspecies().fa2().fa2_sorted().fa());
                     } else if (ploc.dpl_o().pl_subspecies().fa2().fa2_unsorted() != null) {
+                        //unsorted => MolecularSubspecies
                         return visitMolecularSubspeciesFas(headGroup, ploc.dpl_o().pl_subspecies().fa2().fa2_unsorted().fa());
                     }
                 }
@@ -292,7 +298,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 String headGroup = ploc.lpl_o().hg_lpl_oc().getText();
                 return visitStructuralSubspeciesFas(headGroup, Arrays.asList(ploc.lpl_o().fa()));
             } else {
-                throw new PalinomVisitorException("Unhandled context state in PL O!");
+                throw new ParseTreeVisitorException("Unhandled context state in PL O!");
             }
             return Optional.empty();
         }
@@ -312,7 +318,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     return visitMolecularSubspeciesFas(headGroup, cl.cl_subspecies().fa4().fa4_unsorted().fa());
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in CL!");
+                throw new ParseTreeVisitorException("Unhandled context state in CL!");
             }
             return Optional.empty();
         }
@@ -332,7 +338,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     return visitMolecularSubspeciesFas(headGroup, mlcl.mlcl_subspecies().fa3().fa3_unsorted().fa());
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in CL!");
+                throw new ParseTreeVisitorException("Unhandled context state in CL!");
             }
             return Optional.empty();
         }
@@ -352,7 +358,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     return visitMolecularSubspeciesFas(headGroup, dpl.pl_subspecies().fa2().fa2_unsorted().fa());
                 }
             } else {
-                throw new PalinomVisitorException("Unhandled context state in PL!");
+                throw new ParseTreeVisitorException("Unhandled context state in PL!");
             }
             return Optional.empty();
         }
@@ -363,7 +369,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             if (lpl.fa() != null) {
                 return visitStructuralSubspeciesFas(headGroup, Arrays.asList(lpl.fa()));
             } else {
-                throw new PalinomVisitorException("Unhandled context state in PL!");
+                throw new ParseTreeVisitorException("Unhandled context state in PL!");
             }
         }
 
@@ -445,7 +451,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                             hydroxyl = 2;
                             break;
                         default:
-                            throw new PalinomVisitorException("Unsupported old hydroxyl prefix: " + pureCtx.old_hydroxyl().getText());
+                            throw new ParseTreeVisitorException("Unsupported old hydroxyl prefix: " + pureCtx.old_hydroxyl().getText());
                     }
                 } else if (pureCtx.hydroxyl() != null) {
                     hydroxyl = asInt(pureCtx.hydroxyl(), 0);
@@ -456,7 +462,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                         hydroxyl,
                         asInt(pureCtx.db(), 0), LipidFaBondType.ESTER));
             }
-            throw new PalinomVisitorException("Uninitialized lcb_pure context!");
+            throw new ParseTreeVisitorException("Uninitialized lcb_pure context!");
         }
     }
 
@@ -482,7 +488,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         }
     }
 
-    private static LipidFaBondType getLipidFaBondType(GoslinParser.FaContext faContext) throws PalinomVisitorException {
+    private static LipidFaBondType getLipidFaBondType(GoslinParser.FaContext faContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         if (faContext.ether() != null) {
             if ("a".equals(faContext.ether().getText())) {
@@ -490,7 +496,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             } else if ("p".equals(faContext.ether().getText())) {
                 lfbt = LipidFaBondType.ETHER_PLASMENYL;
             } else {
-                throw new PalinomVisitorException("Unknown ether context value: " + faContext.ether());
+                throw new ParseTreeVisitorException("Unknown ether context value: " + faContext.ether());
             }
         }
         return lfbt;
@@ -512,7 +518,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             return fa.name(faName).build();
 
         } else {
-            throw new PalinomVisitorException("Uninitialized FaContext!");
+            throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }
     }
 
@@ -564,7 +570,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             return fa.name(faName).position(position).build();
 
         } else {
-            throw new PalinomVisitorException("Uninitialized FaContext!");
+            throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }
     }
 }
