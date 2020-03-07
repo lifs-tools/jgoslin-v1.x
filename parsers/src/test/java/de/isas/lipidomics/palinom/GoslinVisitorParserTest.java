@@ -325,7 +325,7 @@ public class GoslinVisitorParserTest {
 
         assertEquals(ref, lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
         assertEquals(LipidCategory.GL, lipid.getLipidCategory());
-        assertEquals(LipidClass.TG, lipid.getLipidClass().get());
+        assertEquals(LipidClass.TAG, lipid.getLipidClass().get());
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
