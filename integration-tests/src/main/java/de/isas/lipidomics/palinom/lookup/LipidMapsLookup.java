@@ -17,7 +17,7 @@ package de.isas.lipidomics.palinom.lookup;
 
 import de.isas.lipidomics.domain.ExternalDatabaseReference;
 import de.isas.lipidomics.domain.LipidAdduct;
-import de.isas.lipidomics.palinom.LipidMapsVisitorParser;
+import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.io.BufferedReader;

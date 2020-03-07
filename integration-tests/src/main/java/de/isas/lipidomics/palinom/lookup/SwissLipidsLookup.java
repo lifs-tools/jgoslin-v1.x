@@ -17,7 +17,7 @@ package de.isas.lipidomics.palinom.lookup;
 
 import de.isas.lipidomics.domain.ExternalDatabaseReference;
 import de.isas.lipidomics.domain.LipidAdduct;
-import de.isas.lipidomics.palinom.LipidMapsVisitorParser;
+import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -83,7 +83,7 @@ public class SwissLipidsLookup {
     }
 
     public static String parseAbbreviation(String abbreviation) {
-        LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
+        SwissLipidsVisitorParser parser = new SwissLipidsVisitorParser();
         String result;
         try {
             LipidAdduct la = parser.parse(abbreviation);

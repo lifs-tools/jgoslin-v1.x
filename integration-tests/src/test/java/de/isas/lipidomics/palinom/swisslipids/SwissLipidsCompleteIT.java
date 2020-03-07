@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom;
+package de.isas.lipidomics.palinom.swisslipids;
 
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidSpecies;
@@ -48,7 +48,7 @@ public class SwissLipidsCompleteIT {
             String swissLipidsSynonyms5
     ) throws ParsingException, IOException {
         String lipidName = swissLipidsAbbreviation;
-        LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
+        SwissLipidsVisitorParser parser = new SwissLipidsVisitorParser();
         LipidAdduct lipidAdduct;
         try {
             lipidAdduct = parser.parse(lipidName);
