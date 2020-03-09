@@ -94,7 +94,7 @@ public class LipidClassGenerator {
     }
 
     public String sanitizeToEnumConstant(String lipidName, String lipidCategory) {
-        return lipidName.replaceAll("[/- (),.\\[\\]]", "_").replaceAll("'", "p").replaceAll("^([_0-9]+)",lipidCategory+"_$1").replaceAll("[_]+", "_").toUpperCase();
+        return lipidName.replaceAll("[/\\-\\s(),.\\[\\]]", "_").replaceAll("'", "p").replaceAll("^([_0-9]+)",lipidCategory+"_$1").replaceAll("[_]+", "_").toUpperCase();
     }
 
     public String getEnumFromTable(Stream<LipidClassEntry> stream) {

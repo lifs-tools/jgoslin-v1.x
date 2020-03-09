@@ -87,8 +87,8 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
     private static class LipidVisitor extends LipidMapsBaseVisitor<LipidSpecies> {
 
         public LipidSpecies handlePureFaContext(LipidMapsParser.Pure_faContext ctx) {
-            if (ctx.fa() != null) {
-                MolecularFattyAcid fa = buildMolecularFa(ctx.fa(), "FA1");
+            if (ctx.fa_no_hg() != null && ctx.fa_no_hg().fa() != null) {
+                MolecularFattyAcid fa = buildMolecularFa(ctx.fa_no_hg().fa(), "FA1");
                 LipidSpeciesInfo lsi = new LipidSpeciesInfo(
                     LipidLevel.SPECIES, 
                     fa.getNCarbon(), 
@@ -98,7 +98,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                 );
                 LipidSpecies ls = new LipidSpecies(
                         ctx.hg_fa().getText(),
-                        LipidCategory.valueOf("FA"),
+                        LipidCategory.FA,
                         LipidClass.forHeadGroup(ctx.hg_fa().getText()),
                         Optional.of(lsi)
                 );
