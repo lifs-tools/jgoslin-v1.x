@@ -25,13 +25,13 @@ import java.util.Optional;
  *
  * @author nilshoffmann
  */
-public class GlycerolipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
+public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
 
     private final MolecularSubspeciesFasHandler msfh;
     private final StructuralSubspeciesFasHandler ssfh;
     private final FattyAcylHandler fhf;
 
-    public GlycerolipidHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh, FattyAcylHandler fhf) {
+    public GlyceroLipidHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh, FattyAcylHandler fhf) {
         this.msfh = msfh;
         this.ssfh = ssfh;
         this.fhf = fhf;

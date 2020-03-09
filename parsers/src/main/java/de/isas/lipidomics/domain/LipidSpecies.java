@@ -109,8 +109,8 @@ public class LipidSpecies {
      * species.
      */
     public boolean isEsterLipid() {
-        //return getHeadGroup().endsWith(" O") || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL;
-        return this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL;
+        return getHeadGroup().endsWith(" O") || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL;
+        //return this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL;
     }
 
     /**

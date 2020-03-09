@@ -3,7 +3,6 @@
  */
 package de.isas.lipidomics.palinom;
 
-import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.LipidAdduct;
@@ -134,21 +133,19 @@ public class SwissLipidsVisitorParserTest {
         System.out.println("Testing lysolipid name " + ref1);
         LipidAdduct lipidAdduct1 = parseLipidName(ref1);
         assertNotNull(lipidAdduct1);
-        LipidMolecularSubspecies lipid1 = (LipidMolecularSubspecies) lipidAdduct1.getLipid();
+        LipidSpecies lipid1 = lipidAdduct1.getLipid();
         assertNotNull(lipid1);
         System.out.println(lipid1);
         assertEquals("LPE", lipid1.getHeadGroup());
-        assertEquals("FA1", lipid1.getFa().
-                get("FA1").
-                getName());
-        assertEquals(18, lipid1.getFa().
-                get("FA1").
+        LipidSpeciesInfo li = lipid1.getInfo().get();
+//        assertEquals("FA1", li.getFa().
+//                get("FA1").
+//                getName());
+        assertEquals(18, li.
                 getNCarbon());
-        assertEquals(0, lipid1.getFa().
-                get("FA1").
+        assertEquals(0, li.
                 getNDoubleBonds());
-        assertEquals(0, lipid1.getFa().
-                get("FA1").
+        assertEquals(0, li.
                 getNHydroxy());
     }
     

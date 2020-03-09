@@ -26,12 +26,12 @@ import java.util.Optional;
  *
  * @author nilshoffmann
  */
-public class SterolHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
+public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
 
     private final MolecularSubspeciesFasHandler msfh;
     private final StructuralSubspeciesFasHandler ssfh;
     
-    public SterolHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh) {
+    public SterolLipidHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh) {
         this.msfh = msfh;
         this.ssfh = ssfh;
     }

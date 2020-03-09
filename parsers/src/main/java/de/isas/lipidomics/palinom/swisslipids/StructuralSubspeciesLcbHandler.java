@@ -16,8 +16,9 @@
 package de.isas.lipidomics.palinom.swisslipids;
 
 import de.isas.lipidomics.domain.LipidFaBondType;
-import de.isas.lipidomics.domain.LipidMolecularSubspecies;
+import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
@@ -62,7 +63,25 @@ public class StructuralSubspeciesLcbHandler {
         SwissLipidsParser.Lcb_coreContext pureCtx = ctx.lcb_core();
         StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
         fa.nCarbon(faHelperFunctions.asInt(pureCtx.carbon(), 0));
-//        fa.nHydroxy(faHelperFunctions.asInt(pureCtx.hydroxyl(), 0));
+        Integer hydroxyl = 0;
+        if (pureCtx != null) {
+            if (pureCtx.hydroxyl() != null) {
+                switch (pureCtx.hydroxyl().getText()) {
+                    case "t":
+                        hydroxyl = 3;
+                        break;
+                    case "d":
+                        hydroxyl = 2;
+                        break;
+                    case "m":
+                        hydroxyl = 1;
+                        break;
+                    default:
+                        throw new ParseTreeVisitorException("Unsupported old hydroxyl prefix: " + pureCtx.hydroxyl().getText());
+                }
+            }
+        }
+        fa.nHydroxy(hydroxyl);
         if (pureCtx.db() != null) {
             fa.nDoubleBonds(faHelperFunctions.asInt(pureCtx.db().db_count(), 0));
             if (pureCtx.db().db_positions() != null) {
@@ -73,25 +92,4 @@ public class StructuralSubspeciesLcbHandler {
         return fa.name(faName).position(position).lcb(true).build();
     }
 
-//
-//    public StructuralFattyAcid buildStructuralFa(SwissLipidsParser.FaContext ctx, String faName) {
-//        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
-//        LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
-//        if (ctx.fa_core() != null) {
-//            fa.nCarbon(faHelperFunctions.asInt(ctx.fa_core().carbon(), 0));
-////            fa.nHydroxy(asInt(ctx.fa_core().hydroxyl(), 0));
-//            if (ctx.fa_core().db() != null) {
-//                fa.nDoubleBonds(faHelperFunctions.asInt(ctx.fa_core().db().db_count(), 0));
-//                if (ctx.fa_core().db().db_positions() != null) {
-//                    throw new RuntimeException("Support for double bond positions not implemented yet!");
-//                }
-//            }
-//            fa.lipidFaBondType(lfbt);
-//            return fa.name(faName).build();
-//        } else if(ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() !=null) { //handling of lcbs
-//            throw new ParseTreeVisitorException("LCBs currently not handled!");
-//        } else {
-//            throw new ParseTreeVisitorException("Uninitialized FaContext!");
-//        }
-//    }
 }
