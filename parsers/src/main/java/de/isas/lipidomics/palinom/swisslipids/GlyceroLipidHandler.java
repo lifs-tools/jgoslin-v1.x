@@ -85,7 +85,13 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
             if (lsl.gl_mono_fa().fa_species() != null) {
                 return fhf.visitSpeciesFas(headGroup, lsl.gl_mono_fa().fa_species().fa());
             } else if (lsl.gl_mono_fa().fa2() != null) {
-                throw new ParseTreeVisitorException("Unhandled context state in Gl mono FA2!");
+                if (lsl.gl_mono_fa().fa2().fa2_unsorted() != null) {
+                    return msfh.visitMolecularSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_unsorted().fa());
+                } else if(lsl.gl_mono_fa().fa2().fa2_sorted() != null) {
+                    return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_sorted().fa());   
+                } else {
+                    throw new ParseTreeVisitorException("Unhandled context state in Gl mono FA2!");
+                }
             } else {
                 throw new ParseTreeVisitorException("Unhandled context state in Gl mono FA!");
             }

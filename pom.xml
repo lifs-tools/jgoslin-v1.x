@@ -177,6 +177,29 @@
                     </dependencies>-->
                 </plugin>
                 <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.0.0-M4</version>
+                    <executions>
+                        <execution>
+                            <configuration>
+                                <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                                <!--<parallel>classes</parallel>-->
+                                <!--<argLine>-Xmx2048m -XX:MaxPermSize=256m</argLine>-->
+                                <!--<threadCount>2</threadCount>-->
+                                <trimStackTrace>false</trimStackTrace>
+                                <workingDirectory>${project.build.directory}/failsafe-files</workingDirectory>
+<!--                                <includes>
+                                    <include>**/*IT</include>
+                                </includes>-->
+                            </configuration>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>3.0.1</version>

@@ -50,14 +50,18 @@ public class SwissLipidsCompleteIT {
         String lipidName = swissLipidsAbbreviation;
         SwissLipidsVisitorParser parser = new SwissLipidsVisitorParser();
         LipidAdduct lipidAdduct;
-        try {
-            lipidAdduct = parser.parse(lipidName);
-            LipidSpecies ls = lipidAdduct.getLipid();
-            assertNotNull(ls);
-        } catch (ParsingException ex) {
-            fail("Parsing current SwissLipids identifier: " + swissLipidsAbbreviation + " with transformed name " + lipidName + " failed - name unsupported in grammar!");
-        } catch (ParseTreeVisitorException pve) {
-            fail("Parsing current SwissLipids identifier: " + swissLipidsAbbreviation + " with transformed name " + lipidName + " failed - missing implementation!");
+        if (lipidName == null) {
+            log.warn("Skipping row, abbreviation was null for id={}, level={}, name={}", swissLipidsId, swissLipidsLevel, swissLipidsName);
+        } else {
+            try {
+                lipidAdduct = parser.parse(lipidName);
+                LipidSpecies ls = lipidAdduct.getLipid();
+                assertNotNull(ls);
+            } catch (ParsingException ex) {
+                fail("Parsing current SwissLipids identifier: " + swissLipidsAbbreviation + " with transformed name " + lipidName + " failed - name unsupported in grammar!");
+            } catch (ParseTreeVisitorException pve) {
+                fail("Parsing current SwissLipids identifier: " + swissLipidsAbbreviation + " with transformed name " + lipidName + " failed - incomplete implementation: " + pve.getMessage());
+            }
         }
     }
 }

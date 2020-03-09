@@ -314,6 +314,34 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(2, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
     }
+    
+    @Test
+    public void testMhdg() throws ParsingException {
+        String ref = "MHDG (18:3/16:1)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("MHDG", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(34, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        assertEquals(4, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
+    
+    @Test
+    public void testDhdg() throws ParsingException  {
+        String ref = "DHDG (16:0/16:1)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("DHDG", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(32, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
 
     @Test
     public void testHex2Cer() throws ParsingException {

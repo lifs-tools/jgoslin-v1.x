@@ -19,26 +19,13 @@ import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.Fragment;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
-import de.isas.lipidomics.domain.LipidClass;
-import de.isas.lipidomics.domain.LipidFaBondType;
-import de.isas.lipidomics.domain.LipidLevel;
-import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.domain.LipidSpeciesInfo;
-import de.isas.lipidomics.domain.LipidStructuralSubspecies;
-import de.isas.lipidomics.domain.MolecularFattyAcid;
-import de.isas.lipidomics.domain.StructuralFattyAcid;
-import de.isas.lipidomics.palinom.GoslinBaseVisitor;
 import de.isas.lipidomics.palinom.SwissLipidsBaseVisitor;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-import org.antlr.v4.runtime.tree.RuleNode;
 
 /**
  *
