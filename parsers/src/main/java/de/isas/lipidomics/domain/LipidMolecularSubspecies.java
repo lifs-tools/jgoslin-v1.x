@@ -66,6 +66,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.MOLECULAR_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, lipidFaBondType));
     }
 
+    @Override
     public Map<String, FattyAcid> getFa() {
         return Collections.unmodifiableMap(fa);
     }

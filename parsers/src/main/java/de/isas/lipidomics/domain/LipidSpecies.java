@@ -3,6 +3,8 @@
  */
 package de.isas.lipidomics.domain;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -149,6 +151,10 @@ public class LipidSpecies {
                 throw new RuntimeException(getClass().getSimpleName() + " does not know how to create a lipid string for level " + level);
         }
 
+    }
+    
+    public Map<String, FattyAcid> getFa() {
+        return Collections.emptyMap();
     }
 
 }
