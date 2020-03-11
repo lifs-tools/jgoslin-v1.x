@@ -65,4 +65,9 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
                 throw new RuntimeException(getClass().getSimpleName() + " does not know how to create a lipid string for level " + level);
         }
     }
+
+    @Override
+    public String toString() {
+        return getLipidString(super.info.orElse(LipidSpeciesInfo.NONE).getLevel());
+    }
 }

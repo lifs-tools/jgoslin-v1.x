@@ -6,6 +6,7 @@ package de.isas.lipidomics.palinom;
 import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.Adduct;
+import de.isas.lipidomics.domain.Fragment;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
@@ -13,18 +14,17 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
-import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
+import de.isas.lipidomics.palinom.goslin.GoslinFragmentsVisitorParser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 /**
  *
  * @author nils.hoffmann
  */
-public class GoslinVisitorParserTest {
+public class GoslinFragmentsVisitorParserTest {
 
     @Test
     public void testCh() throws ParsingException {
@@ -260,7 +260,22 @@ public class GoslinVisitorParserTest {
                 get("FA2").
                 getNHydroxy());
         assertEquals("[M+H]1+", lipidAdduct.
-                getAdduct().getLipidString());
+                getAdduct().
+                getLipidString());
+    }
+
+    @Test
+    public void testPL_Pe_fragment() throws ParsingException {
+        String ref = "PE 16:1-12:0 - -(H2O)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertNotNull(lipidAdduct);
+        LipidMolecularSubspecies lipid = (LipidMolecularSubspecies) lipidAdduct.getLipid();
+        assertNotNull(lipid);
+        Fragment frag = lipidAdduct.getFragment();
+        assertNotNull(frag);
+        System.out.println("Fragment name is '" + frag.getName() + "'");
+        assertEquals("-(H2O)", frag.getName());
     }
 
     @Test
@@ -373,7 +388,7 @@ public class GoslinVisitorParserTest {
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
-        GoslinVisitorParser parser = new GoslinVisitorParser();
+        GoslinFragmentsVisitorParser parser = new GoslinFragmentsVisitorParser();
         LipidAdduct lipid = parser.parse(ref);
         return lipid;
     }

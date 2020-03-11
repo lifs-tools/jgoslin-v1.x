@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom.swisslipids;
+package de.isas.lipidomics.palinom;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
+ * Generic base class for context handler implementations for the different
+ * grammar parsers.
  *
  * @author nilshoffmann
- * @param <T>
- * @param <U>
+ * @param <T> the generic {@link ParserRuleContext}
+ * @param <U> the type to return after handling.
  */
 public interface ParserRuleContextHandler<T extends ParserRuleContext, U> {
+
     U handle(T t);
 }

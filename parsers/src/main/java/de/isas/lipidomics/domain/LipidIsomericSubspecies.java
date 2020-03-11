@@ -39,11 +39,11 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
             lipidFaBondType = LipidFaBondType.ESTER;
         }
         for (IsomericFattyAcid fas : fa) {
-            if (getFa().containsKey(fas.getName())) {
+            if (super.fa.containsKey(fas.getName())) {
                 throw new ConstraintViolationException(
                         "FA names must be unique! FA with name " + fas.getName() + " was already added!");
             } else {
-                getFa().put(fas.getName(), fas);
+                super.fa.put(fas.getName(), fas);
                 nCarbon += fas.getNCarbon();
                 nHydroxyl += fas.getNHydroxy();
                 nDoubleBonds += fas.getNDoubleBonds();
@@ -100,5 +100,10 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
             default:
                 throw new RuntimeException(getClass().getSimpleName() + " does not know how to create a lipid string for level " + level);
         }
+    }
+    
+    @Override
+    public String toString() {
+        return getLipidString(super.info.orElse(LipidSpeciesInfo.NONE).getLevel());
     }
 }

@@ -29,6 +29,14 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class Fragment {
+    private static final class None extends Fragment {
+
+        private None() {
+            super("");
+        }
+    }
+
+    public static final Fragment NONE = new None();
 
     private String name;
 }

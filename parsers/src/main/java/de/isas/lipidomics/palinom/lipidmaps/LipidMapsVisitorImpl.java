@@ -40,6 +40,7 @@ import de.isas.lipidomics.palinom.LipidMapsParser.Fa2Context;
 import de.isas.lipidomics.palinom.LipidMapsParser.Hg_ddplContext;
 import de.isas.lipidomics.palinom.LipidMapsParser.Lipid_pureContext;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.LinkedList;
@@ -164,8 +165,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     break;
                 case FA:
                     if (ctx.mediator() != null) {
-                        LipidSpeciesInfo lsi = new LipidSpeciesInfo(LipidLevel.ISOMERIC_SUBSPECIES, -1 , -1, -1, LipidFaBondType.UNDEFINED);
-                        lipid = new LipidSpecies(ctx.mediator().getText(), LipidCategory.FA, LipidClass.forHeadGroup(ctx.mediator().getText()), Optional.of(lsi));
+                        lipid = new LipidIsomericSubspecies(ctx.mediator().getText());
                     } else if (ctx.pure_fa() != null) {
                         lipid = handlePureFaContext(ctx.pure_fa());
                     }
@@ -604,6 +604,8 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             return fa.name(faName).position(position).build();
 
         } else if (ctx.fa_mod() != null) {
+//            ModificationContext modCtx = ctx.fa_mod().modification();
+//            modCtx.
             throw new RuntimeException("Support for modified FA handling not implemented!");
         } else {
             throw new ParseTreeVisitorException("No FaContext!");

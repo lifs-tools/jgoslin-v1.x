@@ -39,5 +39,14 @@ public class Adduct {
             throw new IllegalArgumentException("Sign can only be -1, 0, or 1");
         }
     }
+    
+    public String getLipidString() {
+        if (charge == 0){
+            return "[M]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[M").append(sumFormula).append(adductString).append("]").append(charge).append((chargeSign>0)? "+":"-");
+        return sb.toString();
+    }
 
 }

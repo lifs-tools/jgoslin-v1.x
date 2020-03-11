@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.swisslipids;
 
+import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.SwissLipidsParser.Lipid_pureContext;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
@@ -29,11 +30,13 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
 
     private final MolecularSubspeciesFasHandler msfh;
     private final StructuralSubspeciesFasHandler ssfh;
+    private final IsomericSubspeciesFasHandler isfh;
     private final FattyAcylHandler fhf;
 
-    public GlyceroLipidHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh, FattyAcylHandler fhf) {
+    public GlyceroLipidHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh, IsomericSubspeciesFasHandler isfh, FattyAcylHandler fhf) {
         this.msfh = msfh;
         this.ssfh = ssfh;
+        this.isfh = isfh;
         this.fhf = fhf;
     }
 
@@ -70,7 +73,15 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
             if (dsl.gl_fa().fa3().fa3_unsorted() != null) {
                 return msfh.visitMolecularSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_unsorted().fa());
             } else if (dsl.gl_fa().fa3().fa3_sorted() != null) {
-                return ssfh.visitStructuralSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_sorted().fa());
+                if(dsl.gl_fa().fa3().fa3_sorted().fa() != null) {
+                    if(fhf.isIsomericFa(dsl.gl_fa().fa3().fa3_sorted().fa())) {
+                        return isfh.visitIsomericSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_sorted().fa());
+                    } else {
+                        return ssfh.visitStructuralSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_sorted().fa());
+                    }
+                } else {
+                    throw new ParseTreeVisitorException("Unhandled context state in GL regular FA3 sorted");
+                }
             } else {
                 throw new ParseTreeVisitorException("Unhandled context state in GL regular FA3!");
             }
@@ -88,7 +99,15 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
                 if (lsl.gl_mono_fa().fa2().fa2_unsorted() != null) {
                     return msfh.visitMolecularSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_unsorted().fa());
                 } else if(lsl.gl_mono_fa().fa2().fa2_sorted() != null) {
-                    return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_sorted().fa());   
+                    if(lsl.gl_mono_fa().fa2().fa2_sorted() .fa() != null) {
+                        if(fhf.isIsomericFa(lsl.gl_mono_fa().fa2().fa2_sorted().fa())) {
+                            return isfh.visitIsomericSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_sorted().fa());
+                        } else {
+                            return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_sorted().fa());   
+                        }
+                    } else {
+                        throw new ParseTreeVisitorException("Unhandled context state in Gl mono FA2 sorted!");
+                    }
                 } else {
                     throw new ParseTreeVisitorException("Unhandled context state in Gl mono FA2!");
                 }
@@ -107,7 +126,15 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
                 if (lsl.gl_molecular_fa().fa2().fa2_unsorted() != null) {
                     return msfh.visitMolecularSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_unsorted().fa());
                 } else if (lsl.gl_molecular_fa().fa2().fa2_sorted() != null) {
-                    return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_sorted().fa());
+                    if(lsl.gl_molecular_fa().fa2().fa2_sorted().fa() != null) {
+                        if(fhf.isIsomericFa(lsl.gl_molecular_fa().fa2().fa2_sorted().fa())) {
+                            return isfh.visitIsomericSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_sorted().fa());
+                        } else {
+                            return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_sorted().fa());   
+                        }
+                    } else {
+                        throw new ParseTreeVisitorException("Unhandled context state in GL regular FA2 sorted!");
+                    }
                 } else {
                     throw new ParseTreeVisitorException("Unhandled context state in GL regular FA2!");
                 }

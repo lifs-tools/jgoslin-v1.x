@@ -15,17 +15,17 @@
  */
 package de.isas.lipidomics.palinom.swisslipids;
 
-import de.isas.lipidomics.domain.IsomericFattyAcid;
+import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
-import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.SwissLipidsParser.FaContext;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -60,7 +60,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
 //                    }
                     String mediatorsSingleContext = ctx.fatty_acid().mediator().mediator_single().getText();
                     Optional<LipidClass> lipidClass = LipidClass.forHeadGroup(mediatorsSingleContext);
-                    return new LipidSpecies(ctx.fatty_acid().mediator().getText(),LipidCategory.FA, lipidClass, Optional.of(LipidSpeciesInfo.NONE));
+                    return new LipidSpecies(ctx.fatty_acid().mediator().getText(), LipidCategory.FA, lipidClass, Optional.of(LipidSpeciesInfo.NONE));
             } else {
                 throw new ParseTreeVisitorException("Context for FA head group was null!");
             }
@@ -81,6 +81,11 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
                 throw new ParseTreeVisitorException("Unknown ether context value: " + faContext.fa_core().ether());
             }
         }
+        return lfbt;
+    }
+    
+    public LipidFaBondType getLipidLcbBondType(SwissLipidsParser.LcbContext lcbContext) throws ParseTreeVisitorException {
+        LipidFaBondType lfbt = LipidFaBondType.ESTER;
         return lfbt;
     }
 
@@ -122,6 +127,30 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
                 asInt(faContext.fa_core().db(), 0),
                 lfbt));
     }
+    
+    public Integer getNHydroxyl(SwissLipidsParser.LcbContext lcbContext) {
+        Integer hydroxyl = 0;
+        if (lcbContext.lcb_core() != null) {
+            SwissLipidsParser.Lcb_coreContext coreCtx = lcbContext.lcb_core();
+            if (coreCtx.hydroxyl() != null) {
+                switch (coreCtx.hydroxyl().getText()) {
+                    case "t":
+                        hydroxyl = 3;
+                        break;
+                    case "d":
+                        hydroxyl = 2;
+                        break;
+                    case "m":
+                        hydroxyl = 1;
+                        break;
+                    default:
+                        throw new ParseTreeVisitorException("Unsupported old hydroxyl prefix: " + coreCtx.hydroxyl().getText());
+                }
+                return hydroxyl;
+            }
+        }
+        throw new ParseTreeVisitorException("Uninitialized lcb_core context!");
+    }
 
     public Optional<LipidSpeciesInfo> getSpeciesInfo(SwissLipidsParser.LcbContext lcbContext) {
         Integer hydroxyl = 0;
@@ -149,5 +178,39 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
                     asInt(coreCtx.db(), 0), LipidFaBondType.ESTER));
         }
         throw new ParseTreeVisitorException("Uninitialized lcb_core context!");
+    }
+    
+    public boolean isIsomericFa(List<SwissLipidsParser.FaContext> faContexts) {
+        for(SwissLipidsParser.FaContext faContext:faContexts) {
+            if (faContext.fa_core()!= null) {
+                SwissLipidsParser.Fa_coreContext coreCtx = faContext.fa_core();
+                if(coreCtx.db()!=null) {
+                    if(coreCtx.db().db_positions()!=null) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    public boolean isIsomericFa(SwissLipidsParser.FaContext faContext) {
+        if (faContext.fa_core()!= null) {
+            SwissLipidsParser.Fa_coreContext coreCtx = faContext.fa_core();
+            if(coreCtx.db()!=null) {
+                return coreCtx.db().db_positions()!=null;
+            }
+        }
+        return false;
+    }
+    
+    public boolean isIsomericLcb(SwissLipidsParser.LcbContext lcbContext) {
+        if (lcbContext.lcb_core() != null) {
+            SwissLipidsParser.Lcb_coreContext coreCtx = lcbContext.lcb_core();
+            if(coreCtx.db()!=null) {
+                return coreCtx.db().db_positions()!=null;
+            }
+        }
+        return false;
     }
 }

@@ -62,6 +62,7 @@ public class SwissLipidsVisitorImpl extends SwissLipidsBaseVisitor<LipidAdduct> 
             bs.set(LipidCategory.FA.ordinal(), ctx.fatty_acid() != null);
             bs.set(LipidCategory.GP.ordinal(), ctx.pl() != null);
             bs.set(LipidCategory.SP.ordinal(), ctx.sl() != null);
+            final FattyAcylHandler fah = new FattyAcylHandler();
             LipidCategory contextCategory = LipidCategory.UNDEFINED;
             switch (bs.cardinality()) {
                 case 0:
@@ -75,32 +76,38 @@ public class SwissLipidsVisitorImpl extends SwissLipidsBaseVisitor<LipidAdduct> 
             switch (contextCategory) {
                 case ST:
                     lipid = new SterolLipidHandler(
-                            new MolecularSubspeciesFasHandler(new FattyAcylHandler()),
-                            new StructuralSubspeciesFasHandler(new FattyAcylHandler())
+                            new MolecularSubspeciesFasHandler(fah),
+                            new StructuralSubspeciesFasHandler(fah),
+                            new IsomericSubspeciesFasHandler(fah),
+                            fah
                     ).handle(ctx);
                     break;
                 case GL:
                     lipid = new GlyceroLipidHandler(
-                            new MolecularSubspeciesFasHandler(new FattyAcylHandler()),
-                            new StructuralSubspeciesFasHandler(new FattyAcylHandler()),
-                            new FattyAcylHandler()
+                            new MolecularSubspeciesFasHandler(fah),
+                            new StructuralSubspeciesFasHandler(fah),
+                            new IsomericSubspeciesFasHandler(fah),
+                            fah
                     ).handle(ctx);
                     break;
                 case FA:
-                    lipid = new FattyAcylHandler().handle(ctx);
+                    lipid = fah.handle(ctx);
                     break;
                 case GP:
                     lipid = new GlycerophosphoLipidHandler(
-                            new MolecularSubspeciesFasHandler(new FattyAcylHandler()),
-                            new StructuralSubspeciesFasHandler(new FattyAcylHandler()),
-                            new FattyAcylHandler()
+                            new MolecularSubspeciesFasHandler(fah),
+                            new StructuralSubspeciesFasHandler(fah),
+                            new IsomericSubspeciesFasHandler(fah),
+                            fah
                     ).handle(ctx);
                     break;
                 case SP:
                     lipid = new SphingoLipidHandler(
                             new StructuralSubspeciesLcbHandler(
-                                    new StructuralSubspeciesFasHandler(new FattyAcylHandler()), new FattyAcylHandler()),
-                            new FattyAcylHandler()
+                                    new StructuralSubspeciesFasHandler(fah), fah),
+                            new IsomericSubspeciesLcbHandler(
+                                    new IsomericSubspeciesFasHandler(fah), fah),
+                            fah
                     ).handle(ctx);
                     break;
                 default:

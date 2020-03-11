@@ -110,6 +110,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     lipid = handleGlycerolipid(ctx).orElse(LipidSpecies.NONE);
                     break;
                 case FA:
+                    //FIXME convert to FA handler
                     lipid = new LipidSpecies(ctx.mediatorc().getText(), LipidCategory.FA, 
                             LipidClass.forHeadGroup(ctx.mediatorc().getText()), 
                             Optional.empty()
@@ -483,7 +484,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                     chargeSignValue = 0;
             }
             String adductText = ctx.adduct().getText();
-            Adduct adduct = new Adduct("",adductText, Integer.parseInt(ctx.charge().getText()), chargeSignValue);
+            Adduct adduct = new Adduct("", adductText, Integer.parseInt(ctx.charge().getText()), chargeSignValue);
             return adduct;
         }
     }

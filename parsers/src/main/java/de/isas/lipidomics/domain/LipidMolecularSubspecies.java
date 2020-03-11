@@ -106,4 +106,9 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         }
     }
 
+    @Override
+    public String toString() {
+        return getLipidString(super.info.orElse(LipidSpeciesInfo.NONE).getLevel());
+    }
+
 }

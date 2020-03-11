@@ -9,6 +9,7 @@ import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
@@ -188,6 +189,17 @@ public class SwissLipidsVisitorParserTest {
 //        });
     }
 
+    @Test
+    public void testPG_isomeric() throws ParsingException {
+        String ref = "PG(0:0/16:2(9Z,12Z))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertNotNull(lipidAdduct);
+        LipidIsomericSubspecies lipid = (LipidIsomericSubspecies) lipidAdduct.getLipid();
+        assertNotNull(lipid);
+        System.out.println(lipid);
+    }
+    
     @Test
     public void testPE_plasmanyl() throws ParsingException {
         String ref = "PE(O-18:3/16:2)";

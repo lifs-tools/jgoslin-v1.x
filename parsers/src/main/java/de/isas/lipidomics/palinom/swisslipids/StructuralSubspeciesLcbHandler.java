@@ -16,9 +16,7 @@
 package de.isas.lipidomics.palinom.swisslipids;
 
 import de.isas.lipidomics.domain.LipidFaBondType;
-import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
@@ -84,9 +82,9 @@ public class StructuralSubspeciesLcbHandler {
         fa.nHydroxy(hydroxyl);
         if (pureCtx.db() != null) {
             fa.nDoubleBonds(faHelperFunctions.asInt(pureCtx.db().db_count(), 0));
-            if (pureCtx.db().db_positions() != null) {
-                throw new RuntimeException("Support for double bond positions not implemented yet!");
-            }
+//            if (pureCtx.db().db_positions() != null) {
+//                throw new RuntimeException("Support for double bond positions not implemented yet!");
+//            }
         }
         fa.lipidFaBondType(LipidFaBondType.ESTER);
         return fa.name(faName).position(position).lcb(true).build();

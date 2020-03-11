@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.swisslipids;
 
+import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.SwissLipidsParser.Lipid_pureContext;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
@@ -30,10 +31,12 @@ import java.util.Optional;
 public class SphingoLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
 
     private final StructuralSubspeciesLcbHandler sslh;
+    private final IsomericSubspeciesLcbHandler isfh;
     private final FattyAcylHandler fhf;
 
-    public SphingoLipidHandler(StructuralSubspeciesLcbHandler sslh, FattyAcylHandler fhf) {
+    public SphingoLipidHandler(StructuralSubspeciesLcbHandler sslh, IsomericSubspeciesLcbHandler isfh, FattyAcylHandler fhf) {
         this.sslh = sslh;
+        this.isfh = isfh;
         this.fhf = fhf;
     }
 
@@ -57,7 +60,11 @@ public class SphingoLipidHandler implements ParserRuleContextHandler<Lipid_pureC
         } else if (slc.sl_lcb() != null && slc.sl_lcb().sl_lcb_subspecies() != null) { // subspecies level
             SwissLipidsParser.Sl_lcb_subspeciesContext slsc = slc.sl_lcb().sl_lcb_subspecies();
             List<SwissLipidsParser.FaContext> faContexts = Arrays.asList(slsc.fa());
-            return sslh.visitStructuralSubspeciesLcb(headGroup, slsc.lcb(), faContexts);
+            if(fhf.isIsomericFa(slsc.fa())) {
+                return isfh.visitIsomericSubspeciesLcb(headGroup, slsc.lcb(), faContexts);
+            } else {
+                return sslh.visitStructuralSubspeciesLcb(headGroup, slsc.lcb(), faContexts);
+            }
         } else {
             throw new ParseTreeVisitorException("Unhandled context state in SL!");
         }

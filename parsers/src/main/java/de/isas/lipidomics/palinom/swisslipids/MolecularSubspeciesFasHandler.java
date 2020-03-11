@@ -58,7 +58,7 @@ public class MolecularSubspeciesFasHandler {
             if (ctx.fa_core().db() != null) {
                 fa.nDoubleBonds(faHelperFunctions.asInt(ctx.fa_core().db().db_count(), 0));
                 if (ctx.fa_core().db().db_positions() != null) {
-                    throw new RuntimeException("Support for double bond positions not implemented yet!");
+                    throw new RuntimeException("Support for double bond positions is implemented in "+IsomericSubspeciesFasHandler.class.getSimpleName()+"!");
                 }
             }
             fa.lipidFaBondType(lfbt);

@@ -147,6 +147,8 @@ public class LipidSpecies {
                     lipidString.append(info.get().getLipidFaBondType().suffix());
                 }
                 return lipidString.toString();
+            case UNDEFINED:
+                return this.getHeadGroup();
             default:
                 throw new RuntimeException(getClass().getSimpleName() + " does not know how to create a lipid string for level " + level);
         }
@@ -155,6 +157,11 @@ public class LipidSpecies {
     
     public Map<String, FattyAcid> getFa() {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public String toString() {
+        return getLipidString(info.orElse(LipidSpeciesInfo.NONE).getLevel());
     }
 
 }
