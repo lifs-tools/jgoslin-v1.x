@@ -51,10 +51,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.RuleNode;
 
 /**
- * Overriding implementation of {@link LipidMapsBaseVisitor}.
- * Creates {@link LipidAdduct} instances from the provided context.
- * 
- * @see SwissLipidsVisitorParser 
+ * Overriding implementation of {@link LipidMapsBaseVisitor}. Creates
+ * {@link LipidAdduct} instances from the provided context.
+ *
+ * @see SwissLipidsVisitorParser
  * @author nils.hoffmann
  */
 @Slf4j
@@ -91,11 +91,11 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             if (ctx.fa_no_hg() != null && ctx.fa_no_hg().fa() != null) {
                 MolecularFattyAcid fa = buildMolecularFa(ctx.fa_no_hg().fa(), "FA1");
                 LipidSpeciesInfo lsi = new LipidSpeciesInfo(
-                    LipidLevel.SPECIES, 
-                    fa.getNCarbon(), 
-                    fa.getNHydroxy(),
-                    fa.getNDoubleBonds(),
-                    LipidFaBondType.UNDEFINED
+                        LipidLevel.SPECIES,
+                        fa.getNCarbon(),
+                        fa.getNHydroxy(),
+                        fa.getNDoubleBonds(),
+                        LipidFaBondType.UNDEFINED
                 );
                 LipidSpecies ls = new LipidSpecies(
                         ctx.hg_fa().getText(),
@@ -106,14 +106,14 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                 return ls;
             } else if (ctx.pure_fa_species() != null && ctx.hg_fa() != null) {
                 LipidMapsParser.Pure_fa_speciesContext speciesContext = ctx.pure_fa_species();
-                if(speciesContext!=null) {
+                if (speciesContext != null) {
                     MolecularFattyAcid fa = buildMolecularFa(speciesContext.fa(), "FA1");
                     LipidSpeciesInfo lsi = new LipidSpeciesInfo(
-                        LipidLevel.SPECIES, 
-                        fa.getNCarbon(), 
-                        fa.getNHydroxy(), 
-                        fa.getNDoubleBonds(),
-                        LipidFaBondType.UNDEFINED
+                            LipidLevel.SPECIES,
+                            fa.getNCarbon(),
+                            fa.getNHydroxy(),
+                            fa.getNDoubleBonds(),
+                            LipidFaBondType.UNDEFINED
                     );
                     LipidSpecies ls = new LipidSpecies(
                             ctx.hg_fa().getText(),
@@ -478,12 +478,20 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             if (lcbContext.hydroxyl_lcb() != null) {
                 hydroxyl = getHydroxyCount(lcbContext);
             }
-            return Optional.of(new LipidSpeciesInfo(
-                    LipidLevel.SPECIES,
-                    asInt(lcbContext.lcb_fa().carbon(), 0),
-                    hydroxyl,
-                    asInt(lcbContext.lcb_fa().db(), 0),
-                    LipidFaBondType.ESTER));
+            String modification = "";
+            if (lcbContext.lcb_fa().lcb_fa_mod() != null) {
+                modification = lcbContext.lcb_fa().lcb_fa_mod().modification().getText();
+            }
+            if (lcbContext.lcb_fa().lcb_fa_unmod() != null) {
+                return Optional.of(new LipidSpeciesInfo(
+                        LipidLevel.SPECIES,
+                        asInt(lcbContext.lcb_fa().lcb_fa_unmod().carbon(), 0),
+                        hydroxyl,
+                        asInt(lcbContext.lcb_fa().lcb_fa_unmod().db(), 0),
+                        LipidFaBondType.ESTER));
+            } else {
+                throw new ParseTreeVisitorException("Unknown lcb fa context value: " + lcbContext.getText());
+            }
         }
     }
 
@@ -509,7 +517,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
     }
 
     public static MolecularFattyAcid buildMolecularFa(LipidMapsParser.FaContext ctx, String faName) {
-        MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFaBuilder();
+        MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
         if (ctx.fa_unmod() != null) {
             LipidFaBondType faBondType = getLipidFaBondTypeUnmod(ctx);
             int plasmenylEtherDbBondCorrection = 0;
@@ -524,7 +532,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 fa.nDoubleBonds(plasmenylEtherDbBondCorrection + asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0));
-                if (ctx.fa_unmod().fa_pure().db().db_position() != null) {
+                if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
                     throw new RuntimeException("Support for double bond positions not implemented yet!");
                 }
             }
@@ -552,17 +560,28 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
     }
 
     public static StructuralFattyAcid buildStructuralLcb(LipidMapsParser.LcbContext ctx, String faName, int position) {
-        StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
-        fa.nCarbon(asInt(ctx.lcb_fa().carbon(), 0));
-        Integer nHydroxy = getHydroxyCount(ctx);
-        fa.nHydroxy(nHydroxy);
-        if (ctx.lcb_fa().db() != null) {
-            fa.nDoubleBonds(asInt(ctx.lcb_fa().db().db_count(), 0));
-            if (ctx.lcb_fa().db().db_position() != null) {
-                throw new RuntimeException("Support for double bond positions not implemented yet!");
+        StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
+        // FIXME handle these once they are defined
+        String modifications = "";
+        if (ctx.lcb_fa().lcb_fa_mod() != null) {
+            if (ctx.lcb_fa().lcb_fa_mod().modification() != null) {
+                modifications = ctx.lcb_fa().lcb_fa_mod().modification().getText();
             }
         }
-        return fa.name(faName).position(position).lcb(true).build();
+        if (ctx.lcb_fa().lcb_fa_unmod() != null) {
+            fa.nCarbon(asInt(ctx.lcb_fa().lcb_fa_unmod().carbon(), 0));
+            Integer nHydroxy = getHydroxyCount(ctx);
+            fa.nHydroxy(nHydroxy);
+            if (ctx.lcb_fa().lcb_fa_unmod().db() != null) {
+                fa.nDoubleBonds(asInt(ctx.lcb_fa().lcb_fa_unmod().db().db_count(), 0));
+                if (ctx.lcb_fa().lcb_fa_unmod().db().db_positions() != null) {
+                    throw new RuntimeException("Double bond positions should be handled by the isomeric FA / LCB handler!");
+                }
+            }
+            return fa.name(faName).position(position).lcb(true).build();
+        } else {
+            throw new ParseTreeVisitorException("No LcbContext!");
+        }
     }
 
     private static Integer getHydroxyCount(LipidMapsParser.LcbContext ctx) {
@@ -582,7 +601,13 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
     }
 
     public static StructuralFattyAcid buildStructuralFa(LipidMapsParser.FaContext ctx, String faName, int position) {
-        StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
+        StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
+        String modifications = "";
+        if (ctx.fa_mod() != null) {
+            if (ctx.fa_mod().modification() != null) {
+                modifications = ctx.fa_mod().modification().getText();
+            }
+        }
         if (ctx.fa_unmod() != null) {
             LipidFaBondType faBondType = getLipidFaBondTypeUnmod(ctx);
             int plasmenylEtherDbBondCorrection = 0;
@@ -597,16 +622,11 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 fa.nDoubleBonds(plasmenylEtherDbBondCorrection + asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0));
-                if (ctx.fa_unmod().fa_pure().db().db_position() != null) {
+                if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
                     throw new RuntimeException("Support for double bond positions not implemented yet!");
                 }
             }
             return fa.name(faName).position(position).build();
-
-        } else if (ctx.fa_mod() != null) {
-//            ModificationContext modCtx = ctx.fa_mod().modification();
-//            modCtx.
-            throw new RuntimeException("Support for modified FA handling not implemented!");
         } else {
             throw new ParseTreeVisitorException("No FaContext!");
         }

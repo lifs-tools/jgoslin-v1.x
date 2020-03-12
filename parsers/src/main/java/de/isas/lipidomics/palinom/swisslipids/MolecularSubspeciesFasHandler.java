@@ -50,7 +50,7 @@ public class MolecularSubspeciesFasHandler {
    
 
     public MolecularFattyAcid buildMolecularFa(SwissLipidsParser.FaContext ctx, String faName) {
-        MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFaBuilder();
+        MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
         LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {
             fa.nCarbon(faHelperFunctions.asInt(ctx.fa_core().carbon(), 0));

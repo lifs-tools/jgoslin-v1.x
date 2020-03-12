@@ -120,12 +120,16 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
         if (faContext.fa_lcb_suffix() != null) {
             throw new ParseTreeVisitorException("Unsupported lcb suffix on fa: " + faContext.fa_lcb_suffix().getText());
         }
-        return Optional.of(new LipidSpeciesInfo(
-                LipidLevel.SPECIES,
-                asInt(faContext.fa_core().carbon(), 0),
-                nHydroxyl,
-                asInt(faContext.fa_core().db(), 0),
-                lfbt));
+        return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+                level(LipidLevel.SPECIES).
+                name("FA").
+                position(-1).
+                nCarbon(asInt(faContext.fa_core().carbon(), 0)).
+                nHydroxy(nHydroxyl).
+                nDoubleBonds(asInt(faContext.fa_core().db(), 0)).
+                lipidFaBondType(lfbt).
+            build()
+        );
     }
     
     public Integer getNHydroxyl(SwissLipidsParser.LcbContext lcbContext) {
@@ -153,29 +157,34 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
     }
 
     public Optional<LipidSpeciesInfo> getSpeciesInfo(SwissLipidsParser.LcbContext lcbContext) {
-        Integer hydroxyl = 0;
+        Integer nHydroxyl = 0;
         if (lcbContext.lcb_core() != null) {
             SwissLipidsParser.Lcb_coreContext coreCtx = lcbContext.lcb_core();
             if (coreCtx.hydroxyl() != null) {
                 switch (coreCtx.hydroxyl().getText()) {
                     case "t":
-                        hydroxyl = 3;
+                        nHydroxyl = 3;
                         break;
                     case "d":
-                        hydroxyl = 2;
+                        nHydroxyl = 2;
                         break;
                     case "m":
-                        hydroxyl = 1;
+                        nHydroxyl = 1;
                         break;
                     default:
                         throw new ParseTreeVisitorException("Unsupported old hydroxyl prefix: " + coreCtx.hydroxyl().getText());
                 }
             }
-            return Optional.of(new LipidSpeciesInfo(
-                    LipidLevel.SPECIES,
-                    asInt(coreCtx.carbon(), 0),
-                    hydroxyl,
-                    asInt(coreCtx.db(), 0), LipidFaBondType.ESTER));
+            return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+                    level(LipidLevel.SPECIES).
+                    name("LCB").
+                    position(-1).
+                    nCarbon(asInt(coreCtx.carbon(), 0)).
+                    nHydroxy(nHydroxyl).
+                    nDoubleBonds(asInt(coreCtx.db(), 0)).
+                    lipidFaBondType(getLipidLcbBondType(lcbContext)).
+                build()
+            );
         }
         throw new ParseTreeVisitorException("Uninitialized lcb_core context!");
     }

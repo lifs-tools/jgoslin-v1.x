@@ -29,8 +29,8 @@ public class LipidMolecularSubspeciesTest {
 
         LipidMolecularSubspecies lss = new LipidMolecularSubspecies(
                 "PG",
-                new MolecularFattyAcid("FA1", 8, 0, 1, LipidFaBondType.ESTER, false),
-                new MolecularFattyAcid("FA2", 12, 1, 1, LipidFaBondType.ESTER, false)
+                new MolecularFattyAcid("FA1", 8, 0, 1, LipidFaBondType.ESTER, false, ModificationsList.NONE),
+                new MolecularFattyAcid("FA2", 12, 1, 1, LipidFaBondType.ESTER, false, ModificationsList.NONE)
         );
         String expectedSpecies = "PG 20:2;1";
         assertEquals(expectedSpecies, lss.getLipidString(LipidLevel.SPECIES));

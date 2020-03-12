@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,10 +34,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class LipidMolecularSubspecies extends LipidSpecies {
 
     protected final Map<String, FattyAcid> fa = new LinkedHashMap<>();
 
+    @Builder
     public LipidMolecularSubspecies(String headGroup, MolecularFattyAcid... fa) {
         super(headGroup);
         int nCarbon = 0;
@@ -63,7 +67,16 @@ public class LipidMolecularSubspecies extends LipidSpecies {
                 }
             }
         }
-        super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.MOLECULAR_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, lipidFaBondType));
+        super.info = Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+            level(LipidLevel.MOLECULAR_SUBSPECIES).
+            name(headGroup).
+            position(-1).
+            nCarbon(nCarbon).
+            nHydroxy(nHydroxyl).
+            nDoubleBonds(nDoubleBonds).
+            lipidFaBondType(lipidFaBondType).
+            build()
+        );
     }
 
     @Override
@@ -72,24 +85,14 @@ public class LipidMolecularSubspecies extends LipidSpecies {
     }
 
     protected String buildLipidSubspeciesName(String faSeparator) {
-        List<String> faStrings = new LinkedList<>();
-        for (String faKey : getFa().
-                keySet()) {
-            FattyAcid fattyAcid = getFa().
-                    get(faKey);
-            int nDB = 0;
-            int nHydroxy = 0;
-            int nCarbon = 0;
-            nDB += fattyAcid.getNDoubleBonds();
-            nCarbon += fattyAcid.getNCarbon();
-            nHydroxy += fattyAcid.getNHydroxy();
-            faStrings.add(nCarbon + ":" + nDB + (nHydroxy > 0 ? ";" + nHydroxy : "") + fattyAcid.getLipidFaBondType().suffix());
-        }
+        String faStrings = getFa().values().stream().map((fa) -> {
+            return fa.buildSubstructureName();
+        }).collect(Collectors.joining(faSeparator));
         String hgToFaSep = " ";
         if (isEsterLipid()) {
             hgToFaSep = "-";
         }
-        return getHeadGroup() + (faStrings.isEmpty() ? "" : hgToFaSep) + faStrings.stream().collect(Collectors.joining(faSeparator));
+        return getHeadGroup() + (faStrings.isEmpty() ? "" : hgToFaSep) + faStrings;
     }
 
     @Override

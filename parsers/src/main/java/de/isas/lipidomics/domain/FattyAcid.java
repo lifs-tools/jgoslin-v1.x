@@ -21,8 +21,20 @@ public abstract class FattyAcid {
     private final int nDoubleBonds;
     private final LipidFaBondType lipidFaBondType;
     private final boolean lcb;
+    private final ModificationsList modifications;
 
-    public FattyAcid(String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb) {
+    /**
+     * 
+     * @param name
+     * @param position
+     * @param nCarbon
+     * @param nHydroxy
+     * @param nDoubleBonds
+     * @param lipidFaBondType
+     * @param lcb
+     * @param modifications 
+     */
+    public FattyAcid(String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications) {
         this.name = name;
         if (nCarbon < 0) {
             throw new ConstraintViolationException("FattyAcid must have at least 0 carbons!");
@@ -39,6 +51,13 @@ public abstract class FattyAcid {
         this.nDoubleBonds = nDoubleBonds;
         this.lipidFaBondType = Optional.ofNullable(lipidFaBondType).orElse(LipidFaBondType.UNDEFINED);
         this.lcb = lcb;
+        this.modifications = modifications==null?ModificationsList.NONE:modifications;
     }
+    
+    /**
+     * Build the name of this substructure.
+     * @return the name of this substructure.
+     */
+    public abstract String buildSubstructureName();
 
 }

@@ -20,15 +20,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Example: PE(P-18:0/22:6(4Z,7Z,10Z,13Z,16Z,19Z))
  * @author nils.hoffmann
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
 
+    /**
+     * 
+     * @param headGroup
+     * @param fa 
+     */
+    @Builder(builderMethodName = "lipidIsomericSubspeciesBuilder")
     public LipidIsomericSubspecies(String headGroup, IsomericFattyAcid... fa) {
         super(headGroup);
         int nCarbon = 0;
@@ -54,36 +63,28 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
                 }
             }
         }
-        super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.ISOMERIC_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, lipidFaBondType));
+        super.info = Optional.of(
+            LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+                level(LipidLevel.ISOMERIC_SUBSPECIES).
+                name(headGroup).
+                position(-1).
+                nCarbon(nCarbon).
+                nHydroxy(nHydroxyl).
+                nDoubleBonds(nDoubleBonds).
+                lipidFaBondType(lipidFaBondType).
+            build()
+        );
     }
 
     private String buildLipidIsomericSubstructureName() {
-        List<String> faStrings = new LinkedList<>();
-        for (String faKey : getFa().
-                keySet()) {
-            IsomericFattyAcid fattyAcid = (IsomericFattyAcid) getFa().
-                    get(faKey);
-            int nDB = 0;
-            int nHydroxy = 0;
-            int nCarbon = 0;
-            nDB += fattyAcid.getNDoubleBonds();
-            String dbPos = "";
-            List<String> dbPositions = new LinkedList<>();
-            for (Integer key : fattyAcid.getDoubleBondPositions().keySet()) {
-                dbPositions.add(key + fattyAcid.getDoubleBondPositions().get(key));
-            }
-            if (!fattyAcid.getDoubleBondPositions().isEmpty()) {
-                dbPos = "(" + dbPositions.stream().collect(Collectors.joining(",")) + ")";
-            }
-            nCarbon += fattyAcid.getNCarbon();
-            nHydroxy += fattyAcid.getNHydroxy();
-            faStrings.add(nCarbon + ":" + nDB + dbPos + (nHydroxy > 0 ? ";" + nHydroxy : "") + fattyAcid.getLipidFaBondType().suffix());
-        }
+        String faStrings = getFa().values().stream().map((fa) -> {
+            return fa.buildSubstructureName();
+        }).collect(Collectors.joining("/"));
         String hgToFaSep = " ";
         if (isEsterLipid()) {
             hgToFaSep = "-";
         }
-        return getHeadGroup() + hgToFaSep + faStrings.stream().collect(Collectors.joining("/"));
+        return getHeadGroup() + hgToFaSep + faStrings;
     }
 
     @Override

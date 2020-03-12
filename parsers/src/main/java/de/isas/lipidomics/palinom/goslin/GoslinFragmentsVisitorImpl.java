@@ -494,14 +494,14 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
     }
 
     public static MolecularFattyAcid buildMolecularFa(GoslinFragmentsParser.FaContext ctx, String faName) {
-        MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFaBuilder();
+        MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
         LipidFaBondType lfbt = getLipidFaBondType(ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
             if (ctx.fa_pure().db() != null) {
                 fa.nDoubleBonds(asInt(ctx.fa_pure().db().db_count(), 0));
-                if (ctx.fa_pure().db().db_position() != null) {
+                if (ctx.fa_pure().db().db_positions() != null) {
                     throw new RuntimeException("Support for double bond positions not implemented yet!");
                 }
             }
@@ -532,12 +532,12 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
             throw new RuntimeException("Heavy label in lcb_pure context not implemented yet!");
         }
         GoslinFragmentsParser.Lcb_pureContext pureCtx = ctx.lcb_pure();
-        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
+        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
         fa.nCarbon(asInt(pureCtx.carbon(), 0));
         fa.nHydroxy(asInt(pureCtx.hydroxyl(), 0));
         if (pureCtx.db() != null) {
             fa.nDoubleBonds(asInt(pureCtx.db().db_count(), 0));
-            if (pureCtx.db().db_position() != null) {
+            if (pureCtx.db().db_positions() != null) {
                 throw new RuntimeException("Support for double bond positions not implemented yet!");
             }
         }
@@ -546,14 +546,14 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
     }
 
     public static StructuralFattyAcid buildStructuralFa(GoslinFragmentsParser.FaContext ctx, String faName, int position) {
-        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
+        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
         LipidFaBondType lfbt = getLipidFaBondType(ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
             if (ctx.fa_pure().db() != null) {
                 fa.nDoubleBonds(asInt(ctx.fa_pure().db().db_count(), 0));
-                if (ctx.fa_pure().db().db_position() != null) {
+                if (ctx.fa_pure().db().db_positions() != null) {
                     throw new RuntimeException("Support for double bond positions not implemented yet!");
                 }
             }

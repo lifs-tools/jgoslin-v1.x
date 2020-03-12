@@ -59,7 +59,7 @@ public class StructuralSubspeciesLcbHandler {
 
     public StructuralFattyAcid buildStructuralLcb(SwissLipidsParser.LcbContext ctx, String faName, int position) {
         SwissLipidsParser.Lcb_coreContext pureCtx = ctx.lcb_core();
-        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
+        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
         fa.nCarbon(faHelperFunctions.asInt(pureCtx.carbon(), 0));
         Integer hydroxyl = 0;
         if (pureCtx != null) {

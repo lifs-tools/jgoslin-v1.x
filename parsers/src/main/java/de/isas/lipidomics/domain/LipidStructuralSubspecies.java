@@ -17,15 +17,19 @@ package de.isas.lipidomics.domain;
 
 import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.Optional;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Example: Phosphatidylinositol (8:0/8:0) or PI(8:0/8:0)
  * @author nils.hoffmann
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
 
+    @Builder(builderMethodName = "lipidStructuralSubspeciesBuilder")
     public LipidStructuralSubspecies(String headGroup, StructuralFattyAcid... fa) {
         super(headGroup);
         int nCarbon = 0;
@@ -48,7 +52,16 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
                 }
             }
         }
-        super.info = Optional.of(new LipidSpeciesInfo(LipidLevel.STRUCTURAL_SUBSPECIES, nCarbon, nHydroxyl, nDoubleBonds, lipidFaBondType));
+        super.info = Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+            level(LipidLevel.STRUCTURAL_SUBSPECIES).
+            name(headGroup).
+            position(-1).
+            nCarbon(nCarbon).
+            nHydroxy(nHydroxyl).
+            nDoubleBonds(nDoubleBonds).
+            lipidFaBondType(lipidFaBondType).
+            build()
+        );
     }
 
     @Override

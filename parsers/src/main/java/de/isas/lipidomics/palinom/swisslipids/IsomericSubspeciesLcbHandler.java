@@ -58,7 +58,7 @@ public class IsomericSubspeciesLcbHandler {
     }
 
     public IsomericFattyAcid buildIsomericLcb(SwissLipidsParser.LcbContext ctx, String faName, int position) {
-        IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFaBuilder();
+        IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelperFunctions.getLipidLcbBondType(ctx);
         if (ctx.lcb_core()!= null) {
             fa.nCarbon(faHelperFunctions.asInt(ctx.lcb_core().carbon(), 0));

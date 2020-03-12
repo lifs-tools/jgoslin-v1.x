@@ -15,8 +15,9 @@
  */
 package de.isas.lipidomics.domain;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * This class summarizes the FA parts of a lipid, independent of its head group.
@@ -27,14 +28,14 @@ import lombok.Data;
  *
  * @author nils.hoffmann
  */
-@AllArgsConstructor
 @Data
-public class LipidSpeciesInfo {
+@EqualsAndHashCode(callSuper = true)
+public class LipidSpeciesInfo extends FattyAcid {
 
     private static final class None extends LipidSpeciesInfo {
 
         private None() {
-            super(LipidLevel.UNDEFINED, 0, 0, 0, LipidFaBondType.UNDEFINED);
+            super(LipidLevel.UNDEFINED, "NONE", -1, 0, 0, 0, LipidFaBondType.UNDEFINED, false, ModificationsList.NONE);
         }
     }
 
@@ -44,8 +45,50 @@ public class LipidSpeciesInfo {
     public static final LipidSpeciesInfo NONE = new LipidSpeciesInfo.None();
 
     private final LipidLevel level;
-    private final int nCarbon;
-    private final int nHydroxy;
-    private final int nDoubleBonds;
-    private final LipidFaBondType lipidFaBondType;
+
+    /**
+     * 
+     * @param level
+     * @param name
+     * @param position
+     * @param nCarbon
+     * @param nHydroxy
+     * @param nDoubleBonds
+     * @param lipidFaBondType
+     * @param lcb
+     * @param modifications 
+     */
+    @Builder(builderMethodName = "lipidSpeciesInfoBuilder")
+    public LipidSpeciesInfo(LipidLevel level, String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications) {
+        super(name, position, nCarbon, nHydroxy, nDoubleBonds, lipidFaBondType, lcb, modifications);
+        this.level = level;
+    }
+    
+    /**
+     * 
+     * @param level
+     * @param nCarbon
+     * @param nHydroxy
+     * @param nDoubleBonds
+     * @param lipidFaBondType 
+     */
+    public LipidSpeciesInfo(LipidLevel level, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType) {
+        this(level, level.name(), -1, nCarbon, nHydroxy, nDoubleBonds, lipidFaBondType, false, ModificationsList.NONE);
+    }
+
+    @Override
+    public String buildSubstructureName() {
+        final StringBuilder sb = new StringBuilder();
+        sb.
+                append(getName()).
+                append(" ").
+                append(getNCarbon()).
+                append(":").
+                append(getNDoubleBonds());
+        if (getNHydroxy() > 0) {
+            sb.append(";").append(getNHydroxy());
+        }
+        //FIXME implement output of modifications once this has been settled
+        return sb.toString();
+    }
 }

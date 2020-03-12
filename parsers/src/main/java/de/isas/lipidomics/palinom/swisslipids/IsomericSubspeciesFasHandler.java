@@ -52,7 +52,7 @@ public class IsomericSubspeciesFasHandler {
    
 
     public IsomericFattyAcid buildIsomericFa(SwissLipidsParser.FaContext ctx, String faName, int position) {
-        IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFaBuilder();
+        IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {
             fa.nCarbon(faHelperFunctions.asInt(ctx.fa_core().carbon(), 0));

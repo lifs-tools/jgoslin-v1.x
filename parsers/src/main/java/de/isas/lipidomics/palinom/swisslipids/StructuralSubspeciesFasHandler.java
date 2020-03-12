@@ -50,7 +50,7 @@ public class StructuralSubspeciesFasHandler {
    
 
     public StructuralFattyAcid buildStructuralFa(SwissLipidsParser.FaContext ctx, String faName, int position) {
-        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFaBuilder();
+        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
         LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {
             fa.nCarbon(faHelperFunctions.asInt(ctx.fa_core().carbon(), 0));
