@@ -379,13 +379,13 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         }
 
         private Optional<LipidSpecies> visitSpeciesFas(String headGroup, GoslinParser.FaContext faContext) {
-            return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(faContext)));
+            return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(headGroup, faContext)));
         }
 
         private Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<GoslinParser.FaContext> faContexts) {
             List<MolecularFattyAcid> fas = new LinkedList<>();
             for (int i = 0; i < faContexts.size(); i++) {
-                MolecularFattyAcid fa = buildMolecularFa(faContexts.get(i), "FA" + (i + 1));
+                MolecularFattyAcid fa = buildMolecularFa(headGroup, faContexts.get(i), "FA" + (i + 1));
                 fas.add(fa);
             }
             MolecularFattyAcid[] arrs = new MolecularFattyAcid[fas.size()];
@@ -398,7 +398,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             StructuralFattyAcid lcbA = buildStructuralLcb(lcbContext, "LCB", 1);
             fas.add(lcbA);
             for (int i = 0; i < faContexts.size(); i++) {
-                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 2);
+                StructuralFattyAcid fa = buildStructuralFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 2);
                 fas.add(fa);
             }
             StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
@@ -409,7 +409,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         private Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<GoslinParser.FaContext> faContexts) {
             List<StructuralFattyAcid> fas = new LinkedList<>();
             for (int i = 0; i < faContexts.size(); i++) {
-                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 1);
+                StructuralFattyAcid fa = buildStructuralFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 1);
                 fas.add(fa);
             }
             StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
@@ -422,12 +422,12 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
         }
 
-        private Optional<LipidSpeciesInfo> getSpeciesInfo(GoslinParser.FaContext faContext) {
+        private Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, GoslinParser.FaContext faContext) {
             //fa_pure, ether, heavy
             if (faContext.fa_pure() != null && faContext.heavy_fa() != null) {
                 throw new RuntimeException("Heavy label in FA_pure context not implemented yet!");
             }
-            LipidFaBondType lfbt = getLipidFaBondType(faContext);
+            LipidFaBondType lfbt = getLipidFaBondType(headGroup, faContext);
             return Optional.of(new LipidSpeciesInfo(
                     LipidLevel.SPECIES,
                     asInt(faContext.fa_pure().carbon(), 0),
@@ -489,7 +489,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         }
     }
 
-    private static LipidFaBondType getLipidFaBondType(GoslinParser.FaContext faContext) throws ParseTreeVisitorException {
+    private static LipidFaBondType getLipidFaBondType(String headGroup, GoslinParser.FaContext faContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         if (faContext.ether() != null) {
             if ("a".equals(faContext.ether().getText())) {
@@ -500,12 +500,17 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
                 throw new ParseTreeVisitorException("Unknown ether context value: " + faContext.ether());
             }
         }
+        if(lfbt == LipidFaBondType.ESTER || lfbt == LipidFaBondType.UNDEFINED) {
+            if (headGroup.endsWith(" O") || headGroup.endsWith("-O")) {
+                lfbt = LipidFaBondType.ETHER_UNSPECIFIED;
+            }
+        }
         return lfbt;
     }
 
-    public static MolecularFattyAcid buildMolecularFa(GoslinParser.FaContext ctx, String faName) {
+    public static MolecularFattyAcid buildMolecularFa(String headGroup, GoslinParser.FaContext ctx, String faName) {
         MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
-        LipidFaBondType lfbt = getLipidFaBondType(ctx);
+        LipidFaBondType lfbt = getLipidFaBondType(headGroup, ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
@@ -555,9 +560,9 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         return fa.name(faName).position(position).lcb(true).build();
     }
 
-    public static StructuralFattyAcid buildStructuralFa(GoslinParser.FaContext ctx, String faName, int position) {
+    public static StructuralFattyAcid buildStructuralFa(String headGroup, GoslinParser.FaContext ctx, String faName, int position) {
         StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
-        LipidFaBondType lfbt = getLipidFaBondType(ctx);
+        LipidFaBondType lfbt = getLipidFaBondType(headGroup, ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));

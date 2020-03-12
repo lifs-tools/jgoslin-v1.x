@@ -287,7 +287,7 @@ public class GoslinFragmentsVisitorParserTest {
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
         System.out.println(lipid);
-        assertEquals("PE O", lipid.getHeadGroup());
+        assertEquals("PE", lipid.getHeadGroup());
         assertEquals("FA1", lipid.getFa().
                 get("FA1").
                 getName());
@@ -329,7 +329,7 @@ public class GoslinFragmentsVisitorParserTest {
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
         System.out.println(lipid);
-        assertEquals("PE O", lipid.getHeadGroup());
+        assertEquals("PE", lipid.getHeadGroup());
         assertEquals("FA1", lipid.getFa().
                 get("FA1").
                 getName());

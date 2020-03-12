@@ -1,7 +1,7 @@
 /*
  * 
  */
-package de.isas.lipidomics.palinom.goslin.molecularsubspecies;
+package de.isas.lipidomics.goslin.molecularsubspecies;
 
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import io.cucumber.java.en.Given;

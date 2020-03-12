@@ -85,7 +85,7 @@ public class LipidSpecies {
      * @param lipidSpeciesInfo the lipid species info object.
      */
     public LipidSpecies(String headGroup, Optional<LipidSpeciesInfo> lipidSpeciesInfo) {
-        this.headGroup = headGroup.trim();
+        this.headGroup = headGroup.trim().replaceAll(" O", "");
         this.lipidClass = LipidClass.forHeadGroup(this.headGroup);
         this.lipidCategory = this.lipidClass.map((lipidClass) -> {
             return lipidClass.getCategory();
@@ -104,15 +104,22 @@ public class LipidSpecies {
 
     /**
      * Returns true, if the head group ends with ' O' or if the lipid fa bond
-     * type is either {@link LipidFaBondType#ETHER_PLASMANYL} or
+     * type is either {@link LipidFaBondType#ETHER_UNSPECIFIED},
+     * {@link LipidFaBondType#ETHER_PLASMANYL} or
      * {@link LipidFaBondType#ETHER_PLASMENYL}.
      *
-     * @return whether this is an 'ester' lipid, e.g. a Plasmanyl or Plasmenyl
-     * species.
+     * @return whether this is an 'ether' lipid, e.g. a unspecified ether
+     * species, a Plasmanyl or Plasmenyl species.
      */
-    public boolean isEsterLipid() {
-        return getHeadGroup().endsWith(" O") || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL;
-        //return this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL;
+    public boolean isEtherLipid() {
+        return this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL
+                || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL
+                || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED
+                || getFa().values().stream().anyMatch((t) -> {
+                    return t.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED
+                            || t.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL
+                            || t.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL;
+                });
     }
 
     /**
@@ -136,8 +143,8 @@ public class LipidSpecies {
                 if (this.info.isPresent() && this.info.get().getNCarbon() > 0) {
                     int nCarbon = info.get().getNCarbon();
                     String hgToFaSep = " ";
-                    if (isEsterLipid()) {
-                        hgToFaSep = "-";
+                    if (isEtherLipid()) {
+                        hgToFaSep = " O-";
                     }
                     lipidString.append(hgToFaSep).append(nCarbon);
                     int nDB = info.get().getNDoubleBonds();
@@ -154,7 +161,7 @@ public class LipidSpecies {
         }
 
     }
-    
+
     public Map<String, FattyAcid> getFa() {
         return Collections.emptyMap();
     }

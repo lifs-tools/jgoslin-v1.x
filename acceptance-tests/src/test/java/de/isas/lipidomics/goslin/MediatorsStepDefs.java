@@ -1,7 +1,7 @@
 /*
  * 
  */
-package de.isas.lipidomics.palinom.goslin;
+package de.isas.lipidomics.goslin;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -9,6 +9,7 @@ import io.cucumber.java.en.When;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
+import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 

@@ -89,8 +89,8 @@ public class LipidMolecularSubspecies extends LipidSpecies {
             return fa.buildSubstructureName();
         }).collect(Collectors.joining(faSeparator));
         String hgToFaSep = " ";
-        if (isEsterLipid()) {
-            hgToFaSep = "-";
+        if (isEtherLipid()) {
+            hgToFaSep = " O-";
         }
         return getHeadGroup() + (faStrings.isEmpty() ? "" : hgToFaSep) + faStrings;
     }

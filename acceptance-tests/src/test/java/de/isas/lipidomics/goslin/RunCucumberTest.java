@@ -1,4 +1,4 @@
-package de.isas.lipidomics.palinom.goslin;
+package de.isas.lipidomics.goslin;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;

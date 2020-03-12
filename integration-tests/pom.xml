@@ -3,8 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>de.isas.lipidomics</groupId>
-        <artifactId>palinom</artifactId>
+        <artifactId>jgoslin</artifactId>
         <version>0.9.9.3-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>jgoslin-integration-tests</artifactId>
     <packaging>jar</packaging>
