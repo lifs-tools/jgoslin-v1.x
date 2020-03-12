@@ -7,7 +7,7 @@
         <version>0.9.9.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>palinom-parsers</artifactId>
+    <artifactId>jgoslin-parsers</artifactId>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -194,4 +194,5 @@
             <version>5.1</version>
         </dependency>
     </dependencies>
+    <name>jgoslin-parsers</name>
 </project>

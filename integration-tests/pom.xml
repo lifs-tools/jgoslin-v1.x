@@ -6,7 +6,7 @@
         <artifactId>palinom</artifactId>
         <version>0.9.9.3-SNAPSHOT</version>
     </parent>
-    <artifactId>palinom-integration-tests</artifactId>
+    <artifactId>jgoslin-integration-tests</artifactId>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
@@ -54,4 +54,5 @@
             </plugin>
         </plugins>
     </build>
+    <name>jgoslin-integration-tests</name>
 </project>

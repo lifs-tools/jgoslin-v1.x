@@ -7,7 +7,7 @@
         <version>0.9.9.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>palinom-acceptance-tests</artifactId>
+    <artifactId>jgoslin-acceptance-tests</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -59,4 +59,5 @@
             </plugin>
         </plugins>
     </build>
+    <name>jgoslin-acceptance-tests</name>
 </project>
