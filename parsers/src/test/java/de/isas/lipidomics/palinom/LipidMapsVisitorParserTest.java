@@ -35,6 +35,24 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 @Slf4j
 public class LipidMapsVisitorParserTest {
+    
+    @Test
+    public void testMIPC() throws ParsingException {
+        String ref = "M(IP)2C(t36:0(OH))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("M(IP)2C", lipidAdduct.getLipid().getHeadGroup());
+    }
+    
+    @Test
+    public void testSulfoHexCer() throws ParsingException {
+        String ref = "SulfoHexCer(d36:1)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("SulfoHexCer", lipidAdduct.getLipid().getHeadGroup());
+    }
 
     @Test
     public void testCh() throws ParsingException {
