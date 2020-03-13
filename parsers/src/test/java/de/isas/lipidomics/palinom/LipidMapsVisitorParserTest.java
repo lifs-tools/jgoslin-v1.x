@@ -376,7 +376,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("CoA", lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
         assertEquals(4, lipidAdduct.getLipid().getInfo().get().getNCarbon());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());

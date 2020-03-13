@@ -34,7 +34,7 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 @Slf4j
 public class SwissLipidsCompleteIT {
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index} ==> ''{0}'' can be parsed with the swiss lipids grammar")
     @CsvFileSource(resources = "/de/isas/lipidomics/palinom/swisslipids-names-Feb-10-2020.tsv", numLinesToSkip = 1, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
     public void isValidSwissLipidsNameForCurrentSwissLipids(
             String swissLipidsId,

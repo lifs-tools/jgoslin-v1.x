@@ -33,7 +33,7 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 @Slf4j
 public class LipidMapsCompleteIT {
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index} ==> ''{0}'' can be parsed with the lipidMaps grammar")
     @CsvFileSource(resources = "/de/isas/lipidomics/palinom/lipidmaps-names-Feb-10-2020.tsv", numLinesToSkip = 1, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
     public void isValidLipidMapsNameForCurrentLipidMapsForVisitorParser(
             String lipidMapsId,
@@ -54,10 +54,10 @@ public class LipidMapsCompleteIT {
             lipidAdduct = parser.parse(abbreviation);
             LipidSpecies ls = lipidAdduct.getLipid();
             assertNotNull(ls);
-        } catch (ParsingException ex) {
-            fail("Parsing current LipidMAPS identifier: " + abbreviation + " failed - name unsupported in grammar!");
-        } catch (ParseTreeVisitorException pve) {
+        } catch (RuntimeException rex) {
             fail("Parsing current LipidMAPS identifier: " + abbreviation + " failed - missing implementation!");
+        } catch (ParsingException ex) {
+            log.warn("Parsing current LipidMAPS identifier: " + abbreviation + " failed - name unsupported in grammar!");
         }
     }
 }

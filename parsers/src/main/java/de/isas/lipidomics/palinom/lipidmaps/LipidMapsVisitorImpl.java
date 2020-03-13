@@ -18,6 +18,7 @@ package de.isas.lipidomics.palinom.lipidmaps;
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.Fragment;
+import de.isas.lipidomics.domain.IsomericFattyAcid;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import static de.isas.lipidomics.domain.LipidCategory.GL;
@@ -413,18 +414,18 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             for (int i = 0; i < fa2Contexts.size(); i++) {
                 Fa2Context fa2Ctx = fa2Contexts.get(i);
                 if (fa2Ctx.fa2_sorted() != null) {
-                    if (level == LipidLevel.MOLECULAR_SUBSPECIES) {
-                        throw new ParseTreeVisitorException("CL second FAs group can not be on molecular level, first group was on structural level!");
-                    }
+//                    if (level == LipidLevel.MOLECULAR_SUBSPECIES) {
+//                        throw new ParseTreeVisitorException("CL second FAs group can not be on molecular level, first group was on structural level!");
+//                    }
                     level = LipidLevel.STRUCTURAL_SUBSPECIES;
                     for (int j = 0; j < fa2Ctx.fa2_sorted().fa().size(); j++) {
                         StructuralFattyAcid fa = buildStructuralFa(fa2Ctx.fa2_sorted().fa().get(j), "FA" + ((i + 1) + j), i + 1);
                         fas.add(fa);
                     }
                 } else if (fa2Ctx.fa2_unsorted() != null) {
-                    if (level == LipidLevel.STRUCTURAL_SUBSPECIES) {
-                        throw new ParseTreeVisitorException("CL second FAs group can not be on molecular level, first group was on structural level!");
-                    }
+//                    if (level == LipidLevel.STRUCTURAL_SUBSPECIES) {
+//                        throw new ParseTreeVisitorException("CL second FAs group can not be on molecular level, first group was on structural level!");
+//                    }
                     level = LipidLevel.MOLECULAR_SUBSPECIES;
                     for (int j = 0; j < fa2Ctx.fa2_unsorted().fa().size(); j++) {
                         MolecularFattyAcid fa = buildMolecularFa(fa2Ctx.fa2_unsorted().fa().get(i), "FA" + ((i + 1) + j));
@@ -440,7 +441,11 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                 case STRUCTURAL_SUBSPECIES:
                     StructuralFattyAcid[] sarrs = new StructuralFattyAcid[fas.size()];
                     fas.toArray(sarrs);
-                    return Optional.of(new LipidMolecularSubspecies(headGroup, sarrs));
+                    return Optional.of(new LipidStructuralSubspecies(headGroup, sarrs));
+                case ISOMERIC_SUBSPECIES:
+                    IsomericFattyAcid[] ifa = new IsomericFattyAcid[fas.size()];
+                    fas.toArray(ifa);
+                    return Optional.of(new LipidIsomericSubspecies(headGroup, ifa));
                 default:
                     throw new ParseTreeVisitorException("Unhandled lipid level for CL: " + level);
             }
