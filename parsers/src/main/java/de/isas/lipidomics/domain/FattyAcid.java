@@ -56,8 +56,9 @@ public abstract class FattyAcid {
     
     /**
      * Build the name of this substructure.
+     * @param the structural lipid level to return this substructure's name on.
      * @return the name of this substructure.
      */
-    public abstract String buildSubstructureName();
+    public abstract String buildSubstructureName(LipidLevel level);
 
 }

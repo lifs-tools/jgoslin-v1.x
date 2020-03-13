@@ -15,6 +15,8 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
+
 /**
  * The lipid fatty acyl bond types define how the FA is connected to the head
  * group or which variant of a particular bond type it is.
@@ -35,6 +37,68 @@ public enum LipidFaBondType {
             case ESTER:
             default:
                 return "";
+        }
+    }
+
+    public static LipidFaBondType getLipidFaBondType(String headGroup, FattyAcid... fa) {
+        LipidFaBondType speciesFaBondType = LipidFaBondType.UNDEFINED;
+        if (headGroup.endsWith(" O") || headGroup.endsWith("-O")) {
+            speciesFaBondType = LipidFaBondType.ETHER_UNSPECIFIED;
+        }
+        LipidFaBondType mostSpecificFaBondType = LipidFaBondType.UNDEFINED;
+        for (FattyAcid fas : fa) {
+            LipidFaBondType faBondType = fas.getLipidFaBondType();
+            switch (mostSpecificFaBondType) {
+                case UNDEFINED:
+                    switch (faBondType) {
+                        case ETHER_PLASMANYL:
+                        case ETHER_PLASMENYL:
+                        case ESTER:
+                            mostSpecificFaBondType = faBondType;
+                            break;
+                        default:
+                            throw new ConstraintViolationException("Did not except " + faBondType + " in context of FA: " + fas);
+                    }
+                    break;
+                case ESTER:
+                case ETHER_UNSPECIFIED:
+                    switch (faBondType) {
+                        case ETHER_PLASMANYL:
+                        case ETHER_PLASMENYL:
+                            mostSpecificFaBondType = faBondType;
+                            break;
+                        case UNDEFINED:
+                            throw new ConstraintViolationException("Did not except " + faBondType + " in context of FA: " + fas);
+                    }
+                    break;
+                case ETHER_PLASMANYL:
+                case ETHER_PLASMENYL:
+                    switch (faBondType) {
+                        case ETHER_PLASMANYL:
+                        case ETHER_PLASMENYL:
+                            throw new ConstraintViolationException("Only one FA can define an ether bond to the head group! Tried to add " + fas.getLipidFaBondType() + " over existing " + mostSpecificFaBondType + " for " + headGroup + " with  bond type " + speciesFaBondType + " and FA: " + fas);
+                        case ESTER:
+                            //leave as is, ETHER overrules ESTER
+                            break;
+                        default:
+                            throw new ConstraintViolationException("Did not except " + faBondType + " in context of FA: " + fas);
+                    }
+                    break;
+                default:
+                    throw new ConstraintViolationException("Unhandled case for" + faBondType + " in context of FA: " + fas);
+            }
+        }
+        switch(speciesFaBondType) {
+            case UNDEFINED:
+                return mostSpecificFaBondType;
+            case ETHER_UNSPECIFIED:
+                switch(mostSpecificFaBondType) {
+                    case ETHER_PLASMANYL:
+                    case ETHER_PLASMENYL:
+                        return mostSpecificFaBondType;
+                }
+            default:
+                return speciesFaBondType;
         }
     }
 

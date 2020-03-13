@@ -77,7 +77,7 @@ public class LipidSpeciesInfo extends FattyAcid {
     }
 
     @Override
-    public String buildSubstructureName() {
+    public String buildSubstructureName(LipidLevel level) {
         final StringBuilder sb = new StringBuilder();
         sb.
                 append(getName()).

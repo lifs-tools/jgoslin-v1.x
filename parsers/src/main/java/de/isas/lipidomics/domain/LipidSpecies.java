@@ -3,6 +3,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -66,7 +67,7 @@ public class LipidSpecies {
      * @param lipidSpeciesInfo the lipid species info.
      */
     public LipidSpecies(String headGroup, LipidCategory lipidCategory, Optional<LipidClass> lipidClass, Optional<LipidSpeciesInfo> lipidSpeciesInfo) {
-        this.headGroup = headGroup.trim();
+        this.headGroup = headGroup.trim().replaceAll(" O", "");
         this.lipidCategory = lipidCategory;
         this.lipidClass = lipidClass;
         this.info = lipidSpeciesInfo;
@@ -122,6 +123,31 @@ public class LipidSpecies {
                 });
     }
 
+        
+    public LipidFaBondType inferLipidFaBondType(String headGroup, FattyAcid...fa) {
+        LipidFaBondType lipidFaBondType = null;
+        for(FattyAcid fas:fa) {
+            if (lipidFaBondType == null) {
+                        lipidFaBondType = fas.getLipidFaBondType();
+            } else {
+                if(lipidFaBondType == LipidFaBondType.ETHER_PLASMANYL || lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL || lipidFaBondType == LipidFaBondType.ETHER_UNSPECIFIED) {
+                    if (fas.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED
+                            || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL
+                            || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL) {
+                        throw new ConstraintViolationException(
+                                "Only one FA can define an ether bond to the head group! Tried to add " + fas.getLipidFaBondType() + " over existing " + lipidFaBondType + " for " + headGroup + " and FA: " + fas);
+                    }
+                } else if(lipidFaBondType == LipidFaBondType.UNDEFINED && fas.getLipidFaBondType()!=LipidFaBondType.UNDEFINED) {
+                    lipidFaBondType = fas.getLipidFaBondType();
+                } 
+            }
+        }
+        if(lipidFaBondType == null) {
+            lipidFaBondType = LipidFaBondType.UNDEFINED;
+        }
+        return lipidFaBondType;
+    }
+
     /**
      * Returns a lipid string representation for the given {@link LipidLevel},
      * e.g. Category, Species, etc. Please note that this method is overridden
@@ -157,7 +183,8 @@ public class LipidSpecies {
             case UNDEFINED:
                 return this.getHeadGroup();
             default:
-                throw new RuntimeException(getClass().getSimpleName() + " does not know how to create a lipid string for level " + level);
+                LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();
+                throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
         }
 
     }

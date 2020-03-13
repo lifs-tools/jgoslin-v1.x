@@ -42,7 +42,7 @@ public class IsomericSubspeciesFasHandler {
     public Optional<LipidSpecies> visitIsomericSubspeciesFas(String headGroup, List<SwissLipidsParser.FaContext> faContexts) {
         List<IsomericFattyAcid> fas = new LinkedList<>();
         for (int i = 0; i < faContexts.size(); i++) {
-            IsomericFattyAcid fa = buildIsomericFa(faContexts.get(i), "FA" + (i + 1), i+1);
+            IsomericFattyAcid fa = buildIsomericFa(headGroup, faContexts.get(i), "FA" + (i + 1), i+1);
             fas.add(fa);
         }
         IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
@@ -51,7 +51,7 @@ public class IsomericSubspeciesFasHandler {
     }
    
 
-    public IsomericFattyAcid buildIsomericFa(SwissLipidsParser.FaContext ctx, String faName, int position) {
+    public IsomericFattyAcid buildIsomericFa(String headGroup, SwissLipidsParser.FaContext ctx, String faName, int position) {
         IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {

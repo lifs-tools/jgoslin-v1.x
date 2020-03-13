@@ -9,3 +9,4 @@ nb-configuration.xml
 lipidmaps-normalized.tsv
 swiss-lipids-normalized.tsv
 parsers/src/main/antlr4/de/isas/lipidomics/palinom/swisslipids-names-Feb-10-2020.tsv.bak
+/parsers/nbproject/

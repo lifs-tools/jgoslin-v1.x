@@ -12,7 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>palinom-parsers</artifactId>
+            <artifactId>jgoslin-parsers</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency> 

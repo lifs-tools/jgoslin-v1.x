@@ -40,7 +40,7 @@ public class MolecularSubspeciesFasHandler {
     public Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<SwissLipidsParser.FaContext> faContexts) {
         List<MolecularFattyAcid> fas = new LinkedList<>();
         for (int i = 0; i < faContexts.size(); i++) {
-            MolecularFattyAcid fa = buildMolecularFa(faContexts.get(i), "FA" + (i + 1));
+            MolecularFattyAcid fa = buildMolecularFa(headGroup, faContexts.get(i), "FA" + (i + 1));
             fas.add(fa);
         }
         MolecularFattyAcid[] arrs = new MolecularFattyAcid[fas.size()];
@@ -49,7 +49,7 @@ public class MolecularSubspeciesFasHandler {
     }
    
 
-    public MolecularFattyAcid buildMolecularFa(SwissLipidsParser.FaContext ctx, String faName) {
+    public MolecularFattyAcid buildMolecularFa(String headGroup, SwissLipidsParser.FaContext ctx, String faName) {
         MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
         LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {

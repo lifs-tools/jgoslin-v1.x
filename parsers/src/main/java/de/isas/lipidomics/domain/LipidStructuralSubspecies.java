@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * Example: Phosphatidylinositol (8:0/8:0) or PI(8:0/8:0)
+ *
  * @author nils.hoffmann
  */
 @Data
@@ -35,7 +36,6 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
-        LipidFaBondType lipidFaBondType = LipidFaBondType.ESTER;
         for (StructuralFattyAcid fas : fa) {
             if (super.fa.containsKey(fas.getName())) {
                 throw new ConstraintViolationException(
@@ -45,22 +45,17 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
                 nCarbon += fas.getNCarbon();
                 nHydroxyl += fas.getNHydroxy();
                 nDoubleBonds += fas.getNDoubleBonds();
-                if (lipidFaBondType == LipidFaBondType.ESTER && (fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL)) {
-                    lipidFaBondType = fas.getLipidFaBondType();
-                } else if (lipidFaBondType != LipidFaBondType.ESTER && (fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL)) {
-                    throw new ConstraintViolationException("Only one FA can define an ether bond to the head group! Tried to add " + fas.getLipidFaBondType() + " over existing " + lipidFaBondType);
-                }
             }
         }
         super.info = Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
-            level(LipidLevel.STRUCTURAL_SUBSPECIES).
-            name(headGroup).
-            position(-1).
-            nCarbon(nCarbon).
-            nHydroxy(nHydroxyl).
-            nDoubleBonds(nDoubleBonds).
-            lipidFaBondType(lipidFaBondType).
-            build()
+                level(LipidLevel.STRUCTURAL_SUBSPECIES).
+                name(headGroup).
+                position(-1).
+                nCarbon(nCarbon).
+                nHydroxy(nHydroxyl).
+                nDoubleBonds(nDoubleBonds).
+                lipidFaBondType(LipidFaBondType.getLipidFaBondType(headGroup, fa)).
+                build()
         );
     }
 
@@ -68,14 +63,15 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
     public String getLipidString(LipidLevel level) {
         switch (level) {
             case STRUCTURAL_SUBSPECIES:
-                return super.buildLipidSubspeciesName("/");
+                return super.buildLipidSubspeciesName(level, "/");
             case MOLECULAR_SUBSPECIES:
             case CATEGORY:
             case CLASS:
             case SPECIES:
                 return super.getLipidString(level);
             default:
-                throw new RuntimeException(getClass().getSimpleName() + " does not know how to create a lipid string for level " + level);
+                LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();
+                throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
         }
     }
 

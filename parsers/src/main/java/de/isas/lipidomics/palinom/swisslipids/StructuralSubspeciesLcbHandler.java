@@ -44,7 +44,7 @@ public class StructuralSubspeciesLcbHandler {
         StructuralFattyAcid lcbA = buildStructuralLcb(lcbContext, "LCB", 1);
         fas.add(lcbA);
         for (int i = 0; i < faContexts.size(); i++) {
-            StructuralFattyAcid fa = ssfh.buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 2);
+            StructuralFattyAcid fa = ssfh.buildStructuralFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 2);
             fas.add(fa);
         }
         StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];

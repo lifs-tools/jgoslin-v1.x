@@ -209,6 +209,8 @@ public class SwissLipidsVisitorParserTest {
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
         System.out.println(lipid);
+        assertEquals(LipidCategory.GP, lipid.getLipidCategory());
+        assertEquals(LipidClass.PE, lipid.getLipidClass().get());
         assertEquals("PE", lipid.getHeadGroup());
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, lipid.getFa().get("FA1").getLipidFaBondType());
         assertEquals("FA1", lipid.getFa().
@@ -247,6 +249,8 @@ public class SwissLipidsVisitorParserTest {
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
         System.out.println(lipid);
+        assertEquals(LipidCategory.GP, lipid.getLipidCategory());
+        assertEquals(LipidClass.PE, lipid.getLipidClass().get());
         assertEquals("PE", lipid.getHeadGroup());
         assertEquals(LipidFaBondType.ETHER_PLASMENYL, lipid.getFa().get("FA1").getLipidFaBondType());
         assertEquals("FA1", lipid.getFa().

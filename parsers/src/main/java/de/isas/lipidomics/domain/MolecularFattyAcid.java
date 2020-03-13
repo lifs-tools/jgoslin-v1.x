@@ -31,7 +31,7 @@ public class MolecularFattyAcid extends FattyAcid {
     }
     
     @Override
-    public String buildSubstructureName() {
+    public String buildSubstructureName(LipidLevel level) {
         StringBuilder sb = new StringBuilder();
         int nDB = 0;
         int nHydroxy = 0;

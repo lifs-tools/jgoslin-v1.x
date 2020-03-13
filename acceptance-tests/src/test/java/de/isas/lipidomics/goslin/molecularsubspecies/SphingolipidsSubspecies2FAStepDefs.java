@@ -8,6 +8,7 @@ import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -59,6 +60,13 @@ public class SphingolipidsSubspecies2FAStepDefs {
             Assert.assertEquals(nCarbon.intValue(), fa1.getNCarbon());
             Assert.assertEquals(nDoubleBonds.intValue(), fa1.getNDoubleBonds());
             Assert.assertEquals(nHydroxy.intValue(), fa1.getNHydroxy());
+        } else if (this.lipid instanceof LipidStructuralSubspecies) {
+            LipidStructuralSubspecies lms = (LipidStructuralSubspecies) this.lipid;
+            FattyAcid fa1 = lms.getFa().get("FA1");
+            Assert.assertEquals(position.intValue(), fa1.getPosition());
+            Assert.assertEquals(nCarbon.intValue(), fa1.getNCarbon());
+            Assert.assertEquals(nDoubleBonds.intValue(), fa1.getNDoubleBonds());
+            Assert.assertEquals(nHydroxy.intValue(), fa1.getNHydroxy());
         }
     }
 
@@ -66,6 +74,15 @@ public class SphingolipidsSubspecies2FAStepDefs {
     public void the_second_fatty_acid_FA_with_carbon_atoms_double_bonds_and_hydroxy_groups(Integer position, Integer nCarbon, Integer nDoubleBonds, Integer nHydroxy) {
         if (this.lipid instanceof LipidMolecularSubspecies) {
             LipidMolecularSubspecies lms = (LipidMolecularSubspecies) this.lipid;
+            if (lms.getFa().containsKey("FA2")) {
+                FattyAcid fa2 = lms.getFa().get("FA2");
+                Assert.assertEquals(position.intValue(), fa2.getPosition());
+                Assert.assertEquals(nCarbon.intValue(), fa2.getNCarbon());
+                Assert.assertEquals(nDoubleBonds.intValue(), fa2.getNDoubleBonds());
+                Assert.assertEquals(nHydroxy.intValue(), fa2.getNHydroxy());
+            }
+        } else if (this.lipid instanceof LipidStructuralSubspecies) {
+            LipidStructuralSubspecies lms = (LipidStructuralSubspecies) this.lipid;
             if (lms.getFa().containsKey("FA2")) {
                 FattyAcid fa2 = lms.getFa().get("FA2");
                 Assert.assertEquals(position.intValue(), fa2.getPosition());

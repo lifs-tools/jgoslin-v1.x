@@ -46,10 +46,10 @@ public class IsomericSubspeciesLcbHandler {
     
     public Optional<LipidSpecies> visitIsomericSubspeciesLcb(String headGroup, SwissLipidsParser.LcbContext lcbContext, List<SwissLipidsParser.FaContext> faContexts) {
         List<StructuralFattyAcid> fas = new LinkedList<>();
-        StructuralFattyAcid lcbA = buildIsomericLcb(lcbContext, "LCB", 1);
+        StructuralFattyAcid lcbA = buildIsomericLcb(headGroup, lcbContext, "LCB", 1);
         fas.add(lcbA);
         for (int i = 0; i < faContexts.size(); i++) {
-            IsomericFattyAcid fa = isfh.buildIsomericFa(faContexts.get(i), "FA" + (i + 1), i + 2);
+            IsomericFattyAcid fa = isfh.buildIsomericFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 2);
             fas.add(fa);
         }
         IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
@@ -57,9 +57,9 @@ public class IsomericSubspeciesLcbHandler {
         return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
     }
 
-    public IsomericFattyAcid buildIsomericLcb(SwissLipidsParser.LcbContext ctx, String faName, int position) {
+    public IsomericFattyAcid buildIsomericLcb(String headGroup, SwissLipidsParser.LcbContext ctx, String faName, int position) {
         IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
-        LipidFaBondType lfbt = faHelperFunctions.getLipidLcbBondType(ctx);
+        LipidFaBondType lfbt = faHelperFunctions.getLipidLcbBondType(headGroup, ctx);
         if (ctx.lcb_core()!= null) {
             fa.nCarbon(faHelperFunctions.asInt(ctx.lcb_core().carbon(), 0));
             fa.nHydroxy(faHelperFunctions.getNHydroxyl(ctx));

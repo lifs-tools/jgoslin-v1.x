@@ -18,8 +18,6 @@ package de.isas.lipidomics.domain;
 import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Example: Phosphatidylinositol (8:0-8:0) or PI(8:0-8:0)
+ *
  * @author nils.hoffmann
  */
 @Slf4j
@@ -45,7 +44,6 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
-        LipidFaBondType lipidFaBondType = LipidFaBondType.ESTER;
         for (MolecularFattyAcid fas : fa) {
             if (fas.getPosition() != -1) {
                 throw new ConstraintViolationException("MolecularFattyAcid " + fas.getName() + " must have position set to -1! Was: " + fas.getPosition());
@@ -58,24 +56,18 @@ public class LipidMolecularSubspecies extends LipidSpecies {
                 nCarbon += fas.getNCarbon();
                 nHydroxyl += fas.getNHydroxy();
                 nDoubleBonds += fas.getNDoubleBonds();
-                if (lipidFaBondType == LipidFaBondType.ESTER && (fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL)) {
-                    lipidFaBondType = fas.getLipidFaBondType();
-//                    nDoubleBonds += lipidFaBondType.doubleBondCorrection();
-//                    log.debug("Correcting double bond count to {} due to ether bond.", nDoubleBonds);
-                } else if (lipidFaBondType != LipidFaBondType.ESTER && (fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL)) {
-                    throw new ConstraintViolationException("Only one FA can define an ether bond to the head group! Tried to add " + fas.getLipidFaBondType() + " over existing " + lipidFaBondType);
-                }
             }
+
         }
         super.info = Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
-            level(LipidLevel.MOLECULAR_SUBSPECIES).
-            name(headGroup).
-            position(-1).
-            nCarbon(nCarbon).
-            nHydroxy(nHydroxyl).
-            nDoubleBonds(nDoubleBonds).
-            lipidFaBondType(lipidFaBondType).
-            build()
+                level(LipidLevel.MOLECULAR_SUBSPECIES).
+                name(headGroup).
+                position(-1).
+                nCarbon(nCarbon).
+                nHydroxy(nHydroxyl).
+                nDoubleBonds(nDoubleBonds).
+                lipidFaBondType(LipidFaBondType.getLipidFaBondType(headGroup, fa)).
+                build()
         );
     }
 
@@ -84,9 +76,9 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         return Collections.unmodifiableMap(fa);
     }
 
-    protected String buildLipidSubspeciesName(String faSeparator) {
+    protected String buildLipidSubspeciesName(LipidLevel level, String faSeparator) {
         String faStrings = getFa().values().stream().map((fa) -> {
-            return fa.buildSubstructureName();
+            return fa.buildSubstructureName(level);
         }).collect(Collectors.joining(faSeparator));
         String hgToFaSep = " ";
         if (isEtherLipid()) {
@@ -99,13 +91,14 @@ public class LipidMolecularSubspecies extends LipidSpecies {
     public String getLipidString(LipidLevel level) {
         switch (level) {
             case MOLECULAR_SUBSPECIES:
-                return buildLipidSubspeciesName("_");
+                return buildLipidSubspeciesName(level, "_");
             case CATEGORY:
             case CLASS:
             case SPECIES:
                 return super.getLipidString(level);
             default:
-                throw new RuntimeException(getClass().getSimpleName() + " does not know how to create a lipid string for level " + level);
+                LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();
+                throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
         }
     }
 

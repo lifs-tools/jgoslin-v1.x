@@ -578,7 +578,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     throw new RuntimeException("Double bond positions should be handled by the isomeric FA / LCB handler!");
                 }
             }
-            return fa.name(faName).position(position).lcb(true).build();
+            return fa.name(faName).position(position).lcb(true).lipidFaBondType(LipidFaBondType.ESTER).build();
         } else {
             throw new ParseTreeVisitorException("No LcbContext!");
         }

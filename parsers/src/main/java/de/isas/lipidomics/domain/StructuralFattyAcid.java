@@ -23,7 +23,7 @@ public class StructuralFattyAcid extends MolecularFattyAcid {
     }
 
     @Override
-    public String buildSubstructureName() {
-        return super.buildSubstructureName();
+    public String buildSubstructureName(LipidLevel level) {
+        return super.buildSubstructureName(level);
     }
 }

@@ -8,6 +8,7 @@ import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
+import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
@@ -35,7 +36,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 @Slf4j
 public class LipidMapsVisitorParserTest {
-    
+
     @Test
     public void testMIPC() throws ParsingException {
         String ref = "M(IP)2C(t36:0(OH))";
@@ -44,7 +45,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("M(IP)2C", lipidAdduct.getLipid().getHeadGroup());
     }
-    
+
     @Test
     public void testSulfoHexCer() throws ParsingException {
         String ref = "SulfoHexCer(d36:1)";
@@ -231,6 +232,8 @@ public class LipidMapsVisitorParserTest {
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
         System.out.println(lipid);
+        assertEquals(LipidCategory.GP, lipid.getLipidCategory());
+        assertEquals(LipidClass.PE, lipid.getLipidClass().get());
         assertEquals("PE", lipid.getHeadGroup());
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, lipid.getFa().get("FA1").getLipidFaBondType());
         assertEquals("FA1", lipid.getFa().
@@ -269,6 +272,8 @@ public class LipidMapsVisitorParserTest {
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
         System.out.println(lipid);
+        assertEquals(LipidCategory.GP, lipid.getLipidCategory());
+        assertEquals(LipidClass.PE, lipid.getLipidClass().get());
         assertEquals("PE", lipid.getHeadGroup());
         assertEquals(LipidFaBondType.ETHER_PLASMENYL, lipid.getFa().get("FA1").getLipidFaBondType());
         assertEquals("FA1", lipid.getFa().
@@ -361,6 +366,20 @@ public class LipidMapsVisitorParserTest {
         assertEquals(34, lipidAdduct.getLipid().getInfo().get().getNCarbon());
         assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(2, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
+    
+    @Test
+    public void testFaWithModification() throws ParsingException {
+        String ref = "CoA(4:0(OH))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("CoA", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(4, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

@@ -81,10 +81,11 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
                 throw new ParseTreeVisitorException("Unknown ether context value: " + faContext.fa_core().ether());
             }
         }
+        
         return lfbt;
     }
     
-    public LipidFaBondType getLipidLcbBondType(SwissLipidsParser.LcbContext lcbContext) throws ParseTreeVisitorException {
+    public LipidFaBondType getLipidLcbBondType(String headGroup, SwissLipidsParser.LcbContext lcbContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         return lfbt;
     }
@@ -104,14 +105,14 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
     }
 
     public Optional<LipidSpecies> visitSpeciesLcb(String headGroup, SwissLipidsParser.LcbContext lcbContext) {
-        return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(lcbContext)));
+        return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(headGroup, lcbContext)));
     }
 
     public Optional<LipidSpecies> visitSpeciesFas(String headGroup, SwissLipidsParser.FaContext faContext) {
-        return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(faContext)));
+        return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(headGroup, faContext)));
     }
 
-    public Optional<LipidSpeciesInfo> getSpeciesInfo(SwissLipidsParser.FaContext faContext) {
+    public Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, SwissLipidsParser.FaContext faContext) {
         LipidFaBondType lfbt = getLipidFaBondType(faContext);
         int nHydroxyl = 0;
         if (faContext.fa_lcb_prefix() != null) {
@@ -156,7 +157,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
         throw new ParseTreeVisitorException("Uninitialized lcb_core context!");
     }
 
-    public Optional<LipidSpeciesInfo> getSpeciesInfo(SwissLipidsParser.LcbContext lcbContext) {
+    public Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, SwissLipidsParser.LcbContext lcbContext) {
         Integer nHydroxyl = 0;
         if (lcbContext.lcb_core() != null) {
             SwissLipidsParser.Lcb_coreContext coreCtx = lcbContext.lcb_core();
@@ -182,7 +183,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
                     nCarbon(asInt(coreCtx.carbon(), 0)).
                     nHydroxy(nHydroxyl).
                     nDoubleBonds(asInt(coreCtx.db(), 0)).
-                    lipidFaBondType(getLipidLcbBondType(lcbContext)).
+                    lipidFaBondType(getLipidLcbBondType(headGroup, lcbContext)).
                 build()
             );
         }
