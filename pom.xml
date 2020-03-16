@@ -43,10 +43,44 @@
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
         <junit.vintage.version>5.5.2</junit.vintage.version>
         <lombok.version>1.18.10</lombok.version>
+        <dockerfile.plugin.version>1.4.10</dockerfile.plugin.version>
+        <slf4j.version>1.7.26</slf4j.version>
     </properties>
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>com.google.cloud.tools</groupId>
+                    <artifactId>jib-maven-plugin</artifactId>
+                    <version>1.3.0</version>
+                    <configuration>
+                        <from>
+                            <image>openjdk:11-jre-slim</image>
+                        </from>
+                        <to>
+                            <image>${docker.image.prefix}/${docker.service.prefix}-${project.artifactId}</image>
+                            <tags>
+                                <tag>${project.version}</tag>
+                                <!-- <tag>${project.version}${deploy.env}</tag> -->
+                            </tags>
+                        </to>
+                        <container>
+                            <jvmFlags>
+                                <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
+                            </jvmFlags>
+<!--                            <ports>
+                                <port>${app.port}</port>
+                            </ports>-->
+                            <volumes>
+                                <volume>/tmp</volume>
+                            </volumes>
+                            <!--<user>1000:1000</user>-->
+                            <useCurrentTimestamp>true</useCurrentTimestamp>
+                        </container>
+                        <skip>true</skip>
+                        <allowInsecureRegistries>true</allowInsecureRegistries>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
@@ -188,7 +222,7 @@
                                 <!--<threadCount>2</threadCount>-->
                                 <trimStackTrace>false</trimStackTrace>
                                 <workingDirectory>${project.build.directory}/failsafe-files</workingDirectory>
-<!--                                <includes>
+                                <!--                                <includes>
                                     <include>**/*IT</include>
                                 </includes>-->
                             </configuration>
@@ -198,6 +232,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.2.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -250,8 +289,38 @@
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>dockerfile-maven-plugin</artifactId>
+                    <version>${dockerfile.plugin.version}</version>
+                    <configuration>
+                        <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                        <tag>${project.version}</tag>
+                        <buildArgs>
+                            <APP_NAME>${project.artifactId}</APP_NAME>
+                            <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+                            <APP_VERSION>${project.version}</APP_VERSION>
+                        </buildArgs>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>default</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>build</goal>
+                                <goal>tag</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
     <dependencyManagement>
         <dependencies>
@@ -299,12 +368,12 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.26</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
-                <version>1.7.26</version>
+                <version>${slf4j.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -313,6 +382,7 @@
         <module>parsers</module>
         <module>acceptance-tests</module>
         <module>integration-tests</module>
+        <module>cli</module>
     </modules>
     <name>jgoslin</name>
 </project>
