@@ -17,10 +17,12 @@ package de.isas.lipidomics.palinom.goslin;
 
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.Fragment;
+import de.isas.lipidomics.domain.IsomericFattyAcid;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
@@ -28,15 +30,20 @@ import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.MolecularFattyAcid;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
+import de.isas.lipidomics.domain.StructuralFattyAcid.StructuralFattyAcidBuilder;
 import de.isas.lipidomics.palinom.GoslinFragmentsBaseVisitor;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
+import de.isas.lipidomics.palinom.GoslinParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.RuleNode;
 
@@ -47,6 +54,14 @@ import org.antlr.v4.runtime.tree.RuleNode;
 @Slf4j
 public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<LipidAdduct> {
 
+    /**
+     *
+     * @throws ParseTreeVisitorException for structural or state-related issues
+     * while trying to process a parsing context.
+     * @throws RuntimeException
+     * @param ctx
+     * @return
+     */
     @Override
     public LipidAdduct visitLipid(GoslinFragmentsParser.LipidContext ctx) {
         GoslinFragmentsParser.Lipid_eofContext lipid = ctx.lipid_eof();
@@ -369,13 +384,13 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
         }
 
         private Optional<LipidSpecies> visitSpeciesFas(String headGroup, GoslinFragmentsParser.FaContext faContext) {
-            return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(faContext)));
+            return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(headGroup, faContext)));
         }
 
         private Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<GoslinFragmentsParser.FaContext> faContexts) {
             List<MolecularFattyAcid> fas = new LinkedList<>();
             for (int i = 0; i < faContexts.size(); i++) {
-                MolecularFattyAcid fa = buildMolecularFa(faContexts.get(i), "FA" + (i + 1));
+                MolecularFattyAcid fa = buildMolecularFa(headGroup, faContexts.get(i), "FA" + (i + 1));
                 fas.add(fa);
             }
             MolecularFattyAcid[] arrs = new MolecularFattyAcid[fas.size()];
@@ -387,43 +402,82 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
             List<StructuralFattyAcid> fas = new LinkedList<>();
             StructuralFattyAcid lcbA = buildStructuralLcb(lcbContext, "LCB", 1);
             fas.add(lcbA);
-            for (int i = 0; i < faContexts.size(); i++) {
-                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 2);
-                fas.add(fa);
+            int nIsomericFas = 0;
+            if (lcbA instanceof IsomericFattyAcid) {
+                nIsomericFas++;
             }
-            StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
-            fas.toArray(arrs);
-            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+            for (int i = 0; i < faContexts.size(); i++) {
+                StructuralFattyAcid fa = buildStructuralFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 2);
+                fas.add(fa);
+                if (fa instanceof IsomericFattyAcid) {
+                    nIsomericFas++;
+                }
+            }
+            if (nIsomericFas == fas.size()) {
+                IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
+                fas.stream().map((t) -> {
+                    return (IsomericFattyAcid) t;
+                }).collect(Collectors.toList()).toArray(arrs);
+                return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
+            } else {
+                StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
+                fas.toArray(arrs);
+                return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+            }
         }
 
         private Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<GoslinFragmentsParser.FaContext> faContexts) {
             List<StructuralFattyAcid> fas = new LinkedList<>();
+            int nIsomericFas = 0;
             for (int i = 0; i < faContexts.size(); i++) {
-                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 1);
+                StructuralFattyAcid fa = buildStructuralFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 1);
                 fas.add(fa);
+                if (fa instanceof IsomericFattyAcid) {
+                    nIsomericFas++;
+                }
             }
-            StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
-            fas.toArray(arrs);
-            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+            if (nIsomericFas == fas.size()) {
+                IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
+                fas.stream().map((t) -> {
+                    return (IsomericFattyAcid) t;
+                }).collect(Collectors.toList()).toArray(arrs);
+                return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
+            } else {
+                StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
+                fas.toArray(arrs);
+                return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+            }
         }
 
         private Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, GoslinFragmentsParser.LcbContext lcbContext) {
             StructuralFattyAcid fa = buildStructuralLcb(lcbContext, "LCB", 1);
-            return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
+            if (fa instanceof IsomericFattyAcid) {
+                return Optional.of(new LipidIsomericSubspecies(headGroup, (IsomericFattyAcid) fa));
+            } else {
+                return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
+            }
         }
 
-        private Optional<LipidSpeciesInfo> getSpeciesInfo(GoslinFragmentsParser.FaContext faContext) {
+        private Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, GoslinFragmentsParser.FaContext faContext) {
             //fa_pure, ether, heavy
             if (faContext.fa_pure() != null && faContext.heavy_fa() != null) {
                 throw new RuntimeException("Heavy label in FA_pure context not implemented yet!");
             }
-            LipidFaBondType lfbt = getLipidFaBondType(faContext);
+
+            LipidSpeciesInfo lsi = new LipidSpeciesInfo(
+                    LipidLevel.SPECIES,
+                    asInt(faContext.fa_pure().carbon(), 0),
+                    asInt(faContext.fa_pure().hydroxyl(), 0),
+                    asInt(faContext.fa_pure().db(), 0),
+                    getLipidFaBondType(faContext));
+            LipidFaBondType consensusBondType = LipidFaBondType.getLipidFaBondType(headGroup, lsi);
             return Optional.of(new LipidSpeciesInfo(
                     LipidLevel.SPECIES,
                     asInt(faContext.fa_pure().carbon(), 0),
                     asInt(faContext.fa_pure().hydroxyl(), 0),
                     asInt(faContext.fa_pure().db(), 0),
-                    lfbt));
+                    consensusBondType)
+            );
         }
 
         private Optional<LipidSpeciesInfo> getSpeciesInfo(GoslinFragmentsParser.LcbContext lcbContext) {
@@ -493,7 +547,7 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
         return lfbt;
     }
 
-    public static MolecularFattyAcid buildMolecularFa(GoslinFragmentsParser.FaContext ctx, String faName) {
+    public static MolecularFattyAcid buildMolecularFa(String headGroup, GoslinFragmentsParser.FaContext ctx, String faName) {
         MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
         LipidFaBondType lfbt = getLipidFaBondType(ctx);
         if (ctx.fa_pure() != null) {
@@ -527,34 +581,87 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
         return maybe(t).map(mapper).orElse(r);
     }
 
-    public static StructuralFattyAcid buildStructuralLcb(GoslinFragmentsParser.LcbContext ctx, String faName, int position) {
+    public static IsomericFattyAcid buildIsomericlLcb(GoslinFragmentsParser.LcbContext ctx, String faName, int position) {
         if (ctx.lcb_pure() != null && ctx.heavy_lcb() != null) {
             throw new RuntimeException("Heavy label in lcb_pure context not implemented yet!");
         }
         GoslinFragmentsParser.Lcb_pureContext pureCtx = ctx.lcb_pure();
-        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
+        IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
         fa.nCarbon(asInt(pureCtx.carbon(), 0));
         fa.nHydroxy(asInt(pureCtx.hydroxyl(), 0));
         if (pureCtx.db() != null) {
-            fa.nDoubleBonds(asInt(pureCtx.db().db_count(), 0));
-            if (pureCtx.db().db_positions() != null) {
-                throw new RuntimeException("Support for double bond positions not implemented yet!");
+            if (ctx.lcb_pure().db().db_positions() != null) {
+                Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+                for (GoslinFragmentsParser.Db_positionContext dbpos : ctx.lcb_pure().db().db_positions().db_position().db_position()) {
+                    Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
+                    String cisTrans = dbpos.db_single_position().cistrans().getText();
+                    doubleBondPositions.put(dbPosition, cisTrans);
+                }
+                fa.doubleBondPositions(doubleBondPositions);
+            } else {
+                throw new ParseTreeVisitorException("Can not build isomeric lcb, db_positions context is null!");
             }
         }
         fa.lipidFaBondType(LipidFaBondType.ESTER);
         return fa.name(faName).position(position).lcb(true).build();
     }
 
-    public static StructuralFattyAcid buildStructuralFa(GoslinFragmentsParser.FaContext ctx, String faName, int position) {
-        StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
+    public static StructuralFattyAcid buildStructuralLcb(GoslinFragmentsParser.LcbContext ctx, String faName, int position) {
+        if (ctx.lcb_pure() != null && ctx.heavy_lcb() != null) {
+            throw new RuntimeException("Heavy label in lcb_pure context not implemented yet!");
+        }
+        GoslinFragmentsParser.Lcb_pureContext pureCtx = ctx.lcb_pure();
+        StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
+        fa.nCarbon(asInt(pureCtx.carbon(), 0));
+        fa.nHydroxy(asInt(pureCtx.hydroxyl(), 0));
+        if (pureCtx.db() != null) {
+            if (pureCtx.db().db_positions() != null) {
+                return buildIsomericlLcb(ctx, faName, position);
+            } else if (pureCtx.db().db_count() != null) {
+                fa.nDoubleBonds(asInt(pureCtx.db().db_count(), 0));
+                return buildIsomericlLcb(ctx, faName, position);
+            }
+        }
+        fa.lipidFaBondType(LipidFaBondType.ESTER);
+        return fa.name(faName).position(position).lcb(true).build();
+    }
+
+    public static IsomericFattyAcid buildIsomericFa(String headGroup, GoslinFragmentsParser.FaContext ctx, String faName, int position) {
+        IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
+        LipidFaBondType lfbt = getLipidFaBondType(ctx);
+        if (ctx.fa_pure() != null) {
+            fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
+            fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
+            if (ctx.fa_pure().db().db_positions() != null) {
+//                fa.nDoubleBonds(asInt(ctx.fa_pure().db().db_count(), 0));
+                Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+                for (GoslinFragmentsParser.Db_positionContext dbpos : ctx.fa_pure().db().db_positions().db_position().db_position()) {
+                    Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
+                    String cisTrans = dbpos.db_single_position().cistrans().getText();
+                    doubleBondPositions.put(dbPosition, cisTrans);
+                }
+                fa.doubleBondPositions(doubleBondPositions);
+            } else {
+                throw new ParseTreeVisitorException("Can not build isomeric fa, db_positions context is null!");
+            }
+            fa.lipidFaBondType(lfbt);
+            return fa.name(faName).position(position).build();
+        } else {
+            throw new ParseTreeVisitorException("Uninitialized FaContext!");
+        }
+    }
+
+    public static StructuralFattyAcid buildStructuralFa(String headGroup, GoslinFragmentsParser.FaContext ctx, String faName, int position) {
+        StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
         LipidFaBondType lfbt = getLipidFaBondType(ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
             if (ctx.fa_pure().db() != null) {
-                fa.nDoubleBonds(asInt(ctx.fa_pure().db().db_count(), 0));
                 if (ctx.fa_pure().db().db_positions() != null) {
-                    throw new RuntimeException("Support for double bond positions not implemented yet!");
+                    return buildIsomericFa(headGroup, ctx, faName, position);
+                } else if (ctx.fa_pure().db().db_count() != null) {
+                    fa.nDoubleBonds(asInt(ctx.fa_pure().db().db_count(), 0));
                 }
             }
             fa.lipidFaBondType(lfbt);
@@ -564,5 +671,4 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
             throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }
     }
-
 }
