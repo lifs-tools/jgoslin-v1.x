@@ -706,7 +706,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
                    Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                    for (LipidMapsParser.Db_positionContext dbpos : ctx.fa_unmod().fa_pure().db().db_positions().db_position().db_position()) {
+                    for (LipidMapsParser.Db_positionContext dbpos : ctx.fa_unmod().fa_pure().db().db_positions().db_position()) {
                         Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
                         String cisTrans = dbpos.db_single_position().cistrans().getText();
                         doubleBondPositions.put(dbPosition, cisTrans);
