@@ -58,13 +58,13 @@ public class StructuralSubspeciesFasHandler {
             if (ctx.fa_core().db() != null) {
                 fa.nDoubleBonds(faHelperFunctions.asInt(ctx.fa_core().db().db_count(), 0));
                 if (ctx.fa_core().db().db_positions() != null) {
-                    throw new RuntimeException("Support for double bond positions not implemented yet!");
+                    throw new RuntimeException("Support for double bond positions is implemented in "+IsomericSubspeciesFasHandler.class.getSimpleName()+"!");
                 }
             }
             fa.lipidFaBondType(lfbt);
             return fa.name(faName).position(position).build();
         } else if(ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() !=null) { //handling of lcbs
-            throw new ParseTreeVisitorException("LCBs currently not handled!");
+            throw new RuntimeException("Support for lcbs is implemented in "+StructuralSubspeciesLcbHandler.class.getSimpleName()+"!");
         } else {
             throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }

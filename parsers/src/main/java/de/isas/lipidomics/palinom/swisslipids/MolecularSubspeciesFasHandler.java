@@ -54,7 +54,6 @@ public class MolecularSubspeciesFasHandler {
         LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {
             fa.nCarbon(faHelperFunctions.asInt(ctx.fa_core().carbon(), 0));
-//            fa.nHydroxy(asInt(ctx.fa_core().hydroxyl(), 0));
             if (ctx.fa_core().db() != null) {
                 fa.nDoubleBonds(faHelperFunctions.asInt(ctx.fa_core().db().db_count(), 0));
                 if (ctx.fa_core().db().db_positions() != null) {
@@ -64,7 +63,7 @@ public class MolecularSubspeciesFasHandler {
             fa.lipidFaBondType(lfbt);
             return fa.name(faName).build();
         } else if(ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() !=null) { //handling of lcbs
-            throw new ParseTreeVisitorException("LCBs currently not handled!");
+            throw new RuntimeException("Support for lcbs is implemented in "+StructuralSubspeciesLcbHandler.class.getSimpleName()+"!");
         } else {
             throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }

@@ -19,6 +19,7 @@ import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.Fragment;
 import de.isas.lipidomics.domain.IsomericFattyAcid;
+import de.isas.lipidomics.domain.IsomericFattyAcid.IsomericFattyAcidBuilder;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import static de.isas.lipidomics.domain.LipidCategory.GL;
@@ -44,10 +45,13 @@ import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.RuleNode;
 
@@ -369,7 +373,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         }
 
         private Optional<LipidSpecies> visitSpeciesFas(String headGroup, LipidMapsParser.FaContext faContext) {
-            return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(faContext)));
+            return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(headGroup, faContext)));
         }
 
         private Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<LipidMapsParser.FaContext> faContexts) {
@@ -387,25 +391,51 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             List<StructuralFattyAcid> fas = new LinkedList<>();
             StructuralFattyAcid lcbA = buildStructuralLcb(lcbContext, "LCB", 1);
             fas.add(lcbA);
-            for (int i = 0; i < faContexts.size(); i++) {
-                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 2), i + 2);
-                fas.add(fa);
+            int nIsomericFas = 0;
+            if (lcbA instanceof IsomericFattyAcid) {
+                nIsomericFas++;
             }
-            StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
-            fas.toArray(arrs);
-            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
-
+            for (int i = 0; i < faContexts.size(); i++) {
+                StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 2);
+                fas.add(fa);
+                if (fa instanceof IsomericFattyAcid) {
+                    nIsomericFas++;
+                }
+            }
+            if (nIsomericFas == fas.size()) {
+                IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
+                fas.stream().map((t) -> {
+                    return (IsomericFattyAcid) t;
+                }).collect(Collectors.toList()).toArray(arrs);
+                return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
+            } else {
+                StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
+                fas.toArray(arrs);
+                return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+            }
         }
 
         private Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<LipidMapsParser.FaContext> faContexts) {
             List<StructuralFattyAcid> fas = new LinkedList<>();
+            int nIsomericFas = 0;
             for (int i = 0; i < faContexts.size(); i++) {
                 StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 1);
                 fas.add(fa);
+                if (fa instanceof IsomericFattyAcid) {
+                    nIsomericFas++;
+                }
             }
-            StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
-            fas.toArray(arrs);
-            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+            if (nIsomericFas == fas.size()) {
+                IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
+                fas.stream().map((t) -> {
+                    return (IsomericFattyAcid) t;
+                }).collect(Collectors.toList()).toArray(arrs);
+                return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
+            } else {
+                StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
+                fas.toArray(arrs);
+                return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+            }
         }
 
         private Optional<LipidSpecies> visitSubspeciesFas2(String headGroup, List<LipidMapsParser.Fa2Context> fa2Contexts) {
@@ -456,16 +486,34 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
         }
 
-        private Optional<LipidSpeciesInfo> getSpeciesInfo(LipidMapsParser.FaContext faContext) {
+        private Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, LipidMapsParser.FaContext faContext) {
+//                       if (faContext.fa_pure() != null && faContext.heavy_fa() != null) {
+//                throw new RuntimeException("Heavy label in FA_pure context not implemented yet!");
+//            }
+//
+//            LipidSpeciesInfo lsi = new LipidSpeciesInfo(
+//                    LipidLevel.SPECIES,
+//                    asInt(faContext.fa_pure().carbon(), 0),
+//                    asInt(faContext.fa_pure().hydroxyl(), 0),
+//                    asInt(faContext.fa_pure().db(), 0),
+//                    getLipidFaBondType(faContext));
+//            LipidFaBondType consensusBondType = LipidFaBondType.getLipidFaBondType(headGroup, lsi);
+//            return Optional.of(new LipidSpeciesInfo(
+//                    LipidLevel.SPECIES,
+//                    asInt(faContext.fa_pure().carbon(), 0),
+//                    asInt(faContext.fa_pure().hydroxyl(), 0),
+//                    asInt(faContext.fa_pure().db(), 0),
+//                    consensusBondType)
+//            );
             if (faContext.fa_unmod() != null) {
                 LipidFaBondType faBondType = getLipidFaBondTypeUnmod(faContext);
                 int plasmenylEtherDbBondCorrection = 0;
-                switch (faBondType) {
-                    case ETHER_PLASMENYL:
-                        plasmenylEtherDbBondCorrection = 1;
-                    default:
-                        plasmenylEtherDbBondCorrection = 0;
-                }
+//                switch (faBondType) {
+//                    case ETHER_PLASMENYL:
+//                        plasmenylEtherDbBondCorrection = 1;
+//                    default:
+//                        plasmenylEtherDbBondCorrection = 0;
+//                }
                 return Optional.of(new LipidSpeciesInfo(
                         LipidLevel.SPECIES,
                         asInt(faContext.fa_unmod().fa_pure().carbon(), 0),
@@ -526,12 +574,12 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         if (ctx.fa_unmod() != null) {
             LipidFaBondType faBondType = getLipidFaBondTypeUnmod(ctx);
             int plasmenylEtherDbBondCorrection = 0;
-            switch (faBondType) {
-                case ETHER_PLASMENYL:
-                    plasmenylEtherDbBondCorrection = 1;
-                default:
-                    plasmenylEtherDbBondCorrection = 0;
-            }
+//            switch (faBondType) {
+//                case ETHER_PLASMENYL:
+//                    plasmenylEtherDbBondCorrection = 1;
+//                default:
+//                    plasmenylEtherDbBondCorrection = 0;
+//            }
             fa.lipidFaBondType(faBondType);
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
@@ -564,6 +612,36 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         return maybe(t).map(mapper).orElse(r);
     }
 
+    public static StructuralFattyAcid buildIsomericLcb(LipidMapsParser.LcbContext ctx, String faName, int position) {
+        IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
+        // FIXME handle these once they are defined
+        String modifications = "";
+        if (ctx.lcb_fa().lcb_fa_mod() != null) {
+            if (ctx.lcb_fa().lcb_fa_mod().modification() != null) {
+                modifications = ctx.lcb_fa().lcb_fa_mod().modification().getText();
+            }
+        }
+        if (ctx.lcb_fa().lcb_fa_unmod() != null) {
+            fa.nCarbon(asInt(ctx.lcb_fa().lcb_fa_unmod().carbon(), 0));
+            Integer nHydroxy = getHydroxyCount(ctx);
+            fa.nHydroxy(nHydroxy);
+            if (ctx.lcb_fa().lcb_fa_unmod().db() != null) {
+                if (ctx.lcb_fa().lcb_fa_unmod().db().db_positions() != null) {
+                   Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+                    for (LipidMapsParser.Db_positionContext dbpos : ctx.lcb_fa().lcb_fa_unmod().db().db_positions().db_position().db_position()) {
+                        Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
+                        String cisTrans = dbpos.db_single_position().cistrans().getText();
+                        doubleBondPositions.put(dbPosition, cisTrans);
+                    }
+                    fa.doubleBondPositions(doubleBondPositions); 
+                }
+            }
+            return fa.name(faName).position(position).lcb(true).lipidFaBondType(LipidFaBondType.ESTER).build();
+        } else {
+            throw new ParseTreeVisitorException("No LcbContext!");
+        }
+    }
+    
     public static StructuralFattyAcid buildStructuralLcb(LipidMapsParser.LcbContext ctx, String faName, int position) {
         StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
         // FIXME handle these once they are defined
@@ -580,7 +658,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             if (ctx.lcb_fa().lcb_fa_unmod().db() != null) {
                 fa.nDoubleBonds(asInt(ctx.lcb_fa().lcb_fa_unmod().db().db_count(), 0));
                 if (ctx.lcb_fa().lcb_fa_unmod().db().db_positions() != null) {
-                    throw new RuntimeException("Double bond positions should be handled by the isomeric FA / LCB handler!");
+                    return buildIsomericLcb(ctx, faName, position);
                 }
             }
             return fa.name(faName).position(position).lcb(true).lipidFaBondType(LipidFaBondType.ESTER).build();
@@ -604,6 +682,43 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         }).orElse(0);
         return nHydroxy;
     }
+    
+    public static StructuralFattyAcid buildIsomericFa(LipidMapsParser.FaContext ctx, String faName, int position) {
+        IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
+        String modifications = "";
+        if (ctx.fa_mod() != null) {
+            if (ctx.fa_mod().modification() != null) {
+                modifications = ctx.fa_mod().modification().getText();
+            }
+        }
+        if (ctx.fa_unmod() != null) {
+            LipidFaBondType faBondType = getLipidFaBondTypeUnmod(ctx);
+            int plasmenylEtherDbBondCorrection = 0;
+//            switch (faBondType) {
+//                case ETHER_PLASMENYL:
+//                    plasmenylEtherDbBondCorrection = 1;
+//                default:
+//                    plasmenylEtherDbBondCorrection = 0;
+//            }
+            fa.lipidFaBondType(faBondType);
+            fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
+            fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
+            if (ctx.fa_unmod().fa_pure().db() != null) {
+                if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
+                   Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+                    for (LipidMapsParser.Db_positionContext dbpos : ctx.fa_unmod().fa_pure().db().db_positions().db_position().db_position()) {
+                        Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
+                        String cisTrans = dbpos.db_single_position().cistrans().getText();
+                        doubleBondPositions.put(dbPosition, cisTrans);
+                    }
+                    fa.doubleBondPositions(doubleBondPositions); 
+                }
+            }
+            return fa.name(faName).position(position).build();
+        } else {
+            throw new ParseTreeVisitorException("No FaContext!");
+        }
+    }
 
     public static StructuralFattyAcid buildStructuralFa(LipidMapsParser.FaContext ctx, String faName, int position) {
         StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
@@ -616,19 +731,19 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         if (ctx.fa_unmod() != null) {
             LipidFaBondType faBondType = getLipidFaBondTypeUnmod(ctx);
             int plasmenylEtherDbBondCorrection = 0;
-            switch (faBondType) {
-                case ETHER_PLASMENYL:
-                    plasmenylEtherDbBondCorrection = 1;
-                default:
-                    plasmenylEtherDbBondCorrection = 0;
-            }
+//            switch (faBondType) {
+//                case ETHER_PLASMENYL:
+//                    plasmenylEtherDbBondCorrection = 1;
+//                default:
+//                    plasmenylEtherDbBondCorrection = 0;
+//            }
             fa.lipidFaBondType(faBondType);
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 fa.nDoubleBonds(plasmenylEtherDbBondCorrection + asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0));
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
-                    throw new RuntimeException("Support for double bond positions not implemented yet!");
+                    return buildIsomericFa(ctx, faName, position);
                 }
             }
             return fa.name(faName).position(position).build();
