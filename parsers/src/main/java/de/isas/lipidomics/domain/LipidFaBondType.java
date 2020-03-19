@@ -51,6 +51,7 @@ public enum LipidFaBondType {
             switch (mostSpecificFaBondType) {
                 case UNDEFINED:
                     switch (faBondType) {
+                        case ETHER_UNSPECIFIED:
                         case ETHER_PLASMANYL:
                         case ETHER_PLASMENYL:
                         case ESTER:
@@ -95,6 +96,7 @@ public enum LipidFaBondType {
                 switch(mostSpecificFaBondType) {
                     case ETHER_PLASMANYL:
                     case ETHER_PLASMENYL:
+                    case ETHER_UNSPECIFIED:
                         return mostSpecificFaBondType;
                 }
             default:

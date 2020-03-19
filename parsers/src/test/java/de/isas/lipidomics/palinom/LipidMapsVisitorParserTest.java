@@ -6,7 +6,6 @@ package de.isas.lipidomics.palinom;
 import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.Adduct;
-import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
@@ -16,7 +15,6 @@ import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
-import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,7 +23,6 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,18 +36,31 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class LipidMapsVisitorParserTest {
 
     @Test
-    public void testPE_Isomeric() throws ParsingException {
-        String ref = "PE(18:0/18:1(11Z))";
+    public void testPE_Structural() throws ParsingException {
+        String ref = "PE(18:1/18:2(11Z,13E))";
         System.out.println("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("PE", lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
         assertEquals(2, lipidAdduct.getLipid().getFa().size());
-        assertEquals(0, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
-        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA2").getNDoubleBonds());
+        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA2").getNDoubleBonds());
     }
-    
+
+    @Test
+    public void testPE_Isomeric() throws ParsingException {
+        String ref = "PE(18:0/18:2(11Z,13E))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("PE", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(2, lipidAdduct.getLipid().getFa().size());
+        assertEquals(0, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA2").getNDoubleBonds());
+    }
+
     @Test
     public void testMIPC() throws ParsingException {
         String ref = "M(IP)2C(t36:0(OH))";
@@ -381,7 +391,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(2, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
     }
-    
+
     @Test
     public void testFaWithModification() throws ParsingException {
         String ref = "CoA(4:0(OH))";

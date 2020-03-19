@@ -35,8 +35,10 @@ import de.isas.lipidomics.palinom.GoslinFragmentsBaseVisitor;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import de.isas.lipidomics.palinom.GoslinParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import static de.isas.lipidomics.palinom.goslin.GoslinVisitorImpl.asInt;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -469,7 +471,7 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
                     asInt(faContext.fa_pure().carbon(), 0),
                     asInt(faContext.fa_pure().hydroxyl(), 0),
                     asInt(faContext.fa_pure().db(), 0),
-                    getLipidFaBondType(faContext));
+                    getLipidFaBondType(headGroup, faContext));
             LipidFaBondType consensusBondType = LipidFaBondType.getLipidFaBondType(headGroup, lsi);
             return Optional.of(new LipidSpeciesInfo(
                     LipidLevel.SPECIES,
@@ -533,8 +535,11 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
         }
     }
 
-    private static LipidFaBondType getLipidFaBondType(GoslinFragmentsParser.FaContext faContext) throws ParseTreeVisitorException {
+    private static LipidFaBondType getLipidFaBondType(String headGroup, GoslinFragmentsParser.FaContext faContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
+//        if(headGroup.endsWith(" O") || headGroup.endsWith("-O")) {
+//            lfbt = LipidFaBondType.ETHER_UNSPECIFIED;
+//        }
         if (faContext.ether() != null) {
             if ("a".equals(faContext.ether().getText())) {
                 lfbt = LipidFaBondType.ETHER_PLASMANYL;
@@ -549,7 +554,7 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
 
     public static MolecularFattyAcid buildMolecularFa(String headGroup, GoslinFragmentsParser.FaContext ctx, String faName) {
         MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
-        LipidFaBondType lfbt = getLipidFaBondType(ctx);
+        LipidFaBondType lfbt = getLipidFaBondType(headGroup, ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
@@ -592,14 +597,23 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
         if (pureCtx.db() != null) {
             if (ctx.lcb_pure().db().db_positions() != null) {
                 Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                for (GoslinFragmentsParser.Db_positionContext dbpos : ctx.lcb_pure().db().db_positions().db_position().db_position()) {
-                    Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
-                    String cisTrans = dbpos.db_single_position().cistrans().getText();
+                GoslinFragmentsParser.Db_positionContext dbPosCtx = ctx.lcb_pure().db().db_positions().db_position();
+                if (dbPosCtx.db_single_position() != null) {
+                    Integer dbPosition = asInt(dbPosCtx.db_single_position().db_position_number(), -1);
+                    String cisTrans = dbPosCtx.db_single_position().cistrans().getText();
                     doubleBondPositions.put(dbPosition, cisTrans);
+                } else if (dbPosCtx.db_position() != null) {
+                    for (GoslinFragmentsParser.Db_positionContext dbpos : dbPosCtx.db_position()) {
+                        if (dbpos.db_single_position() != null) {
+                            Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
+                            String cisTrans = dbpos.db_single_position().cistrans().getText();
+                            doubleBondPositions.put(dbPosition, cisTrans);
+                        }
+                    }
                 }
                 fa.doubleBondPositions(doubleBondPositions);
             } else {
-                throw new ParseTreeVisitorException("Can not build isomeric lcb, db_positions context is null!");
+                fa.doubleBondPositions(Collections.emptyMap());
             }
         }
         fa.lipidFaBondType(LipidFaBondType.ESTER);
@@ -615,10 +629,11 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
         fa.nCarbon(asInt(pureCtx.carbon(), 0));
         fa.nHydroxy(asInt(pureCtx.hydroxyl(), 0));
         if (pureCtx.db() != null) {
-            if (pureCtx.db().db_positions() != null) {
+            int nDoubleBonds = asInt(pureCtx.db().db_count(), 0);
+            if (pureCtx.db().db_positions() != null || nDoubleBonds == 0) {
                 return buildIsomericlLcb(ctx, faName, position);
             } else if (pureCtx.db().db_count() != null) {
-                fa.nDoubleBonds(asInt(pureCtx.db().db_count(), 0));
+                fa.nDoubleBonds(nDoubleBonds);
                 return buildIsomericlLcb(ctx, faName, position);
             }
         }
@@ -628,21 +643,29 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
 
     public static IsomericFattyAcid buildIsomericFa(String headGroup, GoslinFragmentsParser.FaContext ctx, String faName, int position) {
         IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
-        LipidFaBondType lfbt = getLipidFaBondType(ctx);
+        LipidFaBondType lfbt = getLipidFaBondType(headGroup, ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
             if (ctx.fa_pure().db().db_positions() != null) {
-//                fa.nDoubleBonds(asInt(ctx.fa_pure().db().db_count(), 0));
                 Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                for (GoslinFragmentsParser.Db_positionContext dbpos : ctx.fa_pure().db().db_positions().db_position().db_position()) {
-                    Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
-                    String cisTrans = dbpos.db_single_position().cistrans().getText();
+                GoslinFragmentsParser.Db_positionContext dbPosCtx = ctx.fa_pure().db().db_positions().db_position();
+                if (dbPosCtx.db_single_position() != null) {
+                    Integer dbPosition = asInt(dbPosCtx.db_single_position().db_position_number(), -1);
+                    String cisTrans = dbPosCtx.db_single_position().cistrans().getText();
                     doubleBondPositions.put(dbPosition, cisTrans);
+                } else if (dbPosCtx.db_position() != null) {
+                    for (GoslinFragmentsParser.Db_positionContext dbpos : dbPosCtx.db_position()) {
+                        if (dbpos.db_single_position() != null) {
+                            Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
+                            String cisTrans = dbpos.db_single_position().cistrans().getText();
+                            doubleBondPositions.put(dbPosition, cisTrans);
+                        }
+                    }
                 }
                 fa.doubleBondPositions(doubleBondPositions);
             } else {
-                throw new ParseTreeVisitorException("Can not build isomeric fa, db_positions context is null!");
+                fa.doubleBondPositions(Collections.emptyMap());
             }
             fa.lipidFaBondType(lfbt);
             return fa.name(faName).position(position).build();
@@ -653,15 +676,16 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
 
     public static StructuralFattyAcid buildStructuralFa(String headGroup, GoslinFragmentsParser.FaContext ctx, String faName, int position) {
         StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
-        LipidFaBondType lfbt = getLipidFaBondType(ctx);
+        LipidFaBondType lfbt = getLipidFaBondType(headGroup, ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
             if (ctx.fa_pure().db() != null) {
-                if (ctx.fa_pure().db().db_positions() != null) {
+                int nDoubleBonds = asInt(ctx.fa_pure().db().db_count(), 0);
+                if (ctx.fa_pure().db().db_positions() != null || nDoubleBonds == 0) {
                     return buildIsomericFa(headGroup, ctx, faName, position);
                 } else if (ctx.fa_pure().db().db_count() != null) {
-                    fa.nDoubleBonds(asInt(ctx.fa_pure().db().db_count(), 0));
+                    fa.nDoubleBonds(nDoubleBonds);
                 }
             }
             fa.lipidFaBondType(lfbt);

@@ -29,6 +29,32 @@ import org.junit.jupiter.api.Test;
 public class GoslinVisitorParserTest {
 
     @Test
+    public void testPE_Structural() throws ParsingException {
+        String ref = "PE 18:1/18:1(11Z)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("PE", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(2, lipidAdduct.getLipid().getFa().size());
+        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
+        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA2").getNDoubleBonds());
+    }
+
+    @Test
+    public void testPE_Isomeric() throws ParsingException {
+        String ref = "PE 18:0/18:1(11Z)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("PE", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(2, lipidAdduct.getLipid().getFa().size());
+        assertEquals(0, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
+        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA2").getNDoubleBonds());
+    }
+
+    @Test
     public void testPE_O() throws ParsingException {
         String ref = "PE O-18:0a/16:2;1";
         System.out.println("Testing lipid name " + ref);
@@ -350,9 +376,57 @@ public class GoslinVisitorParserTest {
         assertEquals(ref, lipid.toString());
         assertEquals(ref, lipid.getLipidString(LipidLevel.SPECIES));
         assertEquals(ref, lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
-        Assertions.assertThrows(ConstraintViolationException.class, () -> { 
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
             assertEquals(ref, lipid.getLipidString(LipidLevel.ISOMERIC_SUBSPECIES));
         });
+    }
+    
+    @Test
+    public void testPE_Plasmenyl_StructuralSpecies() throws ParsingException {
+        String ref = "PE O-16:1p/18:1";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertNotNull(lipidAdduct);
+        LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
+        assertNotNull(lipid);
+        assertEquals(LipidFaBondType.ETHER_PLASMENYL, lipid.getInfo().get().getLipidFaBondType());
+        System.out.println(lipid);
+        assertEquals(LipidCategory.GP, lipid.getLipidCategory());
+        assertEquals(LipidClass.PE, lipid.getLipidClass().get());
+        assertEquals("PE", lipid.getHeadGroup());
+        assertEquals("FA1", lipid.getFa().
+                get("FA1").
+                getName());
+        assertEquals(16, lipid.getFa().
+                get("FA1").
+                getNCarbon());
+        assertEquals(1, lipid.getFa().
+                get("FA1").
+                getNDoubleBonds());
+        assertEquals(1, lipid.getFa().
+                get("FA1").
+                getNHydroxy());
+        assertEquals(LipidFaBondType.ETHER_PLASMENYL, lipid.getFa().
+                get("FA1").
+                getLipidFaBondType());
+        assertFalse(lipid.getFa().
+                get("FA1").
+                isLcb());
+        assertEquals("FA2", lipid.getFa().
+                get("FA2").
+                getName());
+        assertEquals(18, lipid.getFa().
+                get("FA2").
+                getNCarbon());
+        assertEquals(1, lipid.getFa().
+                get("FA2").
+                getNDoubleBonds());
+        assertEquals(0, lipid.getFa().
+                get("FA2").
+                getNHydroxy());
+        assertEquals(LipidFaBondType.ESTER, lipid.getFa().
+                get("FA2").
+                getLipidFaBondType());
     }
 
     @Test

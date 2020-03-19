@@ -19,6 +19,7 @@ import de.isas.lipidomics.domain.IsomericFattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -27,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -46,16 +48,31 @@ public class IsomericSubspeciesLcbHandler {
         List<StructuralFattyAcid> fas = new LinkedList<>();
         StructuralFattyAcid lcbA = buildIsomericLcb(headGroup, lcbContext, "LCB", 1);
         fas.add(lcbA);
-        for (int i = 0; i < faContexts.size(); i++) {
-            IsomericFattyAcid fa = isfh.buildIsomericFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 2);
-            fas.add(fa);
+        int nIsomericFas = 0;
+        if( lcbA instanceof IsomericFattyAcid) {
+            nIsomericFas++;
         }
-        IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
-        fas.toArray(arrs);
-        return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
+        for (int i = 0; i < faContexts.size(); i++) {
+            StructuralFattyAcid fa = isfh.buildIsomericFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 2);
+            fas.add(fa);
+            if (fa instanceof IsomericFattyAcid) {
+                nIsomericFas++;
+            }
+        }
+        if (nIsomericFas == fas.size()) {
+            IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
+            fas.stream().map((t) -> {
+                return (IsomericFattyAcid) t;
+            }).collect(Collectors.toList()).toArray(arrs);
+            return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
+        } else {
+            StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
+            fas.toArray(arrs);
+            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+        }
     }
 
-    public IsomericFattyAcid buildIsomericLcb(String headGroup, SwissLipidsParser.LcbContext ctx, String faName, int position) {
+    public StructuralFattyAcid buildIsomericLcb(String headGroup, SwissLipidsParser.LcbContext ctx, String faName, int position) {
         IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelperFunctions.getLipidLcbBondType(headGroup, ctx);
         if (ctx.lcb_core()!= null) {
@@ -82,15 +99,21 @@ public class IsomericSubspeciesLcbHandler {
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
                     if(ctx.lcb_core().db().db_count() != null) {
                         int doubleBonds = faHelperFunctions.asInt(ctx.lcb_core().db().db_count(), 0);
-                        if(doubleBonds != 0) {
-                            throw new ParseTreeVisitorException("Unexpected number of double bonds: "+doubleBonds+" in LCB IsomericFattyAcid, with no positions defined!");
+                        if(doubleBonds>0) {
+                            return StructuralFattyAcid.structuralFattyAcidBuilder().
+                                lipidFaBondType(lfbt).
+                                name(faName).
+                                lcb(true).
+                                nCarbon(faHelperFunctions.asInt(ctx.lcb_core().carbon(), 0)).
+                                nDoubleBonds(doubleBonds).
+                                build();
                         }
                     }
                     fa.doubleBondPositions(doubleBondPositions);
                 }
             }
             fa.lipidFaBondType(lfbt);
-            return fa.name(faName).position(position).build();
+            return fa.name(faName).lcb(true).position(position).build();
         } else {
             throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }

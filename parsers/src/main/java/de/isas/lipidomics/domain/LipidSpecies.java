@@ -123,30 +123,30 @@ public class LipidSpecies {
                 });
     }
 
-        
-    public LipidFaBondType inferLipidFaBondType(String headGroup, FattyAcid...fa) {
-        LipidFaBondType lipidFaBondType = null;
-        for(FattyAcid fas:fa) {
-            if (lipidFaBondType == null) {
-                        lipidFaBondType = fas.getLipidFaBondType();
-            } else {
-                if(lipidFaBondType == LipidFaBondType.ETHER_PLASMANYL || lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL || lipidFaBondType == LipidFaBondType.ETHER_UNSPECIFIED) {
-                    if (fas.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED
-                            || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL
-                            || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL) {
-                        throw new ConstraintViolationException(
-                                "Only one FA can define an ether bond to the head group! Tried to add " + fas.getLipidFaBondType() + " over existing " + lipidFaBondType + " for " + headGroup + " and FA: " + fas);
-                    }
-                } else if(lipidFaBondType == LipidFaBondType.UNDEFINED && fas.getLipidFaBondType()!=LipidFaBondType.UNDEFINED) {
-                    lipidFaBondType = fas.getLipidFaBondType();
-                } 
-            }
-        }
-        if(lipidFaBondType == null) {
-            lipidFaBondType = LipidFaBondType.UNDEFINED;
-        }
-        return lipidFaBondType;
-    }
+//        
+//    public LipidFaBondType inferLipidFaBondType(String headGroup, FattyAcid...fa) {
+//        LipidFaBondType lipidFaBondType = null;
+//        for(FattyAcid fas:fa) {
+//            if (lipidFaBondType == null) {
+//                        lipidFaBondType = fas.getLipidFaBondType();
+//            } else {
+//                if(lipidFaBondType == LipidFaBondType.ETHER_PLASMANYL || lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL || lipidFaBondType == LipidFaBondType.ETHER_UNSPECIFIED) {
+//                    if (fas.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED
+//                            || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL
+//                            || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL) {
+//                        throw new ConstraintViolationException(
+//                                "Only one FA can define an ether bond to the head group! Tried to add " + fas.getLipidFaBondType() + " over existing " + lipidFaBondType + " for " + headGroup + " and FA: " + fas);
+//                    }
+//                } else if(lipidFaBondType == LipidFaBondType.UNDEFINED && fas.getLipidFaBondType()!=LipidFaBondType.UNDEFINED) {
+//                    lipidFaBondType = fas.getLipidFaBondType();
+//                } 
+//            }
+//        }
+//        if(lipidFaBondType == null) {
+//            lipidFaBondType = LipidFaBondType.UNDEFINED;
+//        }
+//        return lipidFaBondType;
+//    }
 
     /**
      * Returns a lipid string representation for the given {@link LipidLevel},

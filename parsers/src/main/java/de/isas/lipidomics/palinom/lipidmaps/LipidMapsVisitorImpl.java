@@ -45,6 +45,7 @@ import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -627,13 +628,24 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             fa.nHydroxy(nHydroxy);
             if (ctx.lcb_fa().lcb_fa_unmod().db() != null) {
                 if (ctx.lcb_fa().lcb_fa_unmod().db().db_positions() != null) {
-                   Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                    for (LipidMapsParser.Db_positionContext dbpos : ctx.lcb_fa().lcb_fa_unmod().db().db_positions().db_position().db_position()) {
-                        Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
-                        String cisTrans = dbpos.db_single_position().cistrans().getText();
+                    Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+                    LipidMapsParser.Db_positionContext dbPosCtx = ctx.lcb_fa().lcb_fa_unmod().db().db_positions().db_position();
+                    if (dbPosCtx.db_single_position() != null) {
+                        Integer dbPosition = asInt(dbPosCtx.db_single_position().db_position_number(), -1);
+                        String cisTrans = dbPosCtx.db_single_position().cistrans().getText();
                         doubleBondPositions.put(dbPosition, cisTrans);
+                    } else if (dbPosCtx.db_position() != null) {
+                        for (LipidMapsParser.Db_positionContext dbpos : dbPosCtx.db_position()) {
+                            if (dbpos.db_single_position() != null) {
+                                Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
+                                String cisTrans = dbpos.db_single_position().cistrans().getText();
+                                doubleBondPositions.put(dbPosition, cisTrans);
+                            }
+                        }
                     }
-                    fa.doubleBondPositions(doubleBondPositions); 
+                    fa.doubleBondPositions(doubleBondPositions);
+                } else {
+                    fa.doubleBondPositions(Collections.emptyMap());
                 }
             }
             return fa.name(faName).position(position).lcb(true).lipidFaBondType(LipidFaBondType.ESTER).build();
@@ -641,7 +653,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             throw new ParseTreeVisitorException("No LcbContext!");
         }
     }
-    
+
     public static StructuralFattyAcid buildStructuralLcb(LipidMapsParser.LcbContext ctx, String faName, int position) {
         StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
         // FIXME handle these once they are defined
@@ -656,8 +668,9 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             Integer nHydroxy = getHydroxyCount(ctx);
             fa.nHydroxy(nHydroxy);
             if (ctx.lcb_fa().lcb_fa_unmod().db() != null) {
-                fa.nDoubleBonds(asInt(ctx.lcb_fa().lcb_fa_unmod().db().db_count(), 0));
-                if (ctx.lcb_fa().lcb_fa_unmod().db().db_positions() != null) {
+                int nDoubleBonds = asInt(ctx.lcb_fa().lcb_fa_unmod().db().db_count(), 0);
+                fa.nDoubleBonds(nDoubleBonds);
+                if (ctx.lcb_fa().lcb_fa_unmod().db().db_positions() != null || nDoubleBonds == 0) {
                     return buildIsomericLcb(ctx, faName, position);
                 }
             }
@@ -682,7 +695,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         }).orElse(0);
         return nHydroxy;
     }
-    
+
     public static StructuralFattyAcid buildIsomericFa(LipidMapsParser.FaContext ctx, String faName, int position) {
         IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
         String modifications = "";
@@ -705,13 +718,24 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
-                   Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                    for (LipidMapsParser.Db_positionContext dbpos : ctx.fa_unmod().fa_pure().db().db_positions().db_position().db_position()) {
-                        Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
-                        String cisTrans = dbpos.db_single_position().cistrans().getText();
+                    Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+                    LipidMapsParser.Db_positionContext dbPosCtx = ctx.fa_unmod().fa_pure().db().db_positions().db_position();
+                    if (dbPosCtx.db_single_position() != null) {
+                        Integer dbPosition = asInt(dbPosCtx.db_single_position().db_position_number(), -1);
+                        String cisTrans = dbPosCtx.db_single_position().cistrans().getText();
                         doubleBondPositions.put(dbPosition, cisTrans);
+                    } else if (dbPosCtx.db_position() != null) {
+                        for (LipidMapsParser.Db_positionContext dbpos : dbPosCtx.db_position()) {
+                            if (dbpos.db_single_position() != null) {
+                                Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
+                                String cisTrans = dbpos.db_single_position().cistrans().getText();
+                                doubleBondPositions.put(dbPosition, cisTrans);
+                            }
+                        }
                     }
-                    fa.doubleBondPositions(doubleBondPositions); 
+                    fa.doubleBondPositions(doubleBondPositions);
+                } else {
+                    fa.doubleBondPositions(Collections.emptyMap());
                 }
             }
             return fa.name(faName).position(position).build();
@@ -741,8 +765,9 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
-                fa.nDoubleBonds(plasmenylEtherDbBondCorrection + asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0));
-                if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
+                int nDoubleBonds = asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0);
+                fa.nDoubleBonds(plasmenylEtherDbBondCorrection + nDoubleBonds);
+                if (ctx.fa_unmod().fa_pure().db().db_positions() != null || nDoubleBonds == 0) {
                     return buildIsomericFa(ctx, faName, position);
                 }
             }

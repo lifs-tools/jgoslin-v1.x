@@ -4,6 +4,7 @@
 package de.isas.lipidomics.domain;
 
 import static de.isas.lipidomics.domain.LipidLevel.ISOMERIC_SUBSPECIES;
+import static de.isas.lipidomics.domain.LipidLevel.STRUCTURAL_SUBSPECIES;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class IsomericFattyAcid extends StructuralFattyAcid {
         int nCarbon = 0;
         nDB += getNDoubleBonds();
         StringBuilder dbPos = new StringBuilder();
-        if (level == ISOMERIC_SUBSPECIES) {
+        if (level == ISOMERIC_SUBSPECIES || level == STRUCTURAL_SUBSPECIES) {
             List<String> dbPositions = new LinkedList<>();
             for (Integer key : getDoubleBondPositions().keySet()) {
                 dbPositions.add(key + getDoubleBondPositions().get(key));
