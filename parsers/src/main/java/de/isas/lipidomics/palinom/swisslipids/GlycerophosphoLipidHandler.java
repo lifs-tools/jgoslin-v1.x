@@ -103,7 +103,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
                         if(fhf.isIsomericFa(lsl.pl_three_fa().fa3().fa3_sorted().fa())) {
                             return isfh.visitIsomericSubspeciesFas(headGroup, lsl.pl_three_fa().fa3().fa3_sorted().fa());
                         } else {
-                            return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.pl_three_fa().fa3().fa3_unsorted().fa());
+                            return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.pl_three_fa().fa3().fa3_sorted().fa());
                         }
                     } else {
                         throw new ParseTreeVisitorException("Unhandled context state in GP three FA3 sorted !");

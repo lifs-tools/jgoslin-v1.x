@@ -37,6 +37,23 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class SwissLipidsVisitorParserTest {
 
     @Test
+    public void testNAPE() throws ParsingException {
+        String ref = "NAPE (2:0/4:0/14:0)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("NAPE", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(3, lipidAdduct.getLipid().getFa().size());
+        assertEquals(0, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA1").getNCarbon());
+        assertEquals(0, lipidAdduct.getLipid().getFa().get("FA2").getNDoubleBonds());
+        assertEquals(4, lipidAdduct.getLipid().getFa().get("FA2").getNCarbon());
+        assertEquals(0, lipidAdduct.getLipid().getFa().get("FA3").getNDoubleBonds());
+        assertEquals(14, lipidAdduct.getLipid().getFa().get("FA3").getNCarbon());
+    }
+    
+    @Test
     public void testPE_Structural() throws ParsingException {
         String ref = "PE(18:1/18:1(11Z))";
         System.out.println("Testing lipid name " + ref);
