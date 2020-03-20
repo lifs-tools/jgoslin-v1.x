@@ -147,6 +147,18 @@ public class LipidSpecies {
 //        }
 //        return lipidFaBondType;
 //    }
+    /**
+     * Returns a lipid string representation for the {@link LipidLevel}, e.g.
+     * Category, Species, etc, as returned by {@link #getInfo()}.
+     *
+     * Will return the head group name if the level is
+     * {@link LipidSpeciesInfo#NONE}.
+     *
+     * @return the lipid name for the native level.
+     */
+    public String getLipidString() {
+        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+    }
 
     /**
      * Returns a lipid string representation for the given {@link LipidLevel},
@@ -186,7 +198,6 @@ public class LipidSpecies {
                 LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();
                 throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
         }
-
     }
 
     public Map<String, FattyAcid> getFa() {
