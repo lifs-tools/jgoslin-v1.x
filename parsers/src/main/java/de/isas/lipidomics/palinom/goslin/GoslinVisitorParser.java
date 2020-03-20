@@ -3,6 +3,7 @@
  */
 package de.isas.lipidomics.palinom.goslin;
 
+import de.isas.lipidomics.palinom.VisitorParser;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.palinom.GoslinLexer;
@@ -21,8 +22,9 @@ import org.antlr.v4.runtime.TokenStream;
  * @author nils.hoffmann
  */
 @Slf4j
-public class GoslinVisitorParser {
+public class GoslinVisitorParser implements VisitorParser {
 
+    @Override
     public LipidAdduct parse(String lipidString, SyntaxErrorListener listener) throws ParsingException {
         return parseWithModernGrammar(lipidString, listener);
     }
@@ -43,10 +45,6 @@ public class GoslinVisitorParser {
         }
         GoslinVisitorImpl lipidVisitor = new GoslinVisitorImpl();
         return lipidVisitor.visit(context);
-    }
-
-    public LipidAdduct parse(String lipidString) throws ParsingException {
-        return parse(lipidString, new SyntaxErrorListener());
     }
 
 }

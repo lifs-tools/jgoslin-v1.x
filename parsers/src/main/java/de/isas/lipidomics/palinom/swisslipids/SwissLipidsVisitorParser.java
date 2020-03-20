@@ -8,6 +8,7 @@ import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.palinom.SwissLipidsLexer;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.SyntaxErrorListener;
+import de.isas.lipidomics.palinom.VisitorParser;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -21,8 +22,9 @@ import org.antlr.v4.runtime.TokenStream;
  * @author nils.hoffmann
  */
 @Slf4j
-public class SwissLipidsVisitorParser {
+public class SwissLipidsVisitorParser implements VisitorParser {
 
+    @Override
     public LipidAdduct parse(String lipidString, SyntaxErrorListener listener) throws ParsingException {
         return parseWithSwissLipidsGrammar(lipidString, listener);
     }
@@ -43,11 +45,6 @@ public class SwissLipidsVisitorParser {
         }
         SwissLipidsVisitorImpl lipidVisitor = new SwissLipidsVisitorImpl();
         return lipidVisitor.visit(context);
-    }
-    
-
-    public LipidAdduct parse(String lipidString) throws ParsingException {
-        return parse(lipidString, new SyntaxErrorListener());
     }
 
 }
