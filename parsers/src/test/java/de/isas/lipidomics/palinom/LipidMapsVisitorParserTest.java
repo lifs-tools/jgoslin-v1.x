@@ -428,6 +428,6 @@ public class LipidMapsVisitorParserTest {
         LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
         LipidAdduct lipidAdduct = parser.parse(lipidMapsName1);
         LipidSpecies ls = lipidAdduct.getLipid();
-        log.info("Lipid maps name {}:{}", lipidMapsName1, ls.getLipidString(ls.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel()));
+        log.info("Lipid maps name {}:{}", lipidMapsName1, ls.getLipidString());
     }
 }

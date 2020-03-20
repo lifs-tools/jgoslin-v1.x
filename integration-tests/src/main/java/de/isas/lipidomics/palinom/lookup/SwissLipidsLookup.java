@@ -87,7 +87,7 @@ public class SwissLipidsLookup {
         String result;
         try {
             LipidAdduct la = parser.parse(abbreviation);
-            result = la.getLipid().getLipidString(la.getLipid().getInfo().get().getLevel());
+            result = la.getLipid().getLipidString();
         } catch (ParsingException ex) {
             log.error("Exception while parsing " + abbreviation, ex);
             result = "N.D.";

@@ -117,6 +117,6 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
 
     @Override
     public String toString() {
-        return getLipidString(super.info.orElse(LipidSpeciesInfo.NONE).getLevel());
+        return getLipidString();
     }
 }

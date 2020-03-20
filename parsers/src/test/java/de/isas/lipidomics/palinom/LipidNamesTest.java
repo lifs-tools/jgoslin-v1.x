@@ -38,7 +38,7 @@ public class LipidNamesTest {
         GoslinVisitorParser parser = new GoslinVisitorParser();
         LipidAdduct la = parser.parse(lipidName);
         LipidSpecies l = la.getLipid();
-        log.info("{}\t{} ({})", lipidName, l.getLipidString(l.getInfo().get().getLevel()), l.getInfo().get().getLevel());
-        assertEquals(lipidName, l.getLipidString(l.getInfo().get().getLevel()));
+        log.info("{}\t{} ({})", lipidName, l.getLipidString());
+        assertEquals(lipidName, l.getLipidString());
     }
 }

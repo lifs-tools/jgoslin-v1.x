@@ -257,7 +257,7 @@ public class CmdLineParser {
             goslinResult.setLipidMapsClass(getLipidMapsClassAbbreviation(la));
             goslinResult.setLipidSpeciesInfo(la.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE));
             try {
-                String normalizedName = la.getLipid().getLipidString(la.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+                String normalizedName = la.getLipid().getLipidString();
                 goslinResult.setGoslinName(normalizedName);
             } catch (RuntimeException re) {
                 log.warn("Parsing error for {}!", lipidName);
@@ -284,7 +284,7 @@ public class CmdLineParser {
             lmResult.setLipidMapsClass(getLipidMapsClassAbbreviation(lma));
             lmResult.setLipidSpeciesInfo(lma.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE));
             try {
-                String normalizedName = lma.getLipid().getLipidString(lma.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+                String normalizedName = lma.getLipid().getLipidString();
                 lmResult.setGoslinName(normalizedName);
             } catch (RuntimeException re) {
                 log.warn("Parsing error for {}!", lipidName);

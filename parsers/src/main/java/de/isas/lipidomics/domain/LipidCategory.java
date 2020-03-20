@@ -35,8 +35,10 @@ public enum LipidCategory {
     ST("Sterollipid"),
     /* SLM:000390054 Fatty acyls and derivatives */
     FA("Fattyacyls"),
-    /* Swiss lipids*/
-    SL("Saccharolipids");
+    /* LipidMAPS [SL]*/
+    SL("Saccharolipids"),
+    /* LipidMAPS [PK]*/
+    PK("Polyketides");
 
     private final String fullName;
 

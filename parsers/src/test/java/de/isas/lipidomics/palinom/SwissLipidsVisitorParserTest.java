@@ -438,6 +438,6 @@ public class SwissLipidsVisitorParserTest {
         SwissLipidsVisitorParser parser = new SwissLipidsVisitorParser();
         LipidAdduct lipidAdduct = parser.parse(lipidMapsName1);
         LipidSpecies ls = lipidAdduct.getLipid();
-        log.info("Swiss lipids name {}:{}", lipidMapsName1, ls.getLipidString(ls.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel()));
+        log.info("Swiss lipids name {}:{}", lipidMapsName1, ls.getLipidString());
     }
 }
