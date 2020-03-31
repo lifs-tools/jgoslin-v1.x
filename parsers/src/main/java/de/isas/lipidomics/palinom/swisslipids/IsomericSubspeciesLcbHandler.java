@@ -21,6 +21,7 @@ import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedHashMap;
@@ -37,19 +38,19 @@ import java.util.stream.Collectors;
 public class IsomericSubspeciesLcbHandler {
 
     private final IsomericSubspeciesFasHandler isfh;
-    private final FattyAcylHandler faHelperFunctions;
-    
-    public IsomericSubspeciesLcbHandler(IsomericSubspeciesFasHandler isfh, FattyAcylHandler faBondTypeResolver) {
+    private final FattyAcylHelper faHelper;
+
+    public IsomericSubspeciesLcbHandler(IsomericSubspeciesFasHandler isfh, FattyAcylHelper faHelper) {
         this.isfh = isfh;
-        this.faHelperFunctions = faBondTypeResolver;
+        this.faHelper = faHelper;
     }
-    
+
     public Optional<LipidSpecies> visitIsomericSubspeciesLcb(String headGroup, SwissLipidsParser.LcbContext lcbContext, List<SwissLipidsParser.FaContext> faContexts) {
         List<StructuralFattyAcid> fas = new LinkedList<>();
         StructuralFattyAcid lcbA = buildIsomericLcb(headGroup, lcbContext, "LCB", 1);
         fas.add(lcbA);
         int nIsomericFas = 0;
-        if( lcbA instanceof IsomericFattyAcid) {
+        if (lcbA instanceof IsomericFattyAcid) {
             nIsomericFas++;
         }
         for (int i = 0; i < faContexts.size(); i++) {
@@ -74,10 +75,10 @@ public class IsomericSubspeciesLcbHandler {
 
     public StructuralFattyAcid buildIsomericLcb(String headGroup, SwissLipidsParser.LcbContext ctx, String faName, int position) {
         IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
-        LipidFaBondType lfbt = faHelperFunctions.getLipidLcbBondType(headGroup, ctx);
-        if (ctx.lcb_core()!= null) {
-            fa.nCarbon(faHelperFunctions.asInt(ctx.lcb_core().carbon(), 0));
-            fa.nHydroxy(faHelperFunctions.getNHydroxyl(ctx));
+        LipidFaBondType lfbt = faHelper.getLipidLcbBondType(headGroup, ctx);
+        if (ctx.lcb_core() != null) {
+            fa.nCarbon(HandlerUtils.asInt(ctx.lcb_core().carbon(), 0));
+            fa.nHydroxy(faHelper.getNHydroxyl(ctx));
             if (ctx.lcb_core().db() != null) {
                 if (ctx.lcb_core().db().db_positions() != null) {
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
@@ -85,28 +86,28 @@ public class IsomericSubspeciesLcbHandler {
                         SwissLipidsParser.Db_single_positionContext dbSingleCtx = ctx.lcb_core().db().db_positions().db_position().db_single_position();
                         doubleBondPositions.put(Integer.parseInt(dbSingleCtx.db_position_number().getText()), dbSingleCtx.cistrans().getText());
                     } else if (ctx.lcb_core().db().db_positions().db_position().db_position() != null) {
-                        for(SwissLipidsParser.Db_positionContext dbCtx: ctx.lcb_core().db().db_positions().db_position().db_position()) {
+                        for (SwissLipidsParser.Db_positionContext dbCtx : ctx.lcb_core().db().db_positions().db_position().db_position()) {
                             SwissLipidsParser.Db_single_positionContext dbSingleCtx = dbCtx.db_single_position();
-                            if(dbSingleCtx != null) {
+                            if (dbSingleCtx != null) {
                                 doubleBondPositions.put(Integer.parseInt(dbSingleCtx.db_position_number().getText()), dbSingleCtx.cistrans().getText());
                             }
                         }
                     } else {
-                         throw new ParseTreeVisitorException("Unhandled state in LCB IsomericFattyAcid!");
+                        throw new ParseTreeVisitorException("Unhandled state in LCB IsomericFattyAcid!");
                     }
                     fa.doubleBondPositions(doubleBondPositions);
                 } else { // handle cases like (0:0) but with at least one fa with isomeric subspecies level
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                    if(ctx.lcb_core().db().db_count() != null) {
-                        int doubleBonds = faHelperFunctions.asInt(ctx.lcb_core().db().db_count(), 0);
-                        if(doubleBonds>0) {
+                    if (ctx.lcb_core().db().db_count() != null) {
+                        int doubleBonds = HandlerUtils.asInt(ctx.lcb_core().db().db_count(), 0);
+                        if (doubleBonds > 0) {
                             return StructuralFattyAcid.structuralFattyAcidBuilder().
-                                lipidFaBondType(lfbt).
-                                name(faName).
-                                lcb(true).
-                                nCarbon(faHelperFunctions.asInt(ctx.lcb_core().carbon(), 0)).
-                                nDoubleBonds(doubleBonds).
-                                build();
+                                    lipidFaBondType(lfbt).
+                                    name(faName).
+                                    lcb(true).
+                                    nCarbon(HandlerUtils.asInt(ctx.lcb_core().carbon(), 0)).
+                                    nDoubleBonds(doubleBonds).
+                                    build();
                         }
                     }
                     fa.doubleBondPositions(doubleBondPositions);

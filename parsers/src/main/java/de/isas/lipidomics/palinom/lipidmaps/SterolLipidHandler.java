@@ -15,11 +15,12 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-import de.isas.lipidomics.palinom.swisslipids.*;
+//import de.isas.lipidomics.palinom.lipidmaps.*;
+import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.palinom.SwissLipidsParser.Lipid_pureContext;
-import de.isas.lipidomics.palinom.SwissLipidsParser;
+import de.isas.lipidomics.palinom.LipidMapsParser;
+import de.isas.lipidomics.palinom.LipidMapsParser.Lipid_pureContext;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Arrays;
 import java.util.Optional;
@@ -30,16 +31,10 @@ import java.util.Optional;
  */
 public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
 
-    private final MolecularSubspeciesFasHandler msfh;
     private final StructuralSubspeciesFasHandler ssfh;
-    private final IsomericSubspeciesFasHandler isfh;
-    private final FattyAcylHandler fhf;
 
-    public SterolLipidHandler(MolecularSubspeciesFasHandler msfh, StructuralSubspeciesFasHandler ssfh, IsomericSubspeciesFasHandler isfh, FattyAcylHandler fhf) {
-        this.msfh = msfh;
+    public SterolLipidHandler(StructuralSubspeciesFasHandler ssfh) {
         this.ssfh = ssfh;
-        this.isfh = isfh;
-        this.fhf = fhf;
     }
 
     @Override
@@ -47,64 +42,32 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
         return handleSterol(t).orElse(LipidSpecies.NONE);
     }
 
-    private Optional<LipidSpecies> handleSterol(SwissLipidsParser.Lipid_pureContext ctx) throws RuntimeException {
-        if (ctx.st().st_species() != null) {
-            return Optional.of(handleStSpecies(ctx.st().st_species()).orElse(LipidSpecies.NONE));
-        } else if (ctx.st().st_sub1() != null) {
-            return Optional.of(handleStFa1(ctx.st().st_sub1()).orElse(LipidSpecies.NONE));
-        } else if (ctx.st().st_sub2() != null) {
-            return Optional.of(handleStFa2(ctx.st().st_sub2()).orElse(LipidSpecies.NONE));
+    private Optional<LipidSpecies> handleSterol(LipidMapsParser.Lipid_pureContext ctx) throws RuntimeException {
+        if (ctx.sterol().chc() != null) {
+            return Optional.of(handleSt(ctx));
+        } else if (ctx.sterol().chec() != null) {
+            return Optional.of(handleSte(ctx.sterol().chec()).orElse(LipidSpecies.NONE));
         } else {
-            throw new ParseTreeVisitorException("Unhandled sterol lipid: " + ctx.st().getText());
+            throw new ParseTreeVisitorException("Unhandled sterol lipid: " + ctx.sterol().getText());
         }
     }
 
-    private Optional<LipidSpecies> handleStSpecies(SwissLipidsParser.St_speciesContext che) {
-        String headGroup = che.st_species_hg().getText();
-        if (che.st_species_fa() != null) {
-            if (che.st_species_fa().fa_species() != null && che.st_species_fa().fa_species().fa() != null) {
-                if (fhf.isIsomericFa(che.st_species_fa().fa_species().fa())) {
-                    return isfh.visitIsomericSubspeciesFas(headGroup, Arrays.asList(che.st_species_fa().fa_species().fa()));
-                } else {
-                    return ssfh.visitStructuralSubspeciesFas(headGroup, Arrays.asList(che.st_species_fa().fa_species().fa()));
-                }
-            } else {
-                throw new ParseTreeVisitorException("Unhandled context state in sterol species fa!");
-            }
+    private LipidSpecies handleSt(Lipid_pureContext ctx) {
+        if (ctx.sterol() != null && ctx.sterol().chc().ch() != null) {
+            return new LipidIsomericSubspecies(ctx.sterol().chc().ch().getText());
         } else {
-            throw new ParseTreeVisitorException("Unhandled context state in sterol species!");
+            throw new ParseTreeVisitorException("Unhandled context state in Sterol!");
         }
     }
 
-    private Optional<LipidSpecies> handleStFa1(SwissLipidsParser.St_sub1Context che) {
-        String headGroup = che.st_sub1_hg().getText();
-        if (che.st_sub1_fa() != null) {
-            if (fhf.isIsomericFa(che.st_sub1_fa().fa())) {
-                return isfh.visitIsomericSubspeciesFas(headGroup, Arrays.asList(che.st_sub1_fa().fa()));
-            } else {
-                return ssfh.visitStructuralSubspeciesFas(headGroup, Arrays.asList(che.st_sub1_fa().fa()));
-            }
+    private Optional<LipidSpecies> handleSte(LipidMapsParser.ChecContext che) {
+        if (che.che_fa().fa() != null) {
+            return ssfh.visitStructuralSubspeciesFas(che.che_fa().hg_che().getText(), Arrays.asList(che.che_fa().fa()));
+        } else if (che.che() != null) {
+            return ssfh.visitStructuralSubspeciesFas(che.che().hg_che().getText(), Arrays.asList(che.che().fa()));
         } else {
-            throw new ParseTreeVisitorException("Unhandled context state in sterol fa1!");
+            throw new ParseTreeVisitorException("Unhandled context state in ChE!");
         }
     }
 
-    private Optional<LipidSpecies> handleStFa2(SwissLipidsParser.St_sub2Context che) {
-        String headGroup = che.st_sub2_hg().getText();
-        if (che.st_sub2_fa() != null) {
-            if (che.st_sub2_fa().fa2().fa2_unsorted() != null) {
-                return msfh.visitMolecularSubspeciesFas(headGroup, che.st_sub2_fa().fa2().fa2_unsorted().fa());
-            } else if (che.st_sub2_fa().fa2().fa2_sorted() != null) {
-                if (fhf.isIsomericFa(che.st_sub2_fa().fa2().fa2_sorted().fa())) {
-                    return isfh.visitIsomericSubspeciesFas(headGroup, che.st_sub2_fa().fa2().fa2_sorted().fa());
-                } else {
-                    return ssfh.visitStructuralSubspeciesFas(headGroup, che.st_sub2_fa().fa2().fa2_sorted().fa());
-                }
-            } else {
-                throw new ParseTreeVisitorException("Unhandled context state in sterol fa2 FAs!");
-            }
-        } else {
-            throw new ParseTreeVisitorException("Unhandled context state in sterol fa2!");
-        }
-    }
 }

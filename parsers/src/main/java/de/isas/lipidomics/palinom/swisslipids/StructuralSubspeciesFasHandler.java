@@ -19,6 +19,7 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedList;
@@ -31,10 +32,10 @@ import java.util.Optional;
  */
 public class StructuralSubspeciesFasHandler {
 
-    private final FattyAcylHandler faHelperFunctions;
+    private final FattyAcylHelper faHelper;
     
-    public StructuralSubspeciesFasHandler(FattyAcylHandler faBondTypeResolver) {
-        this.faHelperFunctions = faBondTypeResolver;
+    public StructuralSubspeciesFasHandler(FattyAcylHelper faHelper) {
+        this.faHelper = faHelper;
     }
     
     public Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<SwissLipidsParser.FaContext> faContexts) {
@@ -51,12 +52,12 @@ public class StructuralSubspeciesFasHandler {
 
     public StructuralFattyAcid buildStructuralFa(String headGroup, SwissLipidsParser.FaContext ctx, String faName, int position) {
         StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
-        LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
+        LipidFaBondType lfbt = faHelper.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {
-            fa.nCarbon(faHelperFunctions.asInt(ctx.fa_core().carbon(), 0));
+            fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));
 //            fa.nHydroxy(asInt(ctx.fa_core().hydroxyl(), 0));
             if (ctx.fa_core().db() != null) {
-                fa.nDoubleBonds(faHelperFunctions.asInt(ctx.fa_core().db().db_count(), 0));
+                fa.nDoubleBonds(HandlerUtils.asInt(ctx.fa_core().db().db_count(), 0));
                 if (ctx.fa_core().db().db_positions() != null) {
                     throw new RuntimeException("Support for double bond positions is implemented in "+IsomericSubspeciesFasHandler.class.getSimpleName()+"!");
                 }

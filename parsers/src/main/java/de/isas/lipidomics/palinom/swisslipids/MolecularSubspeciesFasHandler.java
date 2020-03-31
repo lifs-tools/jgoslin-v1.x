@@ -19,6 +19,7 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.MolecularFattyAcid;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedList;
@@ -31,12 +32,12 @@ import java.util.Optional;
  */
 public class MolecularSubspeciesFasHandler {
 
-    private final FattyAcylHandler faHelperFunctions;
-    
-    public MolecularSubspeciesFasHandler(FattyAcylHandler faBondTypeResolver) {
-        this.faHelperFunctions = faBondTypeResolver;
+    private final FattyAcylHelper faHelper;
+
+    public MolecularSubspeciesFasHandler(FattyAcylHelper faHelper) {
+        this.faHelper = faHelper;
     }
-    
+
     public Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<SwissLipidsParser.FaContext> faContexts) {
         List<MolecularFattyAcid> fas = new LinkedList<>();
         for (int i = 0; i < faContexts.size(); i++) {
@@ -47,23 +48,22 @@ public class MolecularSubspeciesFasHandler {
         fas.toArray(arrs);
         return Optional.of(new LipidMolecularSubspecies(headGroup, arrs));
     }
-   
 
     public MolecularFattyAcid buildMolecularFa(String headGroup, SwissLipidsParser.FaContext ctx, String faName) {
         MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
-        LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
+        LipidFaBondType lfbt = faHelper.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {
-            fa.nCarbon(faHelperFunctions.asInt(ctx.fa_core().carbon(), 0));
+            fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));
             if (ctx.fa_core().db() != null) {
-                fa.nDoubleBonds(faHelperFunctions.asInt(ctx.fa_core().db().db_count(), 0));
+                fa.nDoubleBonds(HandlerUtils.asInt(ctx.fa_core().db().db_count(), 0));
                 if (ctx.fa_core().db().db_positions() != null) {
-                    throw new RuntimeException("Support for double bond positions is implemented in "+IsomericSubspeciesFasHandler.class.getSimpleName()+"!");
+                    throw new RuntimeException("Support for double bond positions is implemented in " + IsomericSubspeciesFasHandler.class.getSimpleName() + "!");
                 }
             }
             fa.lipidFaBondType(lfbt);
             return fa.name(faName).build();
-        } else if(ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() !=null) { //handling of lcbs
-            throw new RuntimeException("Support for lcbs is implemented in "+StructuralSubspeciesLcbHandler.class.getSimpleName()+"!");
+        } else if (ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() != null) { //handling of lcbs
+            throw new RuntimeException("Support for lcbs is implemented in " + StructuralSubspeciesLcbHandler.class.getSimpleName() + "!");
         } else {
             throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }

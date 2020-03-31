@@ -105,7 +105,7 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
                 case ST:
                     if (ctx.sterol().stc()!= null) {
                         LipidSpeciesInfo lsi = new LipidSpeciesInfo(LipidLevel.SPECIES, 0, 0, 0, LipidFaBondType.UNDEFINED);
-                        lipid = new LipidSpecies(ctx.sterol().stc().st().getText(), LipidCategory.ST, Optional.of(LipidClass.CH), Optional.of(lsi));
+                        lipid = new LipidSpecies(ctx.sterol().stc().st().getText(), LipidCategory.ST, Optional.of(LipidClass.ST), Optional.of(lsi));
                         break;
                     } else if (ctx.sterol().ste() != null) {
                         lipid = handleSte(ctx.sterol().ste()).orElse(LipidSpecies.NONE);

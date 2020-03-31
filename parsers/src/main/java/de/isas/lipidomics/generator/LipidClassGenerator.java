@@ -64,6 +64,8 @@ public class LipidClassGenerator {
         private final String lipidName;
         private final String lipidCategory;
         private final String lipidDescription;
+        private final Integer maxNumFa;
+        private final String allowedNumFa;
         private final List<String> synonyms;
     }
 
@@ -77,12 +79,19 @@ public class LipidClassGenerator {
                 String[] s = iter.next();
                 int len = s.length;
                 List<String> synonyms = new ArrayList<>();
-                for (int i = 3; i < len; i++) {
+                for (int i = 5; i < len; i++) {
                     if (!s[i].trim().isEmpty()) {
                         synonyms.add(s[i]);
                     }
                 }
-                LipidClassEntry entry = new LipidClassEntry(s[0], s[1], s[2], synonyms);
+                LipidClassEntry entry = new LipidClassEntry(
+                        s[0],
+                        s[1],
+                        s[2],
+                        Integer.parseInt(s[3]),
+                        s[4],
+                        synonyms
+                );
                 System.out.println("Entry: " + entry);
                 entries.add(entry);
             }
@@ -94,11 +103,11 @@ public class LipidClassGenerator {
     }
 
     public String sanitizeToEnumConstant(String lipidName, String lipidCategory) {
-        return lipidName.replaceAll("[/\\-\\s(),.\\[\\]]", "_").replaceAll("'", "p").replaceAll("^([_0-9]+)",lipidCategory+"_$1").replaceAll("[_]+", "_").toUpperCase();
+        return lipidName.replaceAll("[/\\-\\s(),.\\[\\]:;]", "_").replaceAll("'", "p").replaceAll("^([_0-9]+)", lipidCategory + "_$1").replaceAll("[_]+", "_").toUpperCase();
     }
 
     public String getEnumFromTable(Stream<LipidClassEntry> stream) {
-        final Builder helloWorld = TypeSpec.enumBuilder("LipidClass").addJavadoc(
+        final Builder lipidClassBuilder = TypeSpec.enumBuilder("LipidClass").addJavadoc(
                 "Enumeration of lipid classes. The shorthand names / abbreviations are used to\n"
                 + "look up the lipid class association of a lipid head group. We try to map each\n"
                 + "abbreviation and synonyms thereof to LipidMAPS main class. However, not all\n"
@@ -110,13 +119,18 @@ public class LipidClassGenerator {
                 + "@author nils.hoffmann"
         ).
                 addModifiers(Modifier.PUBLIC);
-        helloWorld.addField(LipidCategory.class, "category", Modifier.PRIVATE, Modifier.FINAL);
-        helloWorld.addField(String.class, "lipidMapsClassName", Modifier.PRIVATE, Modifier.FINAL);
+        lipidClassBuilder.addField(LipidCategory.class, "category", Modifier.PRIVATE, Modifier.FINAL);
+        lipidClassBuilder.addField(String.class, "lipidMapsClassName", Modifier.PRIVATE, Modifier.FINAL);
         ClassName synonymsClass = ClassName.get("java.lang", "String");
+        ClassName integersClass = ClassName.get("java.lang", "Integer");
         ClassName list = ClassName.get("java.util", "List");
+        lipidClassBuilder.addField(String.class, "allowedNumFaStr", Modifier.PRIVATE, Modifier.FINAL);
+        TypeName listOfIntegers = ParameterizedTypeName.get(list, integersClass);
+        lipidClassBuilder.addField(listOfIntegers, "allowedNumFa", Modifier.PRIVATE, Modifier.FINAL);
+        lipidClassBuilder.addField(Integer.class, "maxNumFa", Modifier.PRIVATE, Modifier.FINAL);
         ClassName arrayList = ClassName.get("java.util", "ArrayList");
         TypeName listOfSynonyms = ParameterizedTypeName.get(list, synonymsClass);
-        helloWorld.addField(listOfSynonyms, "synonyms", Modifier.PRIVATE, Modifier.FINAL);
+        lipidClassBuilder.addField(listOfSynonyms, "synonyms", Modifier.PRIVATE, Modifier.FINAL);
         TypeName optionalLipidClass = ParameterizedTypeName.get(Optional.class, LipidClass.class);
 
 //            private LipidClass(LipidCategory category, String lipidMapsClassName, String... synonyms) {
@@ -127,38 +141,55 @@ public class LipidClassGenerator {
 //        }
 //        this.synonyms = Arrays.asList(synonyms);
 //    }
-        helloWorld.addMethod(
+        lipidClassBuilder.addMethod(
                 MethodSpec.constructorBuilder().
                         addModifiers(Modifier.PRIVATE).
                         addParameter(LipidCategory.class, "category").
                         addStatement("this.$N = $N", "category", "category").
                         addParameter(String.class, "lipidMapsClassName").
                         addStatement("this.$N = $N", "lipidMapsClassName", "lipidMapsClassName").
+                        addParameter(Integer.class, "maxNumFa").
+                        addStatement("this.$N = $N", "maxNumFa", "maxNumFa").
+                        addParameter(String.class, "allowedNumFaStr").
+                        addStatement("this.$N = $N", "allowedNumFaStr", "allowedNumFaStr").
                         addParameter(String[].class, "synonyms").
                         addStatement(
                                 CodeBlock.of(
                                         "if ($N.length == 0) {\n"
-                                        + "throw new IllegalArgumentException(\"Must supply at least one synonym!\");\n"
-                                        + "}", "synonyms")).
+                                        + " throw new IllegalArgumentException(\"Must supply at least one synonym!\");\n"
+                                        + "}", "synonyms")
+                        ).
+                        addStatement(
+                                CodeBlock.of(
+                                        "this.$N = Arrays.asList(allowedNumFaStr.split(\"\\\\|\")).stream().map((t) -> {\n"
+                                        + "   return Integer.parseInt(t);\n"
+                                        + "}).collect(java.util.stream.Collectors.toList())", "allowedNumFa")
+                        ).
                         addStatement("this.$N = Arrays.asList($N)", "synonyms", "synonyms").
                         varargs(true).
                         build()
         );
 
-        helloWorld.addMethod(
+        lipidClassBuilder.addMethod(
                 MethodSpec.methodBuilder("getCategory").addModifiers(Modifier.PUBLIC).returns(LipidCategory.class).addCode("return this.$N;", "category").build()
         );
-        helloWorld.addMethod(
+        lipidClassBuilder.addMethod(
                 MethodSpec.methodBuilder("getAbbreviation").addModifiers(Modifier.PUBLIC).returns(String.class).addCode("return this.$N.get(0);", "synonyms").build()
         );
-        helloWorld.addMethod(
+        lipidClassBuilder.addMethod(
                 MethodSpec.methodBuilder("getLipidMapsClassName").addModifiers(Modifier.PUBLIC).returns(String.class).addCode("return this.$N;", "lipidMapsClassName").build()
         );
-        helloWorld.addMethod(
+        lipidClassBuilder.addMethod(
+                MethodSpec.methodBuilder("getMaxNumFa").addModifiers(Modifier.PUBLIC).returns(Integer.class).addCode("return this.$N;", "maxNumFa").build()
+        );
+        lipidClassBuilder.addMethod(
+                MethodSpec.methodBuilder("getAllowedNumFa").addModifiers(Modifier.PUBLIC).returns(listOfIntegers).addCode("return this.$N;", "allowedNumFa").build()
+        );
+        lipidClassBuilder.addMethod(
                 MethodSpec.methodBuilder("getSynonyms").addModifiers(Modifier.PUBLIC).returns(listOfSynonyms).addCode("return this.$N;", "synonyms").build()
         );
 
-        helloWorld.addMethod(
+        lipidClassBuilder.addMethod(
                 MethodSpec.methodBuilder("matchesAbbreviation").
                         addModifiers(Modifier.PUBLIC).
                         addParameter(String.class, "headGroup").
@@ -171,7 +202,7 @@ public class LipidClassGenerator {
                         build()
         );
 
-        helloWorld.addMethod(
+        lipidClassBuilder.addMethod(
                 MethodSpec.methodBuilder("getLysoAbbreviation").
                         addModifiers(Modifier.PUBLIC).
                         addParameter(LipidClass.class, "lipidClass").
@@ -185,15 +216,15 @@ public class LipidClassGenerator {
                         build()
         );
 
-        helloWorld.addMethod(
+        lipidClassBuilder.addMethod(
                 MethodSpec.methodBuilder("forHeadGroup").
                         addModifiers(Modifier.PUBLIC, Modifier.STATIC).
                         addParameter(String.class, "headGroup").
                         addStatement(
                                 CodeBlock.of(
-                                        "return Arrays.asList(values()).stream().filter((lipidClass) -> {\n" +
-                                        "    return lipidClass.matchesAbbreviation($N.trim());\n" +
-                                        "}).findFirst()", "headGroup")).
+                                        "return Arrays.asList(values()).stream().filter((lipidClass) -> {\n"
+                                        + "    return lipidClass.matchesAbbreviation($N.trim());\n"
+                                        + "}).findFirst()", "headGroup")).
                         returns(optionalLipidClass).
                         build()
         );
@@ -204,15 +235,23 @@ public class LipidClassGenerator {
             String sanitizedName = sanitizeToEnumConstant(lipidClassEntry.getLipidName(), lipidClassEntry.getLipidCategory());
             LipidCategory category = LipidCategory.valueOf(lipidClassEntry.getLipidCategory());
             List<String> template = new ArrayList<>();
-            template.addAll(Arrays.asList("LipidCategory." + category.name(), "\""+lipidClassEntry.lipidDescription+"\"", "\""+lipidClassEntry.lipidName+"\""));
+            template.addAll(
+                    Arrays.asList(
+                            "LipidCategory." + category.name(),
+                            "\"" + lipidClassEntry.lipidDescription + "\"",
+                            lipidClassEntry.maxNumFa + "",
+                            "\"" + lipidClassEntry.allowedNumFa + "\"",
+                            "\"" + lipidClassEntry.lipidName + "\""
+                    )
+            );
             template.addAll(lipidClassEntry.getSynonyms().stream().map((t) -> {
-                return "\""+t+"\"";
+                return "\"" + t + "\"";
             }).collect(Collectors.toList()));
             CodeBlock cb = CodeBlock.of(String.join(", ", template));
-            helloWorld.addEnumConstant(sanitizedName, TypeSpec.anonymousClassBuilder(cb).build());
+            lipidClassBuilder.addEnumConstant(sanitizedName, TypeSpec.anonymousClassBuilder(cb).build());
         });
 
-        return JavaFile.builder("de.isas.lipidomics.domain", helloWorld.build()).addFileComment(
+        return JavaFile.builder("de.isas.lipidomics.domain", lipidClassBuilder.build()).addFileComment(
                 " Copyright 2019 nils.hoffmann.\n"
                 + "\n"
                 + " Licensed under the Apache License, Version 2.0 (the \"License\");\n"

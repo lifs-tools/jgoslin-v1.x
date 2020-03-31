@@ -22,19 +22,20 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.SwissLipidsParser.FaContext;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-import org.antlr.v4.runtime.tree.RuleNode;
 
 /**
  *
  * @author nilshoffmann
  */
 public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsParser.Lipid_pureContext, LipidSpecies> {
+
+    private final FattyAcylHelper helper = new FattyAcylHelper();
 
     @Override
     public LipidSpecies handle(SwissLipidsParser.Lipid_pureContext ctx) {
@@ -48,19 +49,19 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
                 } else {
                     throw new ParseTreeVisitorException("Context for FA fa was null!");
                 }
-            } else if(ctx.fatty_acid().mediator() != null) {
+            } else if (ctx.fatty_acid().mediator() != null) {
                 // mediator fron positions, e.g 11,12-DiHETrE
-                    String mediatorPositions = "";
-                    if(ctx.fatty_acid().mediator().med_positions() != null) {
-                        mediatorPositions = ctx.fatty_acid().mediator().med_positions().getText();
-                    }
+                String mediatorPositions = "";
+                if (ctx.fatty_acid().mediator().med_positions() != null) {
+                    mediatorPositions = ctx.fatty_acid().mediator().med_positions().getText();
+                }
                 // E + Z positions
 //                    if (ctx.fatty_acid().mediator().mediator_single() != null) {
 //                        ctx.fatty_acid().mediator().mediator_single().db_positions();
 //                    }
-                    String mediatorsSingleContext = ctx.fatty_acid().mediator().mediator_single().getText();
-                    Optional<LipidClass> lipidClass = LipidClass.forHeadGroup(mediatorsSingleContext);
-                    return new LipidSpecies(ctx.fatty_acid().mediator().getText(), LipidCategory.FA, lipidClass, Optional.of(LipidSpeciesInfo.NONE));
+                String mediatorsSingleContext = ctx.fatty_acid().mediator().mediator_single().getText();
+                Optional<LipidClass> lipidClass = LipidClass.forHeadGroup(mediatorsSingleContext);
+                return new LipidSpecies(ctx.fatty_acid().mediator().getText(), LipidCategory.FA, lipidClass, Optional.of(LipidSpeciesInfo.NONE));
             } else {
                 throw new ParseTreeVisitorException("Context for FA head group was null!");
             }
@@ -68,40 +69,6 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
         } else {
             throw new ParseTreeVisitorException("Context for FA was null!");
         }
-    }
-
-    public LipidFaBondType getLipidFaBondType(SwissLipidsParser.FaContext faContext) throws ParseTreeVisitorException {
-        LipidFaBondType lfbt = LipidFaBondType.ESTER;
-        if (faContext.fa_core() != null && faContext.fa_core().ether() != null) {
-            if ("O-".equals(faContext.fa_core().ether().getText())) {
-                lfbt = LipidFaBondType.ETHER_PLASMANYL;
-            } else if ("P-".equals(faContext.fa_core().ether().getText())) {
-                lfbt = LipidFaBondType.ETHER_PLASMENYL;
-            } else {
-                throw new ParseTreeVisitorException("Unknown ether context value: " + faContext.fa_core().ether());
-            }
-        }
-        
-        return lfbt;
-    }
-    
-    public LipidFaBondType getLipidLcbBondType(String headGroup, SwissLipidsParser.LcbContext lcbContext) throws ParseTreeVisitorException {
-        LipidFaBondType lfbt = LipidFaBondType.ESTER;
-        return lfbt;
-    }
-
-    public <T extends RuleNode> Integer asInt(T context, Integer defaultValue) {
-        return maybeMapOr(context, (t) -> {
-            return Integer.parseInt(t.getText());
-        }, defaultValue);
-    }
-
-    public static <T> Optional<T> maybe(T t) {
-        return Optional.ofNullable(t);
-    }
-
-    public static <T, R> R maybeMapOr(T t, Function<? super T, R> mapper, R r) {
-        return maybe(t).map(mapper).orElse(r);
     }
 
     public Optional<LipidSpecies> visitSpeciesLcb(String headGroup, SwissLipidsParser.LcbContext lcbContext) {
@@ -113,7 +80,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
     }
 
     public Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, SwissLipidsParser.FaContext faContext) {
-        LipidFaBondType lfbt = getLipidFaBondType(faContext);
+        LipidFaBondType lfbt = helper.getLipidFaBondType(faContext);
         int nHydroxyl = 0;
         if (faContext.fa_lcb_prefix() != null) {
             throw new ParseTreeVisitorException("Unsupported lcb prefix on fa: " + faContext.fa_lcb_prefix().getText());
@@ -125,77 +92,38 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
                 level(LipidLevel.SPECIES).
                 name("FA").
                 position(-1).
-                nCarbon(asInt(faContext.fa_core().carbon(), 0)).
+                nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).
                 nHydroxy(nHydroxyl).
-                nDoubleBonds(asInt(faContext.fa_core().db(), 0)).
+                nDoubleBonds(HandlerUtils.asInt(faContext.fa_core().db(), 0)).
                 lipidFaBondType(lfbt).
-            build()
+                build()
         );
-    }
-    
-    public Integer getNHydroxyl(SwissLipidsParser.LcbContext lcbContext) {
-        Integer hydroxyl = 0;
-        if (lcbContext.lcb_core() != null) {
-            SwissLipidsParser.Lcb_coreContext coreCtx = lcbContext.lcb_core();
-            if (coreCtx.hydroxyl() != null) {
-                switch (coreCtx.hydroxyl().getText()) {
-                    case "t":
-                        hydroxyl = 3;
-                        break;
-                    case "d":
-                        hydroxyl = 2;
-                        break;
-                    case "m":
-                        hydroxyl = 1;
-                        break;
-                    default:
-                        throw new ParseTreeVisitorException("Unsupported old hydroxyl prefix: " + coreCtx.hydroxyl().getText());
-                }
-                return hydroxyl;
-            }
-        }
-        throw new ParseTreeVisitorException("Uninitialized lcb_core context!");
     }
 
     public Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, SwissLipidsParser.LcbContext lcbContext) {
         Integer nHydroxyl = 0;
         if (lcbContext.lcb_core() != null) {
-            SwissLipidsParser.Lcb_coreContext coreCtx = lcbContext.lcb_core();
-            if (coreCtx.hydroxyl() != null) {
-                switch (coreCtx.hydroxyl().getText()) {
-                    case "t":
-                        nHydroxyl = 3;
-                        break;
-                    case "d":
-                        nHydroxyl = 2;
-                        break;
-                    case "m":
-                        nHydroxyl = 1;
-                        break;
-                    default:
-                        throw new ParseTreeVisitorException("Unsupported old hydroxyl prefix: " + coreCtx.hydroxyl().getText());
-                }
-            }
+            helper.getNHydroxyl(lcbContext);
             return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
                     level(LipidLevel.SPECIES).
                     name("LCB").
                     position(-1).
-                    nCarbon(asInt(coreCtx.carbon(), 0)).
+                    nCarbon(HandlerUtils.asInt(lcbContext.lcb_core().carbon(), 0)).
                     nHydroxy(nHydroxyl).
-                    nDoubleBonds(asInt(coreCtx.db(), 0)).
-                    lipidFaBondType(getLipidLcbBondType(headGroup, lcbContext)).
-                build()
+                    nDoubleBonds(HandlerUtils.asInt(lcbContext.lcb_core().db(), 0)).
+                    lipidFaBondType(helper.getLipidLcbBondType(headGroup, lcbContext)).
+                    build()
             );
         }
         throw new ParseTreeVisitorException("Uninitialized lcb_core context!");
     }
-    
+
     public boolean isIsomericFa(List<SwissLipidsParser.FaContext> faContexts) {
-        for(SwissLipidsParser.FaContext faContext:faContexts) {
-            if (faContext.fa_core()!= null) {
+        for (SwissLipidsParser.FaContext faContext : faContexts) {
+            if (faContext.fa_core() != null) {
                 SwissLipidsParser.Fa_coreContext coreCtx = faContext.fa_core();
-                if(coreCtx.db()!=null) {
-                    if(coreCtx.db().db_positions()!=null) {
+                if (coreCtx.db() != null) {
+                    if (coreCtx.db().db_positions() != null) {
                         return true;
                     }
                 }
@@ -203,22 +131,22 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
         }
         return false;
     }
-    
+
     public boolean isIsomericFa(SwissLipidsParser.FaContext faContext) {
-        if (faContext.fa_core()!= null) {
+        if (faContext.fa_core() != null) {
             SwissLipidsParser.Fa_coreContext coreCtx = faContext.fa_core();
-            if(coreCtx.db()!=null) {
-                return coreCtx.db().db_positions()!=null;
+            if (coreCtx.db() != null) {
+                return coreCtx.db().db_positions() != null;
             }
         }
         return false;
     }
-    
+
     public boolean isIsomericLcb(SwissLipidsParser.LcbContext lcbContext) {
         if (lcbContext.lcb_core() != null) {
             SwissLipidsParser.Lcb_coreContext coreCtx = lcbContext.lcb_core();
-            if(coreCtx.db()!=null) {
-                return coreCtx.db().db_positions()!=null;
+            if (coreCtx.db() != null) {
+                return coreCtx.db().db_positions() != null;
             }
         }
         return false;

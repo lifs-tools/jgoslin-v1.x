@@ -21,6 +21,7 @@ import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedHashMap;
@@ -36,10 +37,10 @@ import java.util.stream.Collectors;
  */
 public class IsomericSubspeciesFasHandler {
 
-    private final FattyAcylHandler faHelperFunctions;
+    private final FattyAcylHelper faHelper;
 
-    public IsomericSubspeciesFasHandler(FattyAcylHandler faBondTypeResolver) {
-        this.faHelperFunctions = faBondTypeResolver;
+    public IsomericSubspeciesFasHandler(FattyAcylHelper faHelper) {
+        this.faHelper = faHelper;
     }
 
     public Optional<LipidSpecies> visitIsomericSubspeciesFas(String headGroup, List<SwissLipidsParser.FaContext> faContexts) {
@@ -67,9 +68,9 @@ public class IsomericSubspeciesFasHandler {
 
     public StructuralFattyAcid buildIsomericFa(String headGroup, SwissLipidsParser.FaContext ctx, String faName, int position) {
         IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
-        LipidFaBondType lfbt = faHelperFunctions.getLipidFaBondType(ctx);
+        LipidFaBondType lfbt = faHelper.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {
-            fa.nCarbon(faHelperFunctions.asInt(ctx.fa_core().carbon(), 0));
+            fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));
 //            fa.nHydroxy(asInt(ctx.fa_core().hydroxyl(), 0));
             if (ctx.fa_core().db() != null) {
 //                fa.nDoubleBonds(faHelperFunctions.asInt(ctx.fa_core().db().db_count(), 0));
@@ -92,12 +93,12 @@ public class IsomericSubspeciesFasHandler {
                 } else { // handle cases like (0:0) but with at least one fa with isomeric subspecies level
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
                     if (ctx.fa_core().db().db_count() != null) {
-                        int doubleBonds = faHelperFunctions.asInt(ctx.fa_core().db().db_count(), 0);
+                        int doubleBonds = HandlerUtils.asInt(ctx.fa_core().db().db_count(), 0);
                         if(doubleBonds>0) {
                             return StructuralFattyAcid.structuralFattyAcidBuilder().
                                     lipidFaBondType(lfbt).
                                     name(faName).
-                                    nCarbon(faHelperFunctions.asInt(ctx.fa_core().carbon(), 0)).
+                                    nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0)).
                                     nDoubleBonds(doubleBonds).
                                     build();
                         }

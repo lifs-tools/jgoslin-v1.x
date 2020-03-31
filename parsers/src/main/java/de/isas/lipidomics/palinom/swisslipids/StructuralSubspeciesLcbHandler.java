@@ -19,6 +19,7 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedList;
@@ -32,11 +33,9 @@ import java.util.Optional;
 public class StructuralSubspeciesLcbHandler {
 
     private final StructuralSubspeciesFasHandler ssfh;
-    private final FattyAcylHandler faHelperFunctions;
 
-    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh, FattyAcylHandler faBondTypeResolver) {
+    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh) {
         this.ssfh = ssfh;
-        this.faHelperFunctions = faBondTypeResolver;
     }
 
     public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, SwissLipidsParser.LcbContext lcbContext, List<SwissLipidsParser.FaContext> faContexts) {
@@ -60,7 +59,7 @@ public class StructuralSubspeciesLcbHandler {
     public StructuralFattyAcid buildStructuralLcb(SwissLipidsParser.LcbContext ctx, String faName, int position) {
         SwissLipidsParser.Lcb_coreContext pureCtx = ctx.lcb_core();
         StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
-        fa.nCarbon(faHelperFunctions.asInt(pureCtx.carbon(), 0));
+        fa.nCarbon(HandlerUtils.asInt(pureCtx.carbon(), 0));
         Integer hydroxyl = 0;
         if (pureCtx != null) {
             if (pureCtx.hydroxyl() != null) {
@@ -81,7 +80,7 @@ public class StructuralSubspeciesLcbHandler {
         }
         fa.nHydroxy(hydroxyl);
         if (pureCtx.db() != null) {
-            fa.nDoubleBonds(faHelperFunctions.asInt(pureCtx.db().db_count(), 0));
+            fa.nDoubleBonds(HandlerUtils.asInt(pureCtx.db().db_count(), 0));
 //            if (pureCtx.db().db_positions() != null) {
 //                throw new RuntimeException("Support for double bond positions not implemented yet!");
 //            }
