@@ -101,6 +101,11 @@ public class LipidMolecularSubspecies extends LipidSpecies {
                 throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
         }
     }
+    
+    @Override
+    public boolean validate() {
+        return true;
+    }
 
     @Override
     public String toString() {

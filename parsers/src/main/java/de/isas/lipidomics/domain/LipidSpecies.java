@@ -200,6 +200,22 @@ public class LipidSpecies {
         }
     }
 
+    /**
+     * Validate this lipid against the class-specific available FA types and
+     * slots.
+     *
+     * @return true if this lipid's FA types and their number match the class
+     * definition, false otherwise.
+     */
+    public boolean validate() {
+        return true;
+    }
+
+    /**
+     * Returns the fatty acyls registered for this lipid.
+     *
+     * @return the fatty acyls.
+     */
     public Map<String, FattyAcid> getFa() {
         return Collections.emptyMap();
     }
