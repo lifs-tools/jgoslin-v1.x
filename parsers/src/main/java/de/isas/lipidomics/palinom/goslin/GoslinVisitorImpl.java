@@ -140,23 +140,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             }
             return lipid;
         }
-
-        private Optional<LipidSpecies> handleGlycerolipid(Lipid_pureContext ctx) throws RuntimeException {
-            //glycerophospholipids
-            //cardiolipin
-            if (ctx.gl().dgl() != null) {
-                return handleDgl(ctx.gl().dgl());
-            } else if (ctx.gl().mgl() != null) {
-                return handleMgl(ctx.gl().mgl());
-            } else if (ctx.gl().sgl() != null) {
-                return handleSgl(ctx.gl().sgl());
-            } else if (ctx.gl().tgl() != null) {
-                return handleTgl(ctx.gl().tgl());
-            } else {
-                throw new ParseTreeVisitorException("Unhandled context state in GL!");
-            }
-        }
-
+        
         private Optional<LipidSpecies> handleDsl(GoslinParser.DslContext dsl) {
             String headGroup = dsl.hg_dslc().getText();
             if (dsl.sl_species() != null) { //species level
@@ -186,6 +170,22 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
         private static boolean hasElements(List<?> l) {
             return (l == null ? false : !l.isEmpty());
+        }
+
+        private Optional<LipidSpecies> handleGlycerolipid(Lipid_pureContext ctx) throws RuntimeException {
+            //glycerophospholipids
+            //cardiolipin
+            if (ctx.gl().dgl() != null) {
+                return handleDgl(ctx.gl().dgl());
+            } else if (ctx.gl().mgl() != null) {
+                return handleMgl(ctx.gl().mgl());
+            } else if (ctx.gl().sgl() != null) {
+                return handleSgl(ctx.gl().sgl());
+            } else if (ctx.gl().tgl() != null) {
+                return handleTgl(ctx.gl().tgl());
+            } else {
+                throw new ParseTreeVisitorException("Unhandled context state in GL!");
+            }
         }
 
         private Optional<LipidSpecies> handleTgl(GoslinParser.TglContext tgl) {
