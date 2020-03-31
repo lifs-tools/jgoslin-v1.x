@@ -86,7 +86,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
         public LipidSpecies visitLipid_pure(GoslinParser.Lipid_pureContext ctx) {
             LipidSpecies lipid = null;
             BitSet bs = new BitSet(5);
-            bs.set(LipidCategory.ST.ordinal(), ctx.cholesterol() != null);
+            bs.set(LipidCategory.ST.ordinal(), ctx.sterol() != null);
             bs.set(LipidCategory.GL.ordinal(), ctx.gl() != null);
             bs.set(LipidCategory.FA.ordinal(), ctx.mediatorc() != null);
             bs.set(LipidCategory.GP.ordinal(), ctx.pl() != null);
@@ -103,15 +103,15 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             }
             switch (contextCategory) {
                 case ST:
-                    if (ctx.cholesterol().chc() != null) {
+                    if (ctx.sterol().stc() != null) {
                         LipidSpeciesInfo lsi = new LipidSpeciesInfo(LipidLevel.SPECIES, 0, 0, 0, LipidFaBondType.UNDEFINED);
-                        lipid = new LipidSpecies(ctx.cholesterol().chc().ch().getText(), LipidCategory.ST, Optional.of(LipidClass.CH), Optional.of(lsi));
+                        lipid = new LipidSpecies(ctx.sterol().stc().st().getText(), LipidCategory.ST, Optional.of(LipidClass.ST), Optional.of(lsi));
                         break;
-                    } else if (ctx.cholesterol().che() != null) {
-                        lipid = handleChe(ctx.cholesterol().che()).orElse(LipidSpecies.NONE);
+                    } else if (ctx.sterol().ste() != null) {
+                        lipid = handleSte(ctx.sterol().ste()).orElse(LipidSpecies.NONE);
                         break;
                     } else {
-                        throw new ParseTreeVisitorException("Unhandled sterol lipid: " + ctx.cholesterol().getText());
+                        throw new ParseTreeVisitorException("Unhandled sterol lipid: " + ctx.sterol().getText());
                     }
                 case GL:
                     lipid = handleGlycerolipid(ctx).orElse(LipidSpecies.NONE);
@@ -230,8 +230,8 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             return Optional.empty();
         }
 
-        private Optional<LipidSpecies> handleChe(GoslinParser.CheContext che) {
-            String headGroup = che.hg_chec().getText();
+        private Optional<LipidSpecies> handleSte(GoslinParser.SteContext che) {
+            String headGroup = che.hg_stc().getText();
             if (che.fa() != null) {
                 return visitStructuralSubspeciesFas(headGroup, Arrays.asList(che.fa()));
             } else {

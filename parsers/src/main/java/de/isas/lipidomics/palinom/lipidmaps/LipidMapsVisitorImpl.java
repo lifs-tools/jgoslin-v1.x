@@ -140,7 +140,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         public LipidSpecies visitLipid_pure(LipidMapsParser.Lipid_pureContext ctx) {
             LipidSpecies lipid = null;
             BitSet bs = new BitSet(5);
-            bs.set(LipidCategory.ST.ordinal(), ctx.cholesterol() != null);
+            bs.set(LipidCategory.ST.ordinal(), ctx.sterol()!= null);
             bs.set(LipidCategory.GL.ordinal(), ctx.gl() != null);
             bs.set(LipidCategory.FA.ordinal(), ctx.mediator() != null || ctx.pure_fa() != null);
             bs.set(LipidCategory.GP.ordinal(), ctx.pl() != null);
@@ -157,14 +157,14 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             }
             switch (contextCategory) {
                 case ST:
-                    if (ctx.cholesterol().chc() != null) {
-                        lipid = handleCh(ctx);
+                    if (ctx.sterol().chc() != null) {
+                        lipid = handleSt(ctx);
                         break;
-                    } else if (ctx.cholesterol().chec() != null) {
-                        lipid = handleChe(ctx.cholesterol().chec()).orElse(LipidSpecies.NONE);
+                    } else if (ctx.sterol().chec() != null) {
+                        lipid = handleSte(ctx.sterol().chec()).orElse(LipidSpecies.NONE);
                         break;
                     } else {
-                        throw new ParseTreeVisitorException("Unhandled sterol lipid: " + ctx.cholesterol().getText());
+                        throw new ParseTreeVisitorException("Unhandled sterol lipid: " + ctx.sterol().getText());
                     }
                 case GL:
                     lipid = handleGlycerolipid(ctx).orElse(LipidSpecies.NONE);
@@ -194,11 +194,11 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             return lipid;
         }
 
-        private LipidSpecies handleCh(Lipid_pureContext ctx) {
-            if (ctx.cholesterol() != null && ctx.cholesterol().chc().ch() != null) {
-                return new LipidIsomericSubspecies(ctx.cholesterol().chc().ch().getText());
+        private LipidSpecies handleSt(Lipid_pureContext ctx) {
+            if (ctx.sterol()!= null && ctx.sterol().chc().ch() != null) {
+                return new LipidIsomericSubspecies(ctx.sterol().chc().ch().getText());
             } else {
-                throw new ParseTreeVisitorException("Unhandled context state in Cholesterol!");
+                throw new ParseTreeVisitorException("Unhandled context state in Sterol!");
             }
         }
 
@@ -278,7 +278,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             return Optional.empty();
         }
 
-        private Optional<LipidSpecies> handleChe(LipidMapsParser.ChecContext che) {
+        private Optional<LipidSpecies> handleSte(LipidMapsParser.ChecContext che) {
             if (che.che_fa().fa() != null) {
                 return visitStructuralSubspeciesFas(che.che_fa().hg_che().getText(), Arrays.asList(che.che_fa().fa()));
             } else if (che.che() != null) {
