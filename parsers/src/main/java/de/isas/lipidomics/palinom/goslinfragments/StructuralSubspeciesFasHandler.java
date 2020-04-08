@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom.swisslipids;
+package de.isas.lipidomics.palinom.goslinfragments;
 
 import de.isas.lipidomics.domain.IsomericFattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
@@ -21,8 +21,8 @@ import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
-import de.isas.lipidomics.palinom.HandlerUtils;
-import de.isas.lipidomics.palinom.SwissLipidsParser;
+import de.isas.lipidomics.palinom.GoslinFragmentsParser;
+import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class StructuralSubspeciesFasHandler {
         this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<SwissLipidsParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<GoslinFragmentsParser.FaContext> faContexts) {
         List<StructuralFattyAcid> fas = new LinkedList<>();
         int nIsomericFas = 0;
         for (int i = 0; i < faContexts.size(); i++) {
@@ -66,21 +66,25 @@ public class StructuralSubspeciesFasHandler {
         }
     }
 
-    public StructuralFattyAcid buildStructuralFa(String headGroup, SwissLipidsParser.FaContext ctx, String faName, int position) {
+    public StructuralFattyAcid buildStructuralFa(String headGroup, GoslinFragmentsParser.FaContext ctx, String faName, int position) {
+        if (ctx.fa_pure() != null && ctx.heavy_fa() != null) {
+            throw new RuntimeException("Heavy label in fa_pure context not implemented yet!");
+        }
         StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
-        LipidFaBondType lfbt = faHelper.getLipidFaBondType(ctx);
-        if (ctx.fa_core() != null) {
-            fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));
-            if (ctx.fa_core().db() != null) {
-                fa.nDoubleBonds(HandlerUtils.asInt(ctx.fa_core().db().db_count(), 0));
-                if (ctx.fa_core().db().db_positions() != null) {
+        LipidFaBondType lfbt = faHelper.getLipidFaBondType(headGroup, ctx);
+        if (ctx.fa_pure() != null) {
+            fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
+            fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
+            if (ctx.fa_pure().db() != null) {
+                int nDoubleBonds = asInt(ctx.fa_pure().db().db_count(), 0);
+                if (ctx.fa_pure().db().db_positions() != null || nDoubleBonds == 0) {
                     return isfh.buildIsomericFa(headGroup, ctx, faName, position);
+                } else if (ctx.fa_pure().db().db_count() != null) {
+                    fa.nDoubleBonds(nDoubleBonds);
                 }
             }
             fa.lipidFaBondType(lfbt);
             return fa.name(faName).position(position).build();
-        } else if (ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() != null) { //handling of lcbs
-            throw new RuntimeException("Support for lcbs is implemented in " + StructuralSubspeciesLcbHandler.class.getSimpleName() + "!");
         } else {
             throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }

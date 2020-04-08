@@ -65,18 +65,6 @@ public class StructuralSubspeciesFasHandler {
             return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
         }
     }
-    
-//    public Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<LipidMapsParser.FaContext> faContexts) {
-//        List<StructuralFattyAcid> fas = new LinkedList<>();
-//        for (int i = 0; i < faContexts.size(); i++) {
-//            StructuralFattyAcid fa = buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i+1);
-//            fas.add(fa);
-//        }
-//        StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
-//        fas.toArray(arrs);
-//        return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
-//    }
-//   
 
     public StructuralFattyAcid buildStructuralFa(LipidMapsParser.FaContext ctx, String faName, int position) {
         StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
@@ -87,7 +75,7 @@ public class StructuralSubspeciesFasHandler {
             }
         }
         if (ctx.fa_unmod() != null) {
-            LipidFaBondType faBondType = faHelper.getLipidFaBondTypeUnmod(ctx);
+            LipidFaBondType faBondType = faHelper.getLipidFaBondType(ctx);
             int plasmenylEtherDbBondCorrection = 0;
 //            switch (faBondType) {
 //                case ETHER_PLASMENYL:

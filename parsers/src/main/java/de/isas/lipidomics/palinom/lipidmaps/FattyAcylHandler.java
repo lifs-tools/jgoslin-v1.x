@@ -53,7 +53,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParse
     @Override
     public LipidSpecies handle(LipidMapsParser.Lipid_pureContext ctx) {
         if (ctx.mediator() != null) {
-            return new LipidIsomericSubspecies(ctx.mediator().getText());
+            return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(ctx.mediator().getText()).fa(new IsomericFattyAcid[0]).build();
         } else if (ctx.pure_fa() != null) {
             return msfah.handlePureFaContext(ctx.pure_fa());
         }
@@ -112,38 +112,13 @@ public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParse
     }
 
     public Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, LipidMapsParser.FaContext faContext) {
-//                       if (faContext.fa_pure() != null && faContext.heavy_fa() != null) {
-//                throw new RuntimeException("Heavy label in FA_pure context not implemented yet!");
-//            }
-//
-//            LipidSpeciesInfo lsi = new LipidSpeciesInfo(
-//                    LipidLevel.SPECIES,
-//                    asInt(faContext.fa_pure().carbon(), 0),
-//                    asInt(faContext.fa_pure().hydroxyl(), 0),
-//                    asInt(faContext.fa_pure().db(), 0),
-//                    getLipidFaBondType(faContext));
-//            LipidFaBondType consensusBondType = LipidFaBondType.getLipidFaBondType(headGroup, lsi);
-//            return Optional.of(new LipidSpeciesInfo(
-//                    LipidLevel.SPECIES,
-//                    asInt(faContext.fa_pure().carbon(), 0),
-//                    asInt(faContext.fa_pure().hydroxyl(), 0),
-//                    asInt(faContext.fa_pure().db(), 0),
-//                    consensusBondType)
-//            );
         if (faContext.fa_unmod() != null) {
-            LipidFaBondType faBondType = faHelper.getLipidFaBondTypeUnmod(faContext);
-            int plasmenylEtherDbBondCorrection = 0;
-//                switch (faBondType) {
-//                    case ETHER_PLASMENYL:
-//                        plasmenylEtherDbBondCorrection = 1;
-//                    default:
-//                        plasmenylEtherDbBondCorrection = 0;
-//                }
+            LipidFaBondType faBondType = faHelper.getLipidFaBondType(faContext);
             return Optional.of(new LipidSpeciesInfo(
                     LipidLevel.SPECIES,
                     HandlerUtils.asInt(faContext.fa_unmod().fa_pure().carbon(), 0),
                     HandlerUtils.asInt(faContext.fa_unmod().fa_pure().hydroxyl(), 0),
-                    plasmenylEtherDbBondCorrection + HandlerUtils.asInt(faContext.fa_unmod().fa_pure().db(), 0),
+                    HandlerUtils.asInt(faContext.fa_unmod().fa_pure().db(), 0),
                     faBondType));
         } else if (faContext.fa_mod() != null) {
             throw new RuntimeException("Modified FA handling not implemented yet for " + faContext.getText());

@@ -1,12 +1,13 @@
 /*
  * 
  */
-package de.isas.lipidomics.palinom.goslin;
+package de.isas.lipidomics.palinom.goslinfragments;
 
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.palinom.GoslinFragmentsLexer;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
+import de.isas.lipidomics.palinom.GoslinParser;
 import de.isas.lipidomics.palinom.SyntaxErrorListener;
 import de.isas.lipidomics.palinom.VisitorParser;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ConsoleErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.PredictionMode;
 
 /**
  *

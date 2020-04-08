@@ -15,17 +15,15 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-import de.isas.lipidomics.palinom.swisslipids.*;
 import de.isas.lipidomics.domain.IsomericFattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
-import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,44 +45,85 @@ public class IsomericSubspeciesLcbHandler {
         this.faHelper = faHelper;
     }
 
-    public StructuralFattyAcid buildIsomericLcb(LipidMapsParser.LcbContext ctx, String faName, int position) {
-        IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
-        // FIXME handle these once they are defined
-        String modifications = "";
-        if (ctx.lcb_fa().lcb_fa_mod() != null) {
-            if (ctx.lcb_fa().lcb_fa_mod().modification() != null) {
-                modifications = ctx.lcb_fa().lcb_fa_mod().modification().getText();
+    public Optional<LipidSpecies> visitIsomericSubspeciesLcb(String headGroup, LipidMapsParser.LcbContext lcbContext, List<LipidMapsParser.FaContext> faContexts) {
+        List<StructuralFattyAcid> fas = new LinkedList<>();
+        StructuralFattyAcid lcbA = buildIsomericLcb(headGroup, lcbContext, "LCB", 1);
+        fas.add(lcbA);
+        int nIsomericFas = 0;
+        if (lcbA instanceof IsomericFattyAcid) {
+            nIsomericFas++;
+        }
+        for (int i = 0; i < faContexts.size(); i++) {
+            StructuralFattyAcid fa = isfh.buildIsomericFa(faContexts.get(i), "FA" + (i + 1), i + 2);
+            fas.add(fa);
+            if (fa instanceof IsomericFattyAcid) {
+                nIsomericFas++;
             }
         }
-        if (ctx.lcb_fa().lcb_fa_unmod() != null) {
-            fa.nCarbon(asInt(ctx.lcb_fa().lcb_fa_unmod().carbon(), 0));
-            Integer nHydroxy = faHelper.getHydroxyCount(ctx);
-            fa.nHydroxy(nHydroxy);
-            if (ctx.lcb_fa().lcb_fa_unmod().db() != null) {
-                if (ctx.lcb_fa().lcb_fa_unmod().db().db_positions() != null) {
-                    Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                    LipidMapsParser.Db_positionContext dbPosCtx = ctx.lcb_fa().lcb_fa_unmod().db().db_positions().db_position();
-                    if (dbPosCtx.db_single_position() != null) {
-                        Integer dbPosition = asInt(dbPosCtx.db_single_position().db_position_number(), -1);
-                        String cisTrans = dbPosCtx.db_single_position().cistrans().getText();
-                        doubleBondPositions.put(dbPosition, cisTrans);
-                    } else if (dbPosCtx.db_position() != null) {
-                        for (LipidMapsParser.Db_positionContext dbpos : dbPosCtx.db_position()) {
-                            if (dbpos.db_single_position() != null) {
-                                Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
-                                String cisTrans = dbpos.db_single_position().cistrans().getText();
-                                doubleBondPositions.put(dbPosition, cisTrans);
+        if (nIsomericFas == fas.size()) {
+            IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
+            fas.stream().map((t) -> {
+                return (IsomericFattyAcid) t;
+            }).collect(Collectors.toList()).toArray(arrs);
+            return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
+        } else {
+            StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
+            fas.toArray(arrs);
+            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+        }
+    }
+
+    public StructuralFattyAcid buildIsomericLcb(String headGroup, LipidMapsParser.LcbContext ctx, String faName, int position) {
+        IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
+        LipidFaBondType lfbt = faHelper.getLipidLcbBondType(ctx);
+        if (ctx.lcb_fa() != null) {
+            if (ctx.lcb_fa().lcb_fa_unmod() != null) {
+                LipidMapsParser.Lcb_fa_unmodContext factx = ctx.lcb_fa().lcb_fa_unmod();
+                fa.nCarbon(HandlerUtils.asInt(factx.carbon(), 0));
+                fa.nHydroxy(faHelper.getHydroxyCount(ctx));
+                if (factx.db() != null) {
+                    if (factx.db().db_positions() != null) {
+                        Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+                        if (factx.db().db_positions().db_position().db_single_position() != null) {
+                            LipidMapsParser.Db_single_positionContext dbSingleCtx = factx.db().db_positions().db_position().db_single_position();
+                            doubleBondPositions.put(Integer.parseInt(dbSingleCtx.db_position_number().getText()), dbSingleCtx.cistrans().getText());
+                        } else if (factx.db().db_positions().db_position().db_position() != null) {
+                            for (LipidMapsParser.Db_positionContext dbCtx : factx.db().db_positions().db_position().db_position()) {
+                                LipidMapsParser.Db_single_positionContext dbSingleCtx = dbCtx.db_single_position();
+                                if (dbSingleCtx != null) {
+                                    doubleBondPositions.put(Integer.parseInt(dbSingleCtx.db_position_number().getText()), dbSingleCtx.cistrans().getText());
+                                }
+                            }
+                        } else {
+                            throw new ParseTreeVisitorException("Unhandled state in LCB IsomericFattyAcid!");
+                        }
+                        fa.doubleBondPositions(doubleBondPositions);
+                    } else { // handle cases like (0:0) but with at least one fa with isomeric subspecies level
+                        Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+                        if (factx.db().db_count() != null) {
+                            int doubleBonds = HandlerUtils.asInt(factx.db().db_count(), 0);
+                            if (doubleBonds > 0) {
+                                return StructuralFattyAcid.structuralFattyAcidBuilder().
+                                        lipidFaBondType(lfbt).
+                                        name(faName).
+                                        lcb(true).
+                                        nCarbon(HandlerUtils.asInt(factx.carbon(), 0)).
+                                        nDoubleBonds(doubleBonds).
+                                        build();
                             }
                         }
+                        fa.doubleBondPositions(doubleBondPositions);
                     }
-                    fa.doubleBondPositions(doubleBondPositions);
-                } else {
-                    fa.doubleBondPositions(Collections.emptyMap());
                 }
+                fa.lipidFaBondType(lfbt);
+                return fa.name(faName).lcb(true).position(position).build();
+            } else {
+                throw new ParseTreeVisitorException("Uninitialized FaContext!");
             }
-            return fa.name(faName).position(position).lcb(true).lipidFaBondType(LipidFaBondType.ESTER).build();
+        } else if (ctx.lcb_fa().lcb_fa_mod() != null) {
+            throw new ParseTreeVisitorException("Currently unsupported LCB Fa modified context!");
         } else {
-            throw new ParseTreeVisitorException("No LcbContext!");
+            throw new ParseTreeVisitorException("Uninitialized LCB FaContext!");
         }
     }
 }

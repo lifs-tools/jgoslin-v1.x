@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom.lipidmaps;
+package de.isas.lipidomics.palinom.goslin;
 
 import de.isas.lipidomics.domain.IsomericFattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
@@ -21,9 +21,9 @@ import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
+import de.isas.lipidomics.palinom.GoslinParser;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
-import de.isas.lipidomics.palinom.LipidMapsParser;
-import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -37,29 +37,22 @@ public class StructuralSubspeciesLcbHandler {
 
     private final StructuralSubspeciesFasHandler ssfh;
     private final IsomericSubspeciesLcbHandler islh;
-    private final FattyAcylHelper faHelper;
 
-    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh, IsomericSubspeciesLcbHandler islh, FattyAcylHelper faHelper) {
+    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh, IsomericSubspeciesLcbHandler islh) {
         this.ssfh = ssfh;
         this.islh = islh;
-        this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, LipidMapsParser.LcbContext lcbContext) {
-        StructuralFattyAcid fa = buildStructuralLcb(headGroup, lcbContext, "FA" + 1, 1);
-        return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
-    }
-    
-    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, LipidMapsParser.LcbContext lcbContext, List<LipidMapsParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, GoslinParser.LcbContext lcbContext, List<GoslinParser.FaContext> faContexts) {
         List<StructuralFattyAcid> fas = new LinkedList<>();
-        StructuralFattyAcid lcbA = buildStructuralLcb(headGroup, lcbContext, "LCB", 1);
+        StructuralFattyAcid lcbA = buildStructuralLcb(lcbContext, "LCB", 1);
         fas.add(lcbA);
         int nIsomericFas = 0;
         if (lcbA instanceof IsomericFattyAcid) {
             nIsomericFas++;
         }
         for (int i = 0; i < faContexts.size(); i++) {
-            StructuralFattyAcid fa = ssfh.buildStructuralFa(faContexts.get(i), "FA" + (i + 1), i + 2);
+            StructuralFattyAcid fa = ssfh.buildStructuralFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 2);
             fas.add(fa);
             if (fa instanceof IsomericFattyAcid) {
                 nIsomericFas++;
@@ -78,30 +71,28 @@ public class StructuralSubspeciesLcbHandler {
         }
     }
 
-    public StructuralFattyAcid buildStructuralLcb(String headGroup, LipidMapsParser.LcbContext ctx, String faName, int position) {
+    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, GoslinParser.LcbContext lcbContext) {
+        return visitStructuralSubspeciesLcb(headGroup, lcbContext, Collections.emptyList());
+    }
+
+    public StructuralFattyAcid buildStructuralLcb(GoslinParser.LcbContext ctx, String faName, int position) {
+        if (ctx.lcb_pure() != null && ctx.heavy_lcb() != null) {
+            throw new RuntimeException("Heavy label in lcb_pure context not implemented yet!");
+        }
+        GoslinParser.Lcb_pureContext pureCtx = ctx.lcb_pure();
         StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
-        // FIXME handle these once they are defined
-        String modifications = "";
-        if (ctx.lcb_fa().lcb_fa_mod() != null) {
-            if (ctx.lcb_fa().lcb_fa_mod().modification() != null) {
-                modifications = ctx.lcb_fa().lcb_fa_mod().modification().getText();
-            }
-        }
-        if (ctx.lcb_fa().lcb_fa_unmod() != null) {
-            fa.nCarbon(asInt(ctx.lcb_fa().lcb_fa_unmod().carbon(), 0));
-            Integer nHydroxy = faHelper.getHydroxyCount(ctx);
-            fa.nHydroxy(nHydroxy);
-            if (ctx.lcb_fa().lcb_fa_unmod().db() != null) {
-                int nDoubleBonds = asInt(ctx.lcb_fa().lcb_fa_unmod().db().db_count(), 0);
+        fa.nCarbon(asInt(pureCtx.carbon(), 0));
+        fa.nHydroxy(asInt(pureCtx.hydroxyl(), 0));
+        if (pureCtx.db() != null) {
+            int nDoubleBonds = asInt(pureCtx.db().db_count(), 0);
+            if (pureCtx.db().db_positions() != null || nDoubleBonds == 0) {
+                return islh.buildIsomericLcb(ctx, faName, position);
+            } else if (pureCtx.db().db_count() != null) {
                 fa.nDoubleBonds(nDoubleBonds);
-                if (ctx.lcb_fa().lcb_fa_unmod().db().db_positions() != null || nDoubleBonds == 0) {
-                    return islh.buildIsomericLcb(headGroup, ctx, faName, position);
-                }
             }
-            return fa.name(faName).position(position).lcb(true).lipidFaBondType(LipidFaBondType.ESTER).build();
-        } else {
-            throw new ParseTreeVisitorException("No LcbContext!");
         }
+        fa.lipidFaBondType(LipidFaBondType.ESTER);
+        return fa.name(faName).position(position).lcb(true).build();
     }
 
 }

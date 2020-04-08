@@ -100,7 +100,7 @@ public class MolecularSubspeciesFasHandler {
     public MolecularFattyAcid buildMolecularFa(LipidMapsParser.FaContext ctx, String faName) {
         MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
         if (ctx.fa_unmod() != null) {
-            LipidFaBondType faBondType = faHelper.getLipidFaBondTypeUnmod(ctx);
+            LipidFaBondType faBondType = faHelper.getLipidFaBondType(ctx);
             int plasmenylEtherDbBondCorrection = 0;
             fa.lipidFaBondType(faBondType);
             fa.nCarbon(HandlerUtils.asInt(ctx.fa_unmod().fa_pure().carbon(), 0));

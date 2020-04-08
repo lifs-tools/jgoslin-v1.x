@@ -15,16 +15,20 @@
  */
 package de.isas.lipidomics.palinom.swisslipids;
 
+import de.isas.lipidomics.domain.IsomericFattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
 import de.isas.lipidomics.palinom.HandlerUtils;
+import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -33,30 +37,47 @@ import java.util.Optional;
 public class StructuralSubspeciesLcbHandler {
 
     private final StructuralSubspeciesFasHandler ssfh;
+    private final IsomericSubspeciesLcbHandler islh;
 
-    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh) {
+    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh, IsomericSubspeciesLcbHandler islh) {
         this.ssfh = ssfh;
+        this.islh = islh;
     }
 
     public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, SwissLipidsParser.LcbContext lcbContext, List<SwissLipidsParser.FaContext> faContexts) {
         List<StructuralFattyAcid> fas = new LinkedList<>();
-        StructuralFattyAcid lcbA = buildStructuralLcb(lcbContext, "LCB", 1);
+        StructuralFattyAcid lcbA = buildStructuralLcb(headGroup, lcbContext, "LCB", 1);
         fas.add(lcbA);
+        int nIsomericFas = 0;
+        if (lcbA instanceof IsomericFattyAcid) {
+            nIsomericFas++;
+        }
         for (int i = 0; i < faContexts.size(); i++) {
             StructuralFattyAcid fa = ssfh.buildStructuralFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 2);
             fas.add(fa);
+            if (fa instanceof IsomericFattyAcid) {
+                nIsomericFas++;
+            }
         }
-        StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
-        fas.toArray(arrs);
-        return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+        if (nIsomericFas == fas.size()) {
+            IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
+            fas.stream().map((t) -> {
+                return (IsomericFattyAcid) t;
+            }).collect(Collectors.toList()).toArray(arrs);
+            return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
+        } else {
+            StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
+            fas.toArray(arrs);
+            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
+        }
     }
 
     public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, SwissLipidsParser.LcbContext lcbContext) {
-        StructuralFattyAcid fa = buildStructuralLcb(lcbContext, "LCB", 1);
+        StructuralFattyAcid fa = buildStructuralLcb(headGroup, lcbContext, "LCB", 1);
         return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
     }
 
-    public StructuralFattyAcid buildStructuralLcb(SwissLipidsParser.LcbContext ctx, String faName, int position) {
+    public StructuralFattyAcid buildStructuralLcb(String headGroup, SwissLipidsParser.LcbContext ctx, String faName, int position) {
         SwissLipidsParser.Lcb_coreContext pureCtx = ctx.lcb_core();
         StructuralFattyAcid.StructuralFattyAcidBuilder fa = StructuralFattyAcid.structuralFattyAcidBuilder();
         fa.nCarbon(HandlerUtils.asInt(pureCtx.carbon(), 0));
@@ -80,10 +101,11 @@ public class StructuralSubspeciesLcbHandler {
         }
         fa.nHydroxy(hydroxyl);
         if (pureCtx.db() != null) {
-            fa.nDoubleBonds(HandlerUtils.asInt(pureCtx.db().db_count(), 0));
-//            if (pureCtx.db().db_positions() != null) {
-//                throw new RuntimeException("Support for double bond positions not implemented yet!");
-//            }
+            int nDoubleBonds = HandlerUtils.asInt(pureCtx.db().db_count(), 0);
+            fa.nDoubleBonds(nDoubleBonds);
+            if (pureCtx.db().db_positions() != null || nDoubleBonds == 0) {
+                return islh.buildIsomericLcb(headGroup, ctx, faName, position);
+            }
         }
         fa.lipidFaBondType(LipidFaBondType.ESTER);
         return fa.name(faName).position(position).lcb(true).build();

@@ -71,12 +71,13 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
         @Override
         public LipidSpecies visitLipid_pure(LipidMapsParser.Lipid_pureContext ctx) {
             LipidSpecies lipid = null;
-            BitSet bs = new BitSet(5);
+            BitSet bs = new BitSet(6);
             bs.set(LipidCategory.ST.ordinal(), ctx.sterol() != null);
             bs.set(LipidCategory.GL.ordinal(), ctx.gl() != null);
             bs.set(LipidCategory.FA.ordinal(), ctx.mediator() != null || ctx.pure_fa() != null);
             bs.set(LipidCategory.GP.ordinal(), ctx.pl() != null);
             bs.set(LipidCategory.SP.ordinal(), ctx.sl() != null);
+            bs.set(LipidCategory.PK.ordinal(), ctx.pk() != null);
             final FattyAcylHelper faHelper = new FattyAcylHelper();
             final MolecularSubspeciesFasHandler msfh = new MolecularSubspeciesFasHandler(faHelper);
             final IsomericSubspeciesFasHandler isfh = new IsomericSubspeciesFasHandler(faHelper);
@@ -109,6 +110,9 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
                     break;
                 case SP:
                     lipid = new SphingoLipidHandler(sslh, faHandler).handle(ctx);
+                    break;
+                case PK:
+                    lipid = new PolyketideHandler(msfh, ssfh, faHandler).handle(ctx);
                     break;
                 default:
                     throw new ParseTreeVisitorException("Unhandled contextCategory: " + contextCategory);

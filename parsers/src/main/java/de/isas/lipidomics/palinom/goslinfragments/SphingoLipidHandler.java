@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom.lipidmaps;
+package de.isas.lipidomics.palinom.goslinfragments;
 
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.palinom.LipidMapsParser.Lipid_pureContext;
-import de.isas.lipidomics.palinom.LipidMapsParser;
+import de.isas.lipidomics.palinom.GoslinFragmentsParser.Lipid_pureContext;
+import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Arrays;
 import java.util.Optional;
@@ -30,11 +30,11 @@ import java.util.Optional;
 public class SphingoLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
 
     private final StructuralSubspeciesLcbHandler sslh;
-    private final FattyAcylHandler fhf;
+    private final FattyAcylHandler fah;
 
-    public SphingoLipidHandler(StructuralSubspeciesLcbHandler sslh, FattyAcylHandler fhf) {
+    public SphingoLipidHandler(StructuralSubspeciesLcbHandler sslh, FattyAcylHandler fah) {
         this.sslh = sslh;
-        this.fhf = fhf;
+        this.fah = fah;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class SphingoLipidHandler implements ParserRuleContextHandler<Lipid_pureC
         return handleSphingolipid(t).orElse(LipidSpecies.NONE);
     }
 
-    private Optional<LipidSpecies> handleSphingolipid(LipidMapsParser.Lipid_pureContext ctx) throws RuntimeException {
+    private Optional<LipidSpecies> handleSphingolipid(GoslinFragmentsParser.Lipid_pureContext ctx) throws RuntimeException {
         if (ctx.sl().dsl() != null) {
             return handleDsl(ctx.sl().dsl());
         } else if (ctx.sl().lsl() != null) {
@@ -52,16 +52,16 @@ public class SphingoLipidHandler implements ParserRuleContextHandler<Lipid_pureC
         }
     }
 
-    private Optional<LipidSpecies> handleDsl(LipidMapsParser.DslContext dsl) {
+    private Optional<LipidSpecies> handleDsl(GoslinFragmentsParser.DslContext dsl) {
         String headGroup = dsl.hg_dslc().getText();
-        if (dsl.dsl_species() != null) { //species level
+        if (dsl.sl_species() != null) { //species level
             //process species level
-            return fhf.visitSpeciesLcb(headGroup, dsl.dsl_species().lcb());
-        } else if (dsl.dsl_subspecies() != null) {
+            return fah.visitSpeciesLcb(headGroup, dsl.sl_species().lcb());
+        } else if (dsl.sl_subspecies() != null) {
             //process subspecies
-            if (dsl.dsl_subspecies().lcb_fa_sorted() != null) {
+            if (dsl.sl_subspecies().sorted_fa_separator() != null) {
                 //sorted => StructuralSubspecies
-                return sslh.visitStructuralSubspeciesLcb(headGroup, dsl.dsl_subspecies().lcb_fa_sorted().lcb(), Arrays.asList(dsl.dsl_subspecies().lcb_fa_sorted().fa()));
+                return sslh.visitStructuralSubspeciesLcb(headGroup, dsl.sl_subspecies().lcb(), Arrays.asList(dsl.sl_subspecies().fa()));
             }
         } else {
             throw new ParseTreeVisitorException("Unhandled context state in DSL!");
@@ -69,7 +69,7 @@ public class SphingoLipidHandler implements ParserRuleContextHandler<Lipid_pureC
         return Optional.empty();
     }
 
-    private Optional<LipidSpecies> handleLsl(LipidMapsParser.LslContext lsl) {
+    private Optional<LipidSpecies> handleLsl(GoslinFragmentsParser.LslContext lsl) {
         String headGroup = lsl.hg_lslc().getText();
         if (lsl.lcb() != null) { //species / subspecies level
             //process structural sub species level

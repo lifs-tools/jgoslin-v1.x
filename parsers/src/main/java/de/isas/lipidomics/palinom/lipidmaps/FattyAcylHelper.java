@@ -26,7 +26,12 @@ import java.util.Optional;
  */
 public class FattyAcylHelper {
 
-    public LipidFaBondType getLipidFaBondTypeUnmod(LipidMapsParser.FaContext faContext) throws ParseTreeVisitorException {
+    public LipidFaBondType getLipidLcbBondType(LipidMapsParser.LcbContext lcbContext) throws ParseTreeVisitorException {
+        LipidFaBondType lfbt = LipidFaBondType.ESTER;
+        return lfbt;
+    }
+
+    public LipidFaBondType getLipidFaBondType(LipidMapsParser.FaContext faContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         if (faContext.fa_unmod().ether() != null) {
             if (null == faContext.fa_unmod().ether().getText()) {

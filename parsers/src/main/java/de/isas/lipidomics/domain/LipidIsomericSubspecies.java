@@ -42,10 +42,6 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
-        LipidFaBondType lipidFaBondType = LipidFaBondType.UNDEFINED;
-        if (fa.length > 0) {
-            lipidFaBondType = LipidFaBondType.ESTER;
-        }
         for (IsomericFattyAcid fas : fa) {
             if (super.fa.containsKey(fas.getName())) {
                 throw new ConstraintViolationException(
@@ -55,24 +51,7 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
                 nCarbon += fas.getNCarbon();
                 nHydroxyl += fas.getNHydroxy();
                 nDoubleBonds += fas.getNDoubleBonds();
-                if (lipidFaBondType == null) {
-                    lipidFaBondType = fas.getLipidFaBondType();
-                } else {
-                    if(lipidFaBondType == LipidFaBondType.ETHER_PLASMANYL || lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL || lipidFaBondType == LipidFaBondType.ETHER_UNSPECIFIED) {
-                        if (fas.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED
-                                || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL
-                                || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL) {
-                            throw new ConstraintViolationException(
-                                    "Only one FA can define an ether bond to the head group! Tried to add " + fas.getLipidFaBondType() + " over existing " + lipidFaBondType + " for " + headGroup + " and FA: " + fas);
-                        }
-                    } else if(lipidFaBondType == LipidFaBondType.UNDEFINED && fas.getLipidFaBondType()!=LipidFaBondType.UNDEFINED) {
-                        lipidFaBondType = fas.getLipidFaBondType();
-                    } 
-                }
             }
-        }
-        if (lipidFaBondType == null) {
-            lipidFaBondType = LipidFaBondType.UNDEFINED;
         }
         super.info = Optional.of(
                 LipidSpeciesInfo.lipidSpeciesInfoBuilder().
@@ -82,7 +61,7 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
                         nCarbon(nCarbon).
                         nHydroxy(nHydroxyl).
                         nDoubleBonds(nDoubleBonds).
-                        lipidFaBondType(lipidFaBondType).
+                        lipidFaBondType(LipidFaBondType.getLipidFaBondType(headGroup, fa)).
                         build()
         );
     }
@@ -91,11 +70,7 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
         String faStrings = getFa().values().stream().map((fa) -> {
             return fa.buildSubstructureName(level);
         }).collect(Collectors.joining("/"));
-        String hgToFaSep = " ";
-        if (isEtherLipid()) {
-            hgToFaSep = " O-";
-        }
-        return getHeadGroup() + hgToFaSep + faStrings;
+        return getHeadGroup() + (faStrings.isEmpty() ? "" : getHeadGroupSuffix()) + faStrings;
     }
 
     @Override

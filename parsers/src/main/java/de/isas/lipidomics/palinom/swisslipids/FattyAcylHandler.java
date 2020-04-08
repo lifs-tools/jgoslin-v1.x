@@ -15,10 +15,12 @@
  */
 package de.isas.lipidomics.palinom.swisslipids;
 
+import de.isas.lipidomics.domain.IsomericFattyAcid;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
@@ -60,8 +62,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
 //                        ctx.fatty_acid().mediator().mediator_single().db_positions();
 //                    }
                 String mediatorsSingleContext = ctx.fatty_acid().mediator().mediator_single().getText();
-                Optional<LipidClass> lipidClass = LipidClass.forHeadGroup(mediatorsSingleContext);
-                return new LipidSpecies(ctx.fatty_acid().mediator().getText(), LipidCategory.FA, lipidClass, Optional.of(LipidSpeciesInfo.NONE));
+                return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(mediatorsSingleContext).fa(new IsomericFattyAcid[0]).build();
             } else {
                 throw new ParseTreeVisitorException("Context for FA head group was null!");
             }
@@ -103,7 +104,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
     public Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, SwissLipidsParser.LcbContext lcbContext) {
         Integer nHydroxyl = 0;
         if (lcbContext.lcb_core() != null) {
-            helper.getNHydroxyl(lcbContext);
+            nHydroxyl = helper.getNHydroxyl(lcbContext);
             return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
                     level(LipidLevel.SPECIES).
                     name("LCB").

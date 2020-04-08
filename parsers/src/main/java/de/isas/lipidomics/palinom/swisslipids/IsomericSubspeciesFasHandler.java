@@ -71,9 +71,7 @@ public class IsomericSubspeciesFasHandler {
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {
             fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));
-//            fa.nHydroxy(asInt(ctx.fa_core().hydroxyl(), 0));
             if (ctx.fa_core().db() != null) {
-//                fa.nDoubleBonds(faHelperFunctions.asInt(ctx.fa_core().db().db_count(), 0));
                 if (ctx.fa_core().db().db_positions() != null) {
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
                     if (ctx.fa_core().db().db_positions().db_position().db_single_position() != null) {

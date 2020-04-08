@@ -121,7 +121,7 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(ref1, lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
         assertEquals(LipidClass.forHeadGroup(ref1).get(), lipidAdduct.getLipid().getLipidClass().get());
-        assertEquals(LipidSpeciesInfo.NONE, lipidAdduct.getLipid().getInfo().get());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
 
         System.out.println("Testing second mediator name " + ref2);
         lipidAdduct = parseLipidName(ref2);
@@ -131,7 +131,7 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(ref2, lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
         assertEquals(LipidClass.forHeadGroup(ref2).get(), lipidAdduct.getLipid().getLipidClass().get());
-        assertEquals(LipidSpeciesInfo.NONE, lipidAdduct.getLipid().getInfo().get());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
     }
 
     @Test

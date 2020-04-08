@@ -36,6 +36,32 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class LipidMapsVisitorParserTest {
 
     @Test
+    public void testPK_Structural() throws ParsingException {
+        String ref = "PHENOL(15:2)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("PHENOL", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(1, lipidAdduct.getLipid().getFa().size());
+        assertEquals(15, lipidAdduct.getLipid().getFa().get("FA1").getNCarbon());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
+    }
+    
+    @Test
+    public void testPK_Isomeric() throws ParsingException {
+        String ref = "PHENOL(15:2(8Z,11Z))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("PHENOL", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(1, lipidAdduct.getLipid().getFa().size());
+        assertEquals(15, lipidAdduct.getLipid().getFa().get("FA1").getNCarbon());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
+    }
+    
+    @Test
     public void testPE_Structural() throws ParsingException {
         String ref = "PE(18:1/18:2(11Z,13E))";
         System.out.println("Testing lipid name " + ref);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 nils.hoffmann.
+ * Copyright 2020 nilshoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom.goslin;
+package de.isas.lipidomics.palinom.goslinfragments;
 
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.Fragment;
-import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
-import de.isas.lipidomics.palinom.GoslinBaseVisitor;
-import de.isas.lipidomics.palinom.GoslinParser;
-import de.isas.lipidomics.palinom.GoslinParser.Adduct_infoContext;
-import de.isas.lipidomics.palinom.GoslinParser.Lipid_pureContext;
+import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.palinom.GoslinFragmentsBaseVisitor;
+import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -35,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author nils.hoffmann
  */
 @Slf4j
-class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
+public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<LipidAdduct> {
 
     /**
      *
@@ -46,23 +44,25 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
      * @return
      */
     @Override
-    public LipidAdduct visitLipid(GoslinParser.LipidContext ctx) {
-        GoslinParser.Lipid_eofContext lipid = ctx.lipid_eof();
-        Optional<Lipid_pureContext> categoryContext = Optional.ofNullable(lipid.lipid_pure());
-        Optional<Adduct_infoContext> adductTermContext = Optional.ofNullable(lipid.adduct_info());
-
-        LipidAdduct la = new LipidAdduct(categoryContext.map((cc) -> {
-            return new LipidVisitor().visitLipid_pure(cc);
+    public LipidAdduct visitLipid(GoslinFragmentsParser.LipidContext ctx) {
+        GoslinFragmentsParser.Lipid_eofContext lipid = ctx.lipid_eof();
+        Optional<GoslinFragmentsParser.Fragment_nameContext> fragmentContext = Optional.ofNullable(lipid.fragment_name());
+        Optional<GoslinFragmentsParser.Lipid_pureContext> lipidContext = Optional.ofNullable(lipid.just_lipid().lipid_pure());
+        Optional<GoslinFragmentsParser.Adduct_infoContext> adductTermContext = Optional.ofNullable(lipid.just_lipid().adduct_info());
+        LipidAdduct la = new LipidAdduct(lipidContext.map((cc) -> {
+            return new GoslinFragmentsVisitorImpl.LipidVisitor().visitLipid_pure(cc);
         }).orElse(LipidSpecies.NONE), adductTermContext.map((t) -> {
-            return new AdductVisitor().visitAdduct_info(t);
-        }).orElse(Adduct.NONE), "", new Fragment(""));
+            return new GoslinFragmentsVisitorImpl.AdductVisitor().visitAdduct_info(t);
+        }).orElse(Adduct.NONE), "", fragmentContext.map((t) -> {
+            return new Fragment(t.frag_char().getText());
+        }).orElse(Fragment.NONE));
         return la;
     }
 
-    private static class LipidVisitor extends GoslinBaseVisitor<LipidSpecies> {
+ private static class LipidVisitor extends GoslinFragmentsBaseVisitor<LipidSpecies> {
 
         @Override
-        public LipidSpecies visitLipid_pure(GoslinParser.Lipid_pureContext ctx) {
+        public LipidSpecies visitLipid_pure(GoslinFragmentsParser.Lipid_pureContext ctx) {
             LipidSpecies lipid = null;
             BitSet bs = new BitSet(5);
             bs.set(LipidCategory.ST.ordinal(), ctx.sterol() != null);
@@ -124,10 +124,10 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
     }
 
-    private static class AdductVisitor extends GoslinBaseVisitor<Adduct> {
+    private static class AdductVisitor extends GoslinFragmentsBaseVisitor<Adduct> {
 
         @Override
-        public Adduct visitAdduct_info(GoslinParser.Adduct_infoContext ctx) {
+        public Adduct visitAdduct_info(GoslinFragmentsParser.Adduct_infoContext ctx) {
             String chargeSign = ctx.charge_sign().getText();
             Integer chargeSignValue = 0;
             switch (chargeSign) {

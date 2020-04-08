@@ -68,9 +68,9 @@ public class SwissLipidsVisitorImpl extends SwissLipidsBaseVisitor<LipidAdduct> 
             final FattyAcylHelper faHelper = new FattyAcylHelper();
             final MolecularSubspeciesFasHandler msfh = new MolecularSubspeciesFasHandler(faHelper);
             final IsomericSubspeciesFasHandler isfh = new IsomericSubspeciesFasHandler(faHelper);
-            final StructuralSubspeciesFasHandler ssfh = new StructuralSubspeciesFasHandler(faHelper);
+            final StructuralSubspeciesFasHandler ssfh = new StructuralSubspeciesFasHandler(isfh, faHelper);
             final IsomericSubspeciesLcbHandler islh = new IsomericSubspeciesLcbHandler(isfh, faHelper);
-            final StructuralSubspeciesLcbHandler sslh = new StructuralSubspeciesLcbHandler(ssfh);
+            final StructuralSubspeciesLcbHandler sslh = new StructuralSubspeciesLcbHandler(ssfh, islh);
             final FattyAcylHandler faHandler = new FattyAcylHandler();
             LipidCategory contextCategory = LipidCategory.UNDEFINED;
             switch (bs.cardinality()) {

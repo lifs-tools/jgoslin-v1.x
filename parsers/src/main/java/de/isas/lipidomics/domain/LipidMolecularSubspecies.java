@@ -75,16 +75,20 @@ public class LipidMolecularSubspecies extends LipidSpecies {
     public Map<String, FattyAcid> getFa() {
         return Collections.unmodifiableMap(fa);
     }
+    
+    protected String getHeadGroupSuffix() {
+        String hgToFaSep = " ";
+        if (isEtherLipid()) {
+            hgToFaSep = " O-";
+        }
+        return hgToFaSep;
+    }
 
     protected String buildLipidSubspeciesName(LipidLevel level, String faSeparator) {
         String faStrings = getFa().values().stream().map((fa) -> {
             return fa.buildSubstructureName(level);
         }).collect(Collectors.joining(faSeparator));
-        String hgToFaSep = " ";
-        if (isEtherLipid()) {
-            hgToFaSep = " O-";
-        }
-        return getHeadGroup() + (faStrings.isEmpty() ? "" : hgToFaSep) + faStrings;
+        return getHeadGroup() + (faStrings.isEmpty() ? "" : getHeadGroupSuffix()) + faStrings;
     }
 
     @Override

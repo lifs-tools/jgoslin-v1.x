@@ -38,9 +38,7 @@ public class LipidFaBondTypeTest {
     public void testEtherHeadGroupAndFaEtherUnspecifiedOrUndefinedThrowException() {
         String etherHeadGroup1 = "PE O";
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
-        Assertions.assertThrows(ConstraintViolationException.class, () -> { // should raise exception, fa bond type must not be ETHER_UNSPECIFIED!
-            assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_UNSPECIFIED).build()));
-        });
+        assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_UNSPECIFIED).build()));
         Assertions.assertThrows(ConstraintViolationException.class, () -> { // should raise exception, fa bond type must not be UNDEFINED!
             assertEquals(LipidFaBondType.UNDEFINED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.UNDEFINED).build()));
         });
