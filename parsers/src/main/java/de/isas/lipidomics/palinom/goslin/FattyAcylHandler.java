@@ -15,7 +15,7 @@
  */
 package de.isas.lipidomics.palinom.goslin;
 
-import de.isas.lipidomics.domain.IsomericFattyAcid;
+import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
@@ -47,7 +47,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<GoslinParser.L
 //                        ctx.fatty_acid().mediator().mediator_single().db_positions();
 //                    }
                 String mediatorsSingleContext = ctx.mediatorc().mediator().getText();
-                return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(mediatorsSingleContext).fa(new IsomericFattyAcid[0]).build();
+                return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(mediatorsSingleContext).fa(new FattyAcid[0]).build();
             } else {
                 throw new ParseTreeVisitorException("Context for FA head group was null!");
             }

@@ -38,9 +38,9 @@ public class LipidFaBondTypeTest {
     public void testEtherHeadGroupAndFaEtherUnspecifiedOrUndefinedThrowException() {
         String etherHeadGroup1 = "PE O";
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
-        assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_UNSPECIFIED).build()));
+        assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_UNSPECIFIED).build()));
         Assertions.assertThrows(ConstraintViolationException.class, () -> { // should raise exception, fa bond type must not be UNDEFINED!
-            assertEquals(LipidFaBondType.UNDEFINED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.UNDEFINED).build()));
+            assertEquals(LipidFaBondType.UNDEFINED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.UNDEFINED).build()));
         });
     }
 
@@ -48,30 +48,30 @@ public class LipidFaBondTypeTest {
     public void testEtherHeadGroupOverruledBySpecificFaEther() {
         String etherHeadGroup1 = "PE O";
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
-        assertEquals(LipidFaBondType.ETHER_PLASMANYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build()));
-        assertEquals(LipidFaBondType.ETHER_PLASMENYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build()));
+        assertEquals(LipidFaBondType.ETHER_PLASMANYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build()));
+        assertEquals(LipidFaBondType.ETHER_PLASMENYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build()));
     }
 
     @Test
     public void testEtherHeadGroupDominatesFaEster() {
         String etherHeadGroup1 = "PE O";
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
-        assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build()));
+        assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build()));
     }
     
     @Test
     public void testNormalHeadGroupOverruledByFaEther() {
         String etherHeadGroup1 = "PE";
         assertEquals(LipidFaBondType.UNDEFINED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
-        assertEquals(LipidFaBondType.ETHER_PLASMANYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build()));
-        assertEquals(LipidFaBondType.ETHER_PLASMENYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build()));
+        assertEquals(LipidFaBondType.ETHER_PLASMANYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build()));
+        assertEquals(LipidFaBondType.ETHER_PLASMENYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build()));
     }
     
     @Test
     public void testNormalHeadGroupAndFaEster() {
         String etherHeadGroup1 = "PE";
         assertEquals(LipidFaBondType.UNDEFINED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
-        assertEquals(LipidFaBondType.ESTER, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build()));
+        assertEquals(LipidFaBondType.ESTER, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build()));
     }
     
     @Test
@@ -80,39 +80,39 @@ public class LipidFaBondTypeTest {
         assertEquals(LipidFaBondType.UNDEFINED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, 
                 LipidFaBondType.getLipidFaBondType(etherHeadGroup1, 
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build(),
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build()
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build(),
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build()
                 )
         );
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, 
                 LipidFaBondType.getLipidFaBondType(etherHeadGroup1, 
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build(),
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build()
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build(),
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build()
                 )
         );
         assertEquals(LipidFaBondType.ETHER_PLASMENYL, 
                 LipidFaBondType.getLipidFaBondType(etherHeadGroup1, 
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build(),
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build()
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build(),
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build()
                 )
         );
         assertEquals(LipidFaBondType.ETHER_PLASMENYL, 
                 LipidFaBondType.getLipidFaBondType(etherHeadGroup1, 
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build(),
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build()
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build(),
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build()
                 )
         );
         Assertions.assertThrows(ConstraintViolationException.class, () -> { // should raise exception, fa bond type must not be UNDEFINED!
             assertEquals(LipidFaBondType.ETHER_PLASMENYL, 
                 LipidFaBondType.getLipidFaBondType(etherHeadGroup1, 
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build(),
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build()
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build(),
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build()
                 )
             );
             assertEquals(LipidFaBondType.ETHER_PLASMENYL, 
                 LipidFaBondType.getLipidFaBondType(etherHeadGroup1, 
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build(),
-                        StructuralFattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build()
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build(),
+                        FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build()
                 )
             );
         });

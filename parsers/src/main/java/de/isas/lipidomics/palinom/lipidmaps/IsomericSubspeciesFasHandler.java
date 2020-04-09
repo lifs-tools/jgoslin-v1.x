@@ -15,12 +15,13 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-import de.isas.lipidomics.domain.IsomericFattyAcid;
+import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
-import de.isas.lipidomics.domain.StructuralFattyAcid;
+import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.LipidMapsParser;
@@ -46,30 +47,30 @@ public class IsomericSubspeciesFasHandler {
     }
 
     public Optional<LipidSpecies> visitIsomericSubspeciesFas(String headGroup, List<LipidMapsParser.FaContext> faContexts) {
-        List<StructuralFattyAcid> fas = new LinkedList<>();
+        List<FattyAcid> fas = new LinkedList<>();
         int nIsomericFas = 0;
         for (int i = 0; i < faContexts.size(); i++) {
-            StructuralFattyAcid fa = buildIsomericFa(faContexts.get(i), "FA" + (i + 1), i + 1);
+            FattyAcid fa = buildIsomericFa(faContexts.get(i), "FA" + (i + 1), i + 1);
             fas.add(fa);
-            if (fa instanceof IsomericFattyAcid) {
+            if (fa.getType() == FattyAcidType.ISOMERIC) {
                 nIsomericFas++;
             }
         }
         if (nIsomericFas == fas.size()) {
-            IsomericFattyAcid[] arrs = new IsomericFattyAcid[fas.size()];
+            FattyAcid[] arrs = new FattyAcid[fas.size()];
             fas.stream().map((t) -> {
-                return (IsomericFattyAcid) t;
+                return (FattyAcid) t;
             }).collect(Collectors.toList()).toArray(arrs);
             return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
         } else {
-            StructuralFattyAcid[] arrs = new StructuralFattyAcid[fas.size()];
+            FattyAcid[] arrs = new FattyAcid[fas.size()];
             fas.toArray(arrs);
             return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
         }
     }
 
-    public StructuralFattyAcid buildIsomericFa(LipidMapsParser.FaContext ctx, String faName, int position) {
-        IsomericFattyAcid.IsomericFattyAcidBuilder fa = IsomericFattyAcid.isomericFattyAcidBuilder();
+    public FattyAcid buildIsomericFa(LipidMapsParser.FaContext ctx, String faName, int position) {
+        FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         String modifications = "";
         if (ctx.fa_mod() != null) {
             if (ctx.fa_mod().modification() != null) {
@@ -89,7 +90,7 @@ public class IsomericSubspeciesFasHandler {
                     if (ctx.fa_unmod().fa_pure().db().db_count() != null) {
                         int doubleBonds = HandlerUtils.asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0);
                         if (doubleBonds > 0) {
-                            return StructuralFattyAcid.structuralFattyAcidBuilder().
+                            return FattyAcid.structuralFattyAcidBuilder().
                                     lipidFaBondType(faBondType).
                                     name(faName).
                                     lcb(true).

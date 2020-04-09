@@ -18,7 +18,7 @@ package de.isas.lipidomics.palinom.goslinfragments;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.domain.MolecularFattyAcid;
+import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -39,21 +39,21 @@ public class MolecularSubspeciesFasHandler {
     }
 
     public Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<GoslinFragmentsParser.FaContext> faContexts) {
-        List<MolecularFattyAcid> fas = new LinkedList<>();
+        List<FattyAcid> fas = new LinkedList<>();
         for (int i = 0; i < faContexts.size(); i++) {
-            MolecularFattyAcid fa = buildMolecularFa(headGroup, faContexts.get(i), "FA" + (i + 1));
+            FattyAcid fa = buildMolecularFa(headGroup, faContexts.get(i), "FA" + (i + 1));
             fas.add(fa);
         }
-        MolecularFattyAcid[] arrs = new MolecularFattyAcid[fas.size()];
+        FattyAcid[] arrs = new FattyAcid[fas.size()];
         fas.toArray(arrs);
         return Optional.of(new LipidMolecularSubspecies(headGroup, arrs));
     }
 
-    public MolecularFattyAcid buildMolecularFa(String headGroup, GoslinFragmentsParser.FaContext ctx, String faName) {
+    public FattyAcid buildMolecularFa(String headGroup, GoslinFragmentsParser.FaContext ctx, String faName) {
         if (ctx.fa_pure() != null && ctx.heavy_fa() != null) {
             throw new RuntimeException("Heavy label in fa_pure context not implemented yet!");
         }
-        MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
+        FattyAcid.MolecularFattyAcidBuilder fa = FattyAcid.molecularFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(headGroup, ctx);
         if (ctx.fa_pure() != null) {
             fa.nCarbon(HandlerUtils.asInt(ctx.fa_pure().carbon(), 0));

@@ -15,8 +15,6 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-import de.isas.lipidomics.domain.FattyAcid;
-import de.isas.lipidomics.domain.IsomericFattyAcid;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
@@ -25,8 +23,7 @@ import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
-import de.isas.lipidomics.domain.MolecularFattyAcid;
-import de.isas.lipidomics.domain.StructuralFattyAcid;
+import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -53,7 +50,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParse
     @Override
     public LipidSpecies handle(LipidMapsParser.Lipid_pureContext ctx) {
         if (ctx.mediator() != null) {
-            return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(ctx.mediator().getText()).fa(new IsomericFattyAcid[0]).build();
+            return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(ctx.mediator().getText()).fa(new FattyAcid[0]).build();
         } else if (ctx.pure_fa() != null) {
             return msfah.handlePureFaContext(ctx.pure_fa());
         }
@@ -79,7 +76,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParse
 //                    }
                 level = LipidLevel.STRUCTURAL_SUBSPECIES;
                 for (int j = 0; j < fa2Ctx.fa2_sorted().fa().size(); j++) {
-                    StructuralFattyAcid fa = ssfah.buildStructuralFa(fa2Ctx.fa2_sorted().fa().get(j), "FA" + ((i + 1) + j), i + 1);
+                    FattyAcid fa = ssfah.buildStructuralFa(fa2Ctx.fa2_sorted().fa().get(j), "FA" + ((i + 1) + j), i + 1);
                     fas.add(fa);
                 }
             } else if (fa2Ctx.fa2_unsorted() != null) {
@@ -88,22 +85,22 @@ public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParse
 //                    }
                 level = LipidLevel.MOLECULAR_SUBSPECIES;
                 for (int j = 0; j < fa2Ctx.fa2_unsorted().fa().size(); j++) {
-                    MolecularFattyAcid fa = msfah.buildMolecularFa(fa2Ctx.fa2_unsorted().fa().get(i), "FA" + ((i + 1) + j));
+                    FattyAcid fa = msfah.buildMolecularFa(fa2Ctx.fa2_unsorted().fa().get(i), "FA" + ((i + 1) + j));
                     fas.add(fa);
                 }
             }
         }
         switch (level) {
             case MOLECULAR_SUBSPECIES:
-                MolecularFattyAcid[] marrs = new MolecularFattyAcid[fas.size()];
+                FattyAcid[] marrs = new FattyAcid[fas.size()];
                 fas.toArray(marrs);
                 return Optional.of(new LipidMolecularSubspecies(headGroup, marrs));
             case STRUCTURAL_SUBSPECIES:
-                StructuralFattyAcid[] sarrs = new StructuralFattyAcid[fas.size()];
+                FattyAcid[] sarrs = new FattyAcid[fas.size()];
                 fas.toArray(sarrs);
                 return Optional.of(new LipidStructuralSubspecies(headGroup, sarrs));
             case ISOMERIC_SUBSPECIES:
-                IsomericFattyAcid[] ifa = new IsomericFattyAcid[fas.size()];
+                FattyAcid[] ifa = new FattyAcid[fas.size()];
                 fas.toArray(ifa);
                 return Optional.of(new LipidIsomericSubspecies(headGroup, ifa));
             default:

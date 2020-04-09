@@ -37,12 +37,12 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
      * @param fa
      */
     @Builder(builderMethodName = "lipidIsomericSubspeciesBuilder")
-    public LipidIsomericSubspecies(String headGroup, IsomericFattyAcid... fa) {
+    public LipidIsomericSubspecies(String headGroup, FattyAcid... fa) {
         super(headGroup);
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
-        for (IsomericFattyAcid fas : fa) {
+        for (FattyAcid fas : fa) {
             if (super.fa.containsKey(fas.getName())) {
                 throw new ConstraintViolationException(
                         "FA names must be unique! FA with name " + fas.getName() + " was already added!");

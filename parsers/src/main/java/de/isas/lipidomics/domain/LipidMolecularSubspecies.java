@@ -39,15 +39,15 @@ public class LipidMolecularSubspecies extends LipidSpecies {
     protected final Map<String, FattyAcid> fa = new LinkedHashMap<>();
 
     @Builder
-    public LipidMolecularSubspecies(String headGroup, MolecularFattyAcid... fa) {
+    public LipidMolecularSubspecies(String headGroup, FattyAcid... fa) {
         super(headGroup);
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
-        for (MolecularFattyAcid fas : fa) {
-            if (fas.getPosition() != -1) {
-                throw new ConstraintViolationException("MolecularFattyAcid " + fas.getName() + " must have position set to -1! Was: " + fas.getPosition());
-            }
+        for (FattyAcid fas : fa) {
+//            if (fas.getPosition() != -1) {
+//                throw new ConstraintViolationException("MolecularFattyAcid " + fas.getName() + " must have position set to -1! Was: " + fas.getPosition());
+//            }
             if (this.fa.containsKey(fas.getName())) {
                 throw new ConstraintViolationException(
                         "FA names must be unique! FA with name " + fas.getName() + " was already added!");

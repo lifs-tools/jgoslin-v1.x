@@ -31,12 +31,12 @@ import lombok.EqualsAndHashCode;
 public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
 
     @Builder(builderMethodName = "lipidStructuralSubspeciesBuilder")
-    public LipidStructuralSubspecies(String headGroup, StructuralFattyAcid... fa) {
+    public LipidStructuralSubspecies(String headGroup, FattyAcid... fa) {
         super(headGroup);
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
-        for (StructuralFattyAcid fas : fa) {
+        for (FattyAcid fas : fa) {
             if (super.fa.containsKey(fas.getName())) {
                 throw new ConstraintViolationException(
                         "FA names must be unique! FA with name " + fas.getName() + " was already added!");

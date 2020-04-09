@@ -22,7 +22,7 @@ import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
-import de.isas.lipidomics.domain.MolecularFattyAcid;
+import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -45,7 +45,7 @@ public class MolecularSubspeciesFasHandler {
     public LipidSpecies handlePureFaContext(LipidMapsParser.Pure_faContext ctx) {
         
         if (ctx.fa_no_hg() != null && ctx.fa_no_hg().fa() != null) {
-            MolecularFattyAcid fa = buildMolecularFa(ctx.fa_no_hg().fa(), "FA1");
+            FattyAcid fa = buildMolecularFa(ctx.fa_no_hg().fa(), "FA1");
             LipidSpeciesInfo lsi = new LipidSpeciesInfo(
                     LipidLevel.SPECIES,
                     fa.getNCarbon(),
@@ -63,7 +63,7 @@ public class MolecularSubspeciesFasHandler {
         } else if (ctx.pure_fa_species() != null && ctx.hg_fa() != null) {
             LipidMapsParser.Pure_fa_speciesContext speciesContext = ctx.pure_fa_species();
             if (speciesContext != null) {
-                MolecularFattyAcid fa = buildMolecularFa(speciesContext.fa(), "FA1");
+                FattyAcid fa = buildMolecularFa(speciesContext.fa(), "FA1");
                 LipidSpeciesInfo lsi = new LipidSpeciesInfo(
                         LipidLevel.SPECIES,
                         fa.getNCarbon(),
@@ -87,18 +87,18 @@ public class MolecularSubspeciesFasHandler {
     }
     
     public Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<LipidMapsParser.FaContext> faContexts) {
-        List<MolecularFattyAcid> fas = new LinkedList<>();
+        List<FattyAcid> fas = new LinkedList<>();
         for (int i = 0; i < faContexts.size(); i++) {
-            MolecularFattyAcid fa = buildMolecularFa(faContexts.get(i), "FA" + (i + 1));
+            FattyAcid fa = buildMolecularFa(faContexts.get(i), "FA" + (i + 1));
             fas.add(fa);
         }
-        MolecularFattyAcid[] arrs = new MolecularFattyAcid[fas.size()];
+        FattyAcid[] arrs = new FattyAcid[fas.size()];
         fas.toArray(arrs);
         return Optional.of(new LipidMolecularSubspecies(headGroup, arrs));
     }
     
-    public MolecularFattyAcid buildMolecularFa(LipidMapsParser.FaContext ctx, String faName) {
-        MolecularFattyAcid.MolecularFattyAcidBuilder fa = MolecularFattyAcid.molecularFattyAcidBuilder();
+    public FattyAcid buildMolecularFa(LipidMapsParser.FaContext ctx, String faName) {
+        FattyAcid.MolecularFattyAcidBuilder fa = FattyAcid.molecularFattyAcidBuilder();
         if (ctx.fa_unmod() != null) {
             LipidFaBondType faBondType = faHelper.getLipidFaBondType(ctx);
             int plasmenylEtherDbBondCorrection = 0;
