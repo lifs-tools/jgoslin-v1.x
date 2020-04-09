@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,7 +53,7 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(0, lipidAdduct.getLipid().getFa().get("FA3").getNDoubleBonds());
         assertEquals(14, lipidAdduct.getLipid().getFa().get("FA3").getNCarbon());
     }
-    
+
     @Test
     public void testPE_Structural() throws ParsingException {
         String ref = "PE(18:1/18:1(11Z))";
@@ -414,6 +415,42 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(34, lipidAdduct.getLipid().getInfo().get().getNCarbon());
         assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(2, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
+
+    @Test
+    public void testIsomericSubspecies() throws ParsingException {
+        String ref = "TG(16:0/20:2(11Z,14Z)/22:4(7Z,10Z,13Z,16Z))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("TG", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(58, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        Integer nDoubleBonds = lipidAdduct.getLipid().getFa().values().stream().collect(Collectors.summingInt((t) -> {
+            return t.getNDoubleBonds();
+        }));
+        assertEquals(6, nDoubleBonds);
+        assertEquals(6, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
+    
+    @Test
+    public void testIsomericSubspecies2() throws ParsingException {
+        String ref = "PE(30:5(15Z,18Z,21Z,24Z,27Z)/20:3(8Z,11Z,14Z))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("PE", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.GP, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(50, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        Integer nDoubleBonds = lipidAdduct.getLipid().getFa().values().stream().collect(Collectors.summingInt((t) -> {
+            return t.getNDoubleBonds();
+        }));
+        assertEquals(8, nDoubleBonds);
+        assertEquals(8, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

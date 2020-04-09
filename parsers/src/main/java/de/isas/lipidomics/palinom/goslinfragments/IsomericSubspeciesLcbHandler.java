@@ -24,10 +24,8 @@ import de.isas.lipidomics.domain.StructuralFattyAcid;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -38,9 +36,11 @@ import java.util.stream.Collectors;
 public class IsomericSubspeciesLcbHandler {
 
     private final IsomericSubspeciesFasHandler isfh;
+    private final FattyAcylHelper faHelper;
 
-    public IsomericSubspeciesLcbHandler(IsomericSubspeciesFasHandler isfh) {
+    public IsomericSubspeciesLcbHandler(IsomericSubspeciesFasHandler isfh, FattyAcylHelper faHelper) {
         this.isfh = isfh;
+        this.faHelper = faHelper;
     }
 
     public Optional<LipidSpecies> visitIsomericSubspeciesLcb(String headGroup, GoslinFragmentsParser.LcbContext lcbContext, List<GoslinFragmentsParser.FaContext> faContexts) {
@@ -81,22 +81,7 @@ public class IsomericSubspeciesLcbHandler {
         fa.nHydroxy(asInt(pureCtx.hydroxyl(), 0));
         if (pureCtx.db() != null) {
             if (ctx.lcb_pure().db().db_positions() != null) {
-                Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                GoslinFragmentsParser.Db_positionContext dbPosCtx = ctx.lcb_pure().db().db_positions().db_position();
-                if (dbPosCtx.db_single_position() != null) {
-                    Integer dbPosition = asInt(dbPosCtx.db_single_position().db_position_number(), -1);
-                    String cisTrans = dbPosCtx.db_single_position().cistrans().getText();
-                    doubleBondPositions.put(dbPosition, cisTrans);
-                } else if (dbPosCtx.db_position() != null) {
-                    for (GoslinFragmentsParser.Db_positionContext dbpos : dbPosCtx.db_position()) {
-                        if (dbpos.db_single_position() != null) {
-                            Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
-                            String cisTrans = dbpos.db_single_position().cistrans().getText();
-                            doubleBondPositions.put(dbPosition, cisTrans);
-                        }
-                    }
-                }
-                fa.doubleBondPositions(doubleBondPositions);
+                fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(ctx.lcb_pure().db().db_positions()));
             } else {
                 fa.doubleBondPositions(Collections.emptyMap());
             }

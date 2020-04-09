@@ -15,7 +15,6 @@
  */
 package de.isas.lipidomics.palinom.goslinfragments;
 
-import de.isas.lipidomics.palinom.goslin.*;
 import de.isas.lipidomics.domain.IsomericFattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
@@ -26,10 +25,8 @@ import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -75,22 +72,7 @@ public class IsomericSubspeciesFasHandler {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
             if (ctx.fa_pure().db().db_positions() != null) {
-                Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                GoslinFragmentsParser.Db_positionContext dbPosCtx = ctx.fa_pure().db().db_positions().db_position();
-                if (dbPosCtx.db_single_position() != null) {
-                    Integer dbPosition = asInt(dbPosCtx.db_single_position().db_position_number(), -1);
-                    String cisTrans = dbPosCtx.db_single_position().cistrans().getText();
-                    doubleBondPositions.put(dbPosition, cisTrans);
-                } else if(dbPosCtx.db_position() != null) {
-                    for (GoslinFragmentsParser.Db_positionContext dbpos : dbPosCtx.db_position()) {
-                        if (dbpos.db_single_position() != null) {
-                            Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
-                            String cisTrans = dbpos.db_single_position().cistrans().getText();
-                            doubleBondPositions.put(dbPosition, cisTrans);
-                        }
-                    }
-                }
-                fa.doubleBondPositions(doubleBondPositions);
+                fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(ctx.fa_pure().db().db_positions()));
             } else {
                 fa.doubleBondPositions(Collections.emptyMap());
             }

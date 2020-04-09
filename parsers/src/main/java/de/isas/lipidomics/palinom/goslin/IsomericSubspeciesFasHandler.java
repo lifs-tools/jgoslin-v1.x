@@ -74,22 +74,7 @@ public class IsomericSubspeciesFasHandler {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
             if (ctx.fa_pure().db().db_positions() != null) {
-                Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                GoslinParser.Db_positionContext dbPosCtx = ctx.fa_pure().db().db_positions().db_position();
-                if (dbPosCtx.db_single_position() != null) {
-                    Integer dbPosition = asInt(dbPosCtx.db_single_position().db_position_number(), -1);
-                    String cisTrans = dbPosCtx.db_single_position().cistrans().getText();
-                    doubleBondPositions.put(dbPosition, cisTrans);
-                } else if(dbPosCtx.db_position() != null) {
-                    for (GoslinParser.Db_positionContext dbpos : dbPosCtx.db_position()) {
-                        if (dbpos.db_single_position() != null) {
-                            Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
-                            String cisTrans = dbpos.db_single_position().cistrans().getText();
-                            doubleBondPositions.put(dbPosition, cisTrans);
-                        }
-                    }
-                }
-                fa.doubleBondPositions(doubleBondPositions);
+                fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(ctx.fa_pure().db().db_positions()));
             } else {
                 fa.doubleBondPositions(Collections.emptyMap());
             }

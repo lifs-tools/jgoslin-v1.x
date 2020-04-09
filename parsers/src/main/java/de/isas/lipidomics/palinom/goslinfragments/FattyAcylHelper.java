@@ -17,8 +17,13 @@ package de.isas.lipidomics.palinom.goslinfragments;
 
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
+import de.isas.lipidomics.palinom.GoslinParser;
 import de.isas.lipidomics.palinom.HandlerUtils;
+import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  *
@@ -52,5 +57,37 @@ public class FattyAcylHelper {
             }
         }
         return lfbt;
+    }
+
+    public Map<Integer, String> resolveDoubleBondPosition(GoslinFragmentsParser.Db_positionContext dbContext, Map<Integer, String> doubleBondPositions) {
+        if (dbContext.db_single_position() != null) {
+            doubleBondPositions.put(
+                    Integer.parseInt(dbContext.db_single_position().db_position_number().getText()),
+                    Optional.ofNullable(dbContext.db_single_position().cistrans()).map((t) -> {
+                        return t.getText();
+                    }).orElse(""));
+        } else {
+            for (GoslinFragmentsParser.Db_positionContext dbSubContext : dbContext.db_position()) {
+                resolveDoubleBondPosition(dbSubContext, doubleBondPositions);
+            }
+        }
+        return doubleBondPositions;
+    }
+
+    /**
+     * db_positions : ROB db_position RCB; db_position : db_single_position |
+     * db_position db_position_separator db_position; db_single_position :
+     * db_position_number | db_position_number cistrans; db_position_number :
+     * number;
+     *
+     * @return
+     */
+    public Map<Integer, String> resolveDoubleBondPositions(GoslinFragmentsParser.Db_positionsContext context) {
+        Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+        if (context.db_position() != null) {
+            return resolveDoubleBondPosition(context.db_position(), doubleBondPositions);
+        } else {
+            throw new ParseTreeVisitorException("Unhandled state in IsomericFattyAcid - double bond positions!");
+        }
     }
 }

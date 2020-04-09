@@ -53,10 +53,10 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
     public LipidAdduct visitLipid(LipidMapsParser.LipidContext ctx) {
         LipidMapsParser.Lipid_ruleContext lipid = ctx.lipid_rule();
         if (lipid.isotope() != null) {
-            throw new ParseTreeVisitorException("Support for isotopes in LipidMaps names not implemented yet!");
+            log.warn("Support for isotopes in LipidMaps names not implemented yet!");
         }
         if (lipid.lipid_mono() != null && lipid.lipid_mono().isoform() != null) {
-            throw new ParseTreeVisitorException("Support for isoforms in LipidMaps names not implemented yet!");
+            log.warn("Support for isoforms in LipidMaps names not implemented yet!");
         }
         Optional<Lipid_pureContext> categoryContext = Optional.ofNullable(lipid.lipid_mono().lipid_pure());
 

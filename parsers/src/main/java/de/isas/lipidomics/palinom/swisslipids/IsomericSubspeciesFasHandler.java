@@ -73,26 +73,12 @@ public class IsomericSubspeciesFasHandler {
             fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));
             if (ctx.fa_core().db() != null) {
                 if (ctx.fa_core().db().db_positions() != null) {
-                    Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                    if (ctx.fa_core().db().db_positions().db_position().db_single_position() != null) {
-                        SwissLipidsParser.Db_single_positionContext dbSingleCtx = ctx.fa_core().db().db_positions().db_position().db_single_position();
-                        doubleBondPositions.put(Integer.parseInt(dbSingleCtx.db_position_number().getText()), dbSingleCtx.cistrans().getText());
-                    } else if (ctx.fa_core().db().db_positions().db_position().db_position() != null) {
-                        for (SwissLipidsParser.Db_positionContext dbCtx : ctx.fa_core().db().db_positions().db_position().db_position()) {
-                            SwissLipidsParser.Db_single_positionContext dbSingleCtx = dbCtx.db_single_position();
-                            if (dbSingleCtx != null) {
-                                doubleBondPositions.put(Integer.parseInt(dbSingleCtx.db_position_number().getText()), dbSingleCtx.cistrans().getText());
-                            }
-                        }
-                    } else {
-                        throw new ParseTreeVisitorException("Unhandled state in IsomericFattyAcid!");
-                    }
-                    fa.doubleBondPositions(doubleBondPositions);
+                    fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(ctx.fa_core().db().db_positions()));
                 } else { // handle cases like (0:0) but with at least one fa with isomeric subspecies level
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
                     if (ctx.fa_core().db().db_count() != null) {
                         int doubleBonds = HandlerUtils.asInt(ctx.fa_core().db().db_count(), 0);
-                        if(doubleBonds>0) {
+                        if (doubleBonds > 0) {
                             return StructuralFattyAcid.structuralFattyAcidBuilder().
                                     lipidFaBondType(lfbt).
                                     name(faName).

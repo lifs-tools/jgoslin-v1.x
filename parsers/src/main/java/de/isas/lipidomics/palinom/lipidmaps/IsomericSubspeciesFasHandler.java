@@ -21,6 +21,7 @@ import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.StructuralFattyAcid;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -82,24 +83,22 @@ public class IsomericSubspeciesFasHandler {
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
+                    fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(ctx.fa_unmod().fa_pure().db().db_positions()));
+                } else {
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
-                    LipidMapsParser.Db_positionContext dbPosCtx = ctx.fa_unmod().fa_pure().db().db_positions().db_position();
-                    if (dbPosCtx.db_single_position() != null) {
-                        Integer dbPosition = asInt(dbPosCtx.db_single_position().db_position_number(), -1);
-                        String cisTrans = dbPosCtx.db_single_position().cistrans().getText();
-                        doubleBondPositions.put(dbPosition, cisTrans);
-                    } else if (dbPosCtx.db_position() != null) {
-                        for (LipidMapsParser.Db_positionContext dbpos : dbPosCtx.db_position()) {
-                            if (dbpos.db_single_position() != null) {
-                                Integer dbPosition = asInt(dbpos.db_single_position().db_position_number(), -1);
-                                String cisTrans = dbpos.db_single_position().cistrans().getText();
-                                doubleBondPositions.put(dbPosition, cisTrans);
-                            }
+                    if (ctx.fa_unmod().fa_pure().db().db_count() != null) {
+                        int doubleBonds = HandlerUtils.asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0);
+                        if (doubleBonds > 0) {
+                            return StructuralFattyAcid.structuralFattyAcidBuilder().
+                                    lipidFaBondType(faBondType).
+                                    name(faName).
+                                    lcb(true).
+                                    nCarbon(HandlerUtils.asInt(ctx.fa_unmod().fa_pure().carbon(), 0)).
+                                    nDoubleBonds(doubleBonds).
+                                    build();
                         }
                     }
                     fa.doubleBondPositions(doubleBondPositions);
-                } else {
-                    fa.doubleBondPositions(Collections.emptyMap());
                 }
             }
             return fa.name(faName).position(position).build();

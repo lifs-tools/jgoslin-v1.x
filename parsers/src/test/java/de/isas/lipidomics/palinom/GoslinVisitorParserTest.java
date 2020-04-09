@@ -392,7 +392,7 @@ public class GoslinVisitorParserTest {
         assertEquals(ref, lipid.getLipidString(LipidLevel.ISOMERIC_SUBSPECIES));
         assertEquals(ref, lipid.getLipidString());
     }
-    
+
     @Test
     public void testPE_Plasmenyl_StructuralSpecies() throws ParsingException {
         String ref = "PE O-16:1p/18:1";
@@ -510,6 +510,20 @@ public class GoslinVisitorParserTest {
         assertEquals(ref, lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
         assertEquals(LipidCategory.GL, lipid.getLipidCategory());
         assertEquals(LipidClass.TAG, lipid.getLipidClass().get());
+    }
+
+    @Test
+    public void testIsomericSubspecies() throws ParsingException {
+        String ref = "TAG 16:0/20:2(11Z,14Z)/22:4(7Z,10Z,13Z,16Z)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("TAG", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(58, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        assertEquals(6, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

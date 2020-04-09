@@ -74,7 +74,7 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
             final MolecularSubspeciesFasHandler msfh = new MolecularSubspeciesFasHandler(faHelper);
             final IsomericSubspeciesFasHandler isfh = new IsomericSubspeciesFasHandler(faHelper);
             final StructuralSubspeciesFasHandler ssfh = new StructuralSubspeciesFasHandler(isfh, faHelper);
-            final IsomericSubspeciesLcbHandler islh = new IsomericSubspeciesLcbHandler(isfh);
+            final IsomericSubspeciesLcbHandler islh = new IsomericSubspeciesLcbHandler(isfh, faHelper);
             final StructuralSubspeciesLcbHandler sslh = new StructuralSubspeciesLcbHandler(ssfh, islh);
             final FattyAcylHandler faHandler = new FattyAcylHandler();
             LipidCategory contextCategory = LipidCategory.UNDEFINED;
