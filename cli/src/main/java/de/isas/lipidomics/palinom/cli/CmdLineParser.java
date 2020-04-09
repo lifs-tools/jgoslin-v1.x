@@ -34,12 +34,11 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -117,6 +116,7 @@ public class CmdLineParser {
         String lipidNameOpt = addLipidNameInputOption(options);
         String lipidFileOpt = addLipidFileInputOption(options);
         String outputToFileOpt = addOutputToFileOption(options);
+        String grammarOpt = addGrammarOption(options);
 
         CommandLine line = parser.parse(options, args);
         if (line.getOptions().length == 0 || line.hasOption(helpOpt)) {
@@ -135,16 +135,16 @@ public class CmdLineParser {
             } else if (line.hasOption(lipidFileOpt)) {
                 lipidNames = Files.lines(new File(lipidFileOpt).toPath());
             }
-            if(toFile) {
+            if (toFile) {
                 log.info("Saving output to 'goslin-out.tsv'.");
                 boolean successful = writeToFile(new File("goslin-out.tsv"), parseNames(lipidNames));
-                if(!successful) {
+                if (!successful) {
                     System.exit(1);
                 }
             } else {
                 log.info("Echoing output to stdout.");
                 boolean successful = writeToStdOut(parseNames(lipidNames));
-                if(!successful) {
+                if (!successful) {
                     System.exit(1);
                 }
             }
@@ -161,7 +161,7 @@ public class CmdLineParser {
         private String lipidName;
 
         private Grammar grammar;
-        
+
         private LipidLevel level;
 
         private List<String> messages = Collections.emptyList();
@@ -181,21 +181,23 @@ public class CmdLineParser {
     }
 
     protected static boolean writeToStdOut(List<Pair<String, List<ValidationResult>>> results) {
-        
-        try(StringWriter sw = new StringWriter()) {
-            writeToWriter(new BufferedWriter(sw), results);
+
+        try (StringWriter sw = new StringWriter()) {
+            try (BufferedWriter bw = new BufferedWriter(sw)) {
+                writeToWriter(bw, results);
+            }
             sw.flush();
             sw.close();
-            System.out.println(sw.toString());
+            log.info(sw.toString());
             return true;
         } catch (IOException ex) {
             log.error("Caught exception while trying to write validation results string!", ex);
             return false;
         }
     }
-    
+
     protected static boolean writeToFile(File f, List<Pair<String, List<ValidationResult>>> results) {
-        
+
         try (BufferedWriter bw = Files.newBufferedWriter(f.toPath())) {
             writeToWriter(bw, results);
             return true;
@@ -204,7 +206,7 @@ public class CmdLineParser {
             return false;
         }
     }
-    
+
     protected static void writeToWriter(BufferedWriter bw, List<Pair<String, List<ValidationResult>>> results) {
         String header = "ORIGINAL_NAME\tNORMALIZED_NAME\tGRAMMAR\tLEVEL\tLM_CATEGORY\tLM_CLASS\tFAS\tMESSAGES";
         try {
@@ -252,6 +254,7 @@ public class CmdLineParser {
             goslinResult.setLipidName(lipidName);
             goslinResult.setLipidAdduct(la);
             goslinResult.setGrammar(ValidationResult.Grammar.GOSLIN);
+            goslinResult.setLevel(la.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
             goslinResult.setMessages(toStringMessages(listener));
             goslinResult.setLipidMapsCategory(la.getLipid().getLipidCategory().name());
             goslinResult.setLipidMapsClass(getLipidMapsClassAbbreviation(la));
@@ -359,10 +362,17 @@ public class CmdLineParser {
         options.addOption("h", helpOpt, false, "Print help message.");
         return helpOpt;
     }
-    
+
     protected static String addOutputToFileOption(Options options) {
         String outputToFileOpt = "outputFile";
         options.addOption("o", outputToFileOpt, false, "Write output to file 'goslin-out.tsv' instead of to std out.");
         return outputToFileOpt;
     }
+
+    protected static String addGrammarOption(Options options) {
+        String grammarOpt = "grammar";
+        options.addOption("g", grammarOpt, true, "Use the provided grammar explicitly instead of all grammars. Options are: " + Arrays.toString(ValidationResult.Grammar.values()));
+        return grammarOpt;
+    }
+
 }

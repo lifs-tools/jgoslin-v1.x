@@ -6,7 +6,7 @@
         <artifactId>jgoslin</artifactId>
         <version>0.9.9.3-SNAPSHOT</version>
     </parent>
-    <artifactId>jgsolin-cli</artifactId>
+    <artifactId>jgoslin-cli</artifactId>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

@@ -66,7 +66,6 @@ public class MolecularSubspeciesFasHandler {
             }
             fa.lipidFaBondType(lfbt);
             return fa.name(faName).build();
-
         } else {
             throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }
