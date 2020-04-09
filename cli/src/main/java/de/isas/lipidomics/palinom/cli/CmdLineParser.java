@@ -24,9 +24,13 @@ import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.palinom.SyntaxErrorListener;
+import de.isas.lipidomics.palinom.VisitorParser;
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
+import de.isas.lipidomics.palinom.goslinfragments.GoslinFragmentsVisitorParser;
 import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
+import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -135,15 +139,25 @@ public class CmdLineParser {
             } else if (line.hasOption(lipidFileOpt)) {
                 lipidNames = Files.lines(new File(lipidFileOpt).toPath());
             }
+            List<Pair<String, List<ValidationResult>>> results = Collections.emptyList();
+            if (line.hasOption(grammarOpt)) {
+                results = parseNamesWith(lipidNames, ValidationResult.Grammar.valueOf(line.getOptionValue(grammarOpt)));
+            } else {
+                results = parseNames(lipidNames);
+            }
+            if(results.isEmpty()) {
+                log.info("No results generated. Please check input file or lipid names passed on the cli!");
+                System.exit(1);
+            }
             if (toFile) {
                 log.info("Saving output to 'goslin-out.tsv'.");
-                boolean successful = writeToFile(new File("goslin-out.tsv"), parseNames(lipidNames));
+                boolean successful = writeToFile(new File("goslin-out.tsv"), results);
                 if (!successful) {
                     System.exit(1);
                 }
             } else {
                 log.info("Echoing output to stdout.");
-                boolean successful = writeToStdOut(parseNames(lipidNames));
+                boolean successful = writeToStdOut(results);
                 if (!successful) {
                     System.exit(1);
                 }
@@ -244,62 +258,70 @@ public class CmdLineParser {
         }).collect(Collectors.toList());
     }
 
-    protected static Pair<String, List<ValidationResult>> parseName(String lipidName) {
-        List<ValidationResult> results = new ArrayList<>();
-        GoslinVisitorParser parser = new GoslinVisitorParser();
+    protected static List<Pair<String, List<ValidationResult>>> parseNamesWith(Stream<String> lipidNames, ValidationResult.Grammar grammar) {
+        return lipidNames.map((t) -> {
+            return parseNameWith(t, grammar);
+        }).collect(Collectors.toList()).stream().map((t) -> {
+            return Pair.of(t.getKey(), Arrays.asList(t.getValue()));
+        }).collect(Collectors.toList());
+    }
+
+    protected static Pair<String, ValidationResult> parseNameWith(String lipidName, ValidationResult.Grammar grammar) {
+        VisitorParser parser;
         SyntaxErrorListener listener = new SyntaxErrorListener();
-        ValidationResult goslinResult = new ValidationResult();
+        ValidationResult validationResult = new ValidationResult();
+        switch (grammar) {
+            case GOSLIN:
+                parser = new GoslinVisitorParser();
+                break;
+            case GOSLIN_FRAGMENTS:
+                parser = new GoslinFragmentsVisitorParser();
+                break;
+            case LIPIDMAPS:
+                parser = new LipidMapsVisitorParser();
+                break;
+            case SWISSLIPIDS:
+                parser = new SwissLipidsVisitorParser();
+                break;
+            default:
+                throw new ConstraintViolationException("Unsupported grammar: " + grammar);
+        }
         try {
             LipidAdduct la = parser.parse(lipidName, listener);
-            goslinResult.setLipidName(lipidName);
-            goslinResult.setLipidAdduct(la);
-            goslinResult.setGrammar(ValidationResult.Grammar.GOSLIN);
-            goslinResult.setLevel(la.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
-            goslinResult.setMessages(toStringMessages(listener));
-            goslinResult.setLipidMapsCategory(la.getLipid().getLipidCategory().name());
-            goslinResult.setLipidMapsClass(getLipidMapsClassAbbreviation(la));
-            goslinResult.setLipidSpeciesInfo(la.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE));
+            validationResult.setLipidName(lipidName);
+            validationResult.setLipidAdduct(la);
+            validationResult.setGrammar(grammar);
+            validationResult.setLevel(la.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+            validationResult.setMessages(toStringMessages(listener));
+            validationResult.setLipidMapsCategory(la.getLipid().getLipidCategory().name());
+            validationResult.setLipidMapsClass(getLipidMapsClassAbbreviation(la));
+            validationResult.setLipidSpeciesInfo(la.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE));
             try {
                 String normalizedName = la.getLipid().getLipidString();
-                goslinResult.setGoslinName(normalizedName);
+                validationResult.setGoslinName(normalizedName);
             } catch (RuntimeException re) {
                 log.warn("Parsing error for {}!", lipidName);
             }
-            extractFas(la, goslinResult);
+            extractFas(la, validationResult);
         } catch (ParsingException ex) {
-            goslinResult.setLipidName(lipidName);
-            goslinResult.setMessages(toStringMessages(listener));
-            log.warn("Caught exception while parsing " + lipidName + " with Goslin grammar: ", ex);
+            validationResult.setLipidName(lipidName);
+            validationResult.setMessages(toStringMessages(listener));
+            log.warn("Caught exception while parsing " + lipidName + " with " + grammar + " grammar: ", ex);
 
         }
-        results.add(goslinResult);
-        SyntaxErrorListener lmListener = new SyntaxErrorListener();
-        ValidationResult lmResult = new ValidationResult();
-        try {
-            LipidMapsVisitorParser lmParser = new LipidMapsVisitorParser();
-            LipidAdduct lma = lmParser.parse(lipidName, lmListener);
-            lmResult.setLipidName(lipidName);
-            lmResult.setLipidAdduct(lma);
-            lmResult.setGrammar(ValidationResult.Grammar.LIPIDMAPS);
-            lmResult.setLevel(lma.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
-            lmResult.setMessages(toStringMessages(lmListener));
-            lmResult.setLipidMapsCategory(lma.getLipid().getLipidCategory().name());
-            lmResult.setLipidMapsClass(getLipidMapsClassAbbreviation(lma));
-            lmResult.setLipidSpeciesInfo(lma.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE));
-            try {
-                String normalizedName = lma.getLipid().getLipidString();
-                lmResult.setGoslinName(normalizedName);
-            } catch (RuntimeException re) {
-                log.warn("Parsing error for {}!", lipidName);
-            }
-            extractFas(lma, lmResult);
-        } catch (ParsingException ex1) {
-            log.warn("Caught exception while parsing " + lipidName + " with LipidMaps grammar: ", ex1);
-//            ValidationResult result = new ValidationResult();
-            lmResult.setLipidName(lipidName);
-            lmResult.setMessages(toStringMessages(lmListener));
-        }
-        results.add(lmResult);
+        return Pair.of(lipidName, validationResult);
+    }
+
+    protected static Pair<String, List<ValidationResult>> parseName(String lipidName) {
+        List<ValidationResult> results = new ArrayList<>();
+        Pair<String, ValidationResult> goslinResult = parseNameWith(lipidName, ValidationResult.Grammar.GOSLIN);
+        results.add(goslinResult.getValue());
+        Pair<String, ValidationResult> goslinFragmentsResult = parseNameWith(lipidName, ValidationResult.Grammar.GOSLIN_FRAGMENTS);
+        results.add(goslinFragmentsResult.getValue());
+        Pair<String, ValidationResult> lipidMapsResult = parseNameWith(lipidName, ValidationResult.Grammar.LIPIDMAPS);
+        results.add(lipidMapsResult.getValue());
+        Pair<String, ValidationResult> swissLipidsResult = parseNameWith(lipidName, ValidationResult.Grammar.SWISSLIPIDS);
+        results.add(swissLipidsResult.getValue());
         return Pair.of(lipidName, results);
     }
 
