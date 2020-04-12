@@ -45,7 +45,8 @@ public class LipidMapsCompleteIT {
             String lipidMapsSubClass
     ) throws ParsingException, IOException {
         if (abbreviation == null) {
-            fail("Entry " + lipidMapsId + " had no abbreviation!");
+            log.info("Entry " + lipidMapsId + " had no abbreviation! Skipping!");
+            return;
         }
         log.info("Parsing current lipid maps identifier: {}", abbreviation);
 
