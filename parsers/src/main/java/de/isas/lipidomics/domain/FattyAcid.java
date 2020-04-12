@@ -178,6 +178,13 @@ public class FattyAcid {
                 append(dbPos.toString()).
                 append(nHydroxy > 0 ? ";" + nHydroxy : "").
                 append(getLipidFaBondType().suffix());
+        if (!getModifications().isEmpty()) {
+            sb.append("(");
+            sb.append(getModifications().stream().map((t) -> {
+                return (t.getLeft() == -1 ? "" : t.getLeft()) + "" + t.getRight();
+            }).collect(Collectors.joining(",")));
+            sb.append(")");
+        }
         return sb.toString();
     }
 

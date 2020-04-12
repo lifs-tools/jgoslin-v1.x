@@ -13,7 +13,6 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,7 +46,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(15, lipidAdduct.getLipid().getFa().get("FA1").getNCarbon());
         assertEquals(2, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
     }
-    
+
     @Test
     public void testPK_Isomeric() throws ParsingException {
         String ref = "PHENOL(15:2(8Z,11Z))";
@@ -60,7 +59,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(15, lipidAdduct.getLipid().getFa().get("FA1").getNCarbon());
         assertEquals(2, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
     }
-    
+
     @Test
     public void testPE_Structural() throws ParsingException {
         String ref = "PE(18:1/18:2(11Z,13E))";
@@ -431,7 +430,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
     }
-    
+
     @Test
     public void testIsomericSubspecies() throws ParsingException {
         String ref = "TG(16:0/20:2(11Z,14Z)/22:4(7Z,10Z,13Z,16Z))[iso6]";
@@ -444,6 +443,41 @@ public class LipidMapsVisitorParserTest {
         assertEquals(58, lipidAdduct.getLipid().getInfo().get().getNCarbon());
         assertEquals(6, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+//        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA3").getModifications().size());
+    }
+
+    @Test
+    public void testModification() throws ParsingException {
+        String ref = "FA(6:0(OH,Ke))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("FA", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
+        // this is a species level fatty acyl
+        assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(6, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+        assertEquals(2, lipidAdduct.getLipid().getInfo().get().getModifications().size());
+        assertEquals("FA 6:0(OH,Ke)", lipidAdduct.getLipid().getLipidString());
+    }
+    
+    @Test
+    public void testPip2IsomericSubspeciesLevel() throws ParsingException {
+        String ref = "PIP2[3',5'](16:0/18:2(9Z,12Z))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("PIP2", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidCategory.GP, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(34, lipidAdduct.getLipid().getInfo().get().getNCarbon());
+        assertEquals(2, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA2").getDoubleBondPositions().size());
+        assertEquals("PIP2 16:0/18:2(9Z,12Z)", lipidAdduct.getLipid().getLipidString());
+        assertEquals("PIP2 34:2", lipidAdduct.getLipid().getLipidString(LipidLevel.SPECIES));
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

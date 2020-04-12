@@ -15,7 +15,6 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-//import de.isas.lipidomics.palinom.lipidmaps.*;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;

@@ -15,7 +15,6 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
@@ -78,6 +77,11 @@ public class IsomericSubspeciesLcbHandler {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidLcbBondType(ctx);
         if (ctx.lcb_fa() != null) {
+            if (ctx.lcb_fa().lcb_fa_mod() != null) {
+                if (ctx.lcb_fa().lcb_fa_mod().modification() != null) {
+                    fa.modifications(faHelper.resolveModifications(ctx.lcb_fa().lcb_fa_mod().modification()));
+                }
+            }
             if (ctx.lcb_fa().lcb_fa_unmod() != null) {
                 LipidMapsParser.Lcb_fa_unmodContext factx = ctx.lcb_fa().lcb_fa_unmod();
                 fa.nCarbon(HandlerUtils.asInt(factx.carbon(), 0));
@@ -107,8 +111,6 @@ public class IsomericSubspeciesLcbHandler {
             } else {
                 throw new ParseTreeVisitorException("Uninitialized FaContext!");
             }
-        } else if (ctx.lcb_fa().lcb_fa_mod() != null) {
-            throw new ParseTreeVisitorException("Currently unsupported LCB Fa modified context!");
         } else {
             throw new ParseTreeVisitorException("Uninitialized LCB FaContext!");
         }

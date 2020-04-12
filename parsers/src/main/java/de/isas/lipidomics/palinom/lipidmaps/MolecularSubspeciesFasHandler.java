@@ -37,22 +37,23 @@ import java.util.Optional;
 public class MolecularSubspeciesFasHandler {
 
     private final FattyAcylHelper faHelper;
-    
+
     public MolecularSubspeciesFasHandler(FattyAcylHelper faHelper) {
         this.faHelper = faHelper;
     }
-    
+
     public LipidSpecies handlePureFaContext(LipidMapsParser.Pure_faContext ctx) {
-        
+
         if (ctx.fa_no_hg() != null && ctx.fa_no_hg().fa() != null) {
             FattyAcid fa = buildMolecularFa(ctx.fa_no_hg().fa(), "FA1");
-            LipidSpeciesInfo lsi = new LipidSpeciesInfo(
-                    LipidLevel.SPECIES,
-                    fa.getNCarbon(),
-                    fa.getNHydroxy(),
-                    fa.getNDoubleBonds(),
-                    LipidFaBondType.UNDEFINED
-            );
+            LipidSpeciesInfo.LipidSpeciesInfoBuilder builder = LipidSpeciesInfo.lipidSpeciesInfoBuilder();
+            LipidSpeciesInfo lsi = builder.level(LipidLevel.SPECIES).
+                    nCarbon(fa.getNCarbon()).
+                    nHydroxy(fa.getNHydroxy()).
+                    nDoubleBonds(fa.getNDoubleBonds()).
+                    lipidFaBondType(LipidFaBondType.UNDEFINED).
+                    modifications(fa.getModifications()).
+                build();
             LipidSpecies ls = new LipidSpecies(
                     ctx.hg_fa().getText(),
                     LipidCategory.FA,
@@ -64,13 +65,14 @@ public class MolecularSubspeciesFasHandler {
             LipidMapsParser.Pure_fa_speciesContext speciesContext = ctx.pure_fa_species();
             if (speciesContext != null) {
                 FattyAcid fa = buildMolecularFa(speciesContext.fa(), "FA1");
-                LipidSpeciesInfo lsi = new LipidSpeciesInfo(
-                        LipidLevel.SPECIES,
-                        fa.getNCarbon(),
-                        fa.getNHydroxy(),
-                        fa.getNDoubleBonds(),
-                        LipidFaBondType.UNDEFINED
-                );
+                LipidSpeciesInfo.LipidSpeciesInfoBuilder builder = LipidSpeciesInfo.lipidSpeciesInfoBuilder();
+                LipidSpeciesInfo lsi = builder.level(LipidLevel.SPECIES).
+                        nCarbon(fa.getNCarbon()).
+                        nHydroxy(fa.getNHydroxy()).
+                        nDoubleBonds(fa.getNDoubleBonds()).
+                        lipidFaBondType(LipidFaBondType.UNDEFINED).
+                        modifications(fa.getModifications()).
+                    build();
                 LipidSpecies ls = new LipidSpecies(
                         ctx.hg_fa().getText(),
                         LipidCategory.FA,
@@ -85,7 +87,7 @@ public class MolecularSubspeciesFasHandler {
             throw new ParseTreeVisitorException("Unhandled pure FA: " + ctx.getText());
         }
     }
-    
+
     public Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<LipidMapsParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         for (int i = 0; i < faContexts.size(); i++) {
@@ -96,9 +98,14 @@ public class MolecularSubspeciesFasHandler {
         fas.toArray(arrs);
         return Optional.of(new LipidMolecularSubspecies(headGroup, arrs));
     }
-    
+
     public FattyAcid buildMolecularFa(LipidMapsParser.FaContext ctx, String faName) {
         FattyAcid.MolecularFattyAcidBuilder fa = FattyAcid.molecularFattyAcidBuilder();
+        if (ctx.fa_mod() != null) {
+            if (ctx.fa_mod().modification() != null) {
+                fa.modifications(faHelper.resolveModifications(ctx.fa_mod().modification()));
+            }
+        }
         if (ctx.fa_unmod() != null) {
             LipidFaBondType faBondType = faHelper.getLipidFaBondType(ctx);
             int plasmenylEtherDbBondCorrection = 0;
@@ -113,8 +120,6 @@ public class MolecularSubspeciesFasHandler {
             }
             return fa.name(faName).build();
 
-        } else if (ctx.fa_mod() != null) {
-            throw new RuntimeException("Support for modified FA handling not implemented!");
         } else {
             throw new ParseTreeVisitorException("No FaContext!");
         }

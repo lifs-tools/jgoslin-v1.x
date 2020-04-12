@@ -16,12 +16,17 @@
 package de.isas.lipidomics.palinom.lipidmaps;
 
 import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.domain.ModificationsList;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.LipidMapsParser;
-import de.isas.lipidomics.palinom.SwissLipidsParser;
+import de.isas.lipidomics.palinom.LipidMapsParser.ModificationContext;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  *
@@ -100,6 +105,38 @@ public class FattyAcylHelper {
             return resolveDoubleBondPosition(context.db_position(), doubleBondPositions);
         } else {
             throw new ParseTreeVisitorException("Unhandled state in IsomericFattyAcid - double bond positions!");
+        }
+    }
+
+    public ModificationsList resolveModification(ModificationContext context, ModificationsList mods) {
+        Integer contextNumber = -1;
+        String modText = "";
+        if (context.number() != null) {
+            contextNumber = HandlerUtils.asInt(context.number(), -1);
+        }
+        if (context.mod_text() != null) {
+            modText = context.mod_text().getText();
+            mods.add(Pair.of(contextNumber, modText));
+        }
+        if (context.modification() != null) {
+            return resolveModificationList(context.modification(), mods);
+        }
+        return mods;
+    }
+
+    public ModificationsList resolveModificationList(List<ModificationContext> modifications, ModificationsList mods) {
+        for (ModificationContext context : modifications) {
+            resolveModification(context, mods);
+        }
+        return mods;
+    }
+
+    public ModificationsList resolveModifications(LipidMapsParser.ModificationContext modifications) {
+        if (modifications != null) {
+            ModificationsList mods = new ModificationsList();
+            return resolveModificationList(Arrays.asList(modifications), mods);
+        } else {
+            throw new ParseTreeVisitorException("Unhandled state in FattyAcid Modifications!");
         }
     }
 }

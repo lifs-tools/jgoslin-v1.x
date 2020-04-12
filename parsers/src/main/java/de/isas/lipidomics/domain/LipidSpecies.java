@@ -7,6 +7,7 @@ import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -123,30 +124,6 @@ public class LipidSpecies {
                 });
     }
 
-//        
-//    public LipidFaBondType inferLipidFaBondType(String headGroup, FattyAcid...fa) {
-//        LipidFaBondType lipidFaBondType = null;
-//        for(FattyAcid fas:fa) {
-//            if (lipidFaBondType == null) {
-//                        lipidFaBondType = fas.getLipidFaBondType();
-//            } else {
-//                if(lipidFaBondType == LipidFaBondType.ETHER_PLASMANYL || lipidFaBondType == LipidFaBondType.ETHER_PLASMENYL || lipidFaBondType == LipidFaBondType.ETHER_UNSPECIFIED) {
-//                    if (fas.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED
-//                            || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL
-//                            || fas.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL) {
-//                        throw new ConstraintViolationException(
-//                                "Only one FA can define an ether bond to the head group! Tried to add " + fas.getLipidFaBondType() + " over existing " + lipidFaBondType + " for " + headGroup + " and FA: " + fas);
-//                    }
-//                } else if(lipidFaBondType == LipidFaBondType.UNDEFINED && fas.getLipidFaBondType()!=LipidFaBondType.UNDEFINED) {
-//                    lipidFaBondType = fas.getLipidFaBondType();
-//                } 
-//            }
-//        }
-//        if(lipidFaBondType == null) {
-//            lipidFaBondType = LipidFaBondType.UNDEFINED;
-//        }
-//        return lipidFaBondType;
-//    }
     /**
      * Returns a lipid string representation for the {@link LipidLevel}, e.g.
      * Category, Species, etc, as returned by {@link #getInfo()}.
@@ -190,6 +167,13 @@ public class LipidSpecies {
                     int nHydroxy = info.get().getNHydroxy();
                     lipidString.append(nHydroxy > 0 ? ";" + nHydroxy : "");
                     lipidString.append(info.get().getLipidFaBondType().suffix());
+                    if (!info.get().getModifications().isEmpty()) {
+                        lipidString.append("(");
+                        lipidString.append(info.get().getModifications().stream().map((t) -> {
+                            return (t.getLeft() == -1 ? "" : t.getLeft()) + "" + t.getRight();
+                        }).collect(Collectors.joining(",")));
+                        lipidString.append(")");
+                    }
                 }
                 return lipidString.toString();
             case UNDEFINED:

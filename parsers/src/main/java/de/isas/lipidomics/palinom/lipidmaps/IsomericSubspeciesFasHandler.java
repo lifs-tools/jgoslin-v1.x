@@ -15,7 +15,6 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
@@ -26,7 +25,6 @@ import de.isas.lipidomics.palinom.HandlerUtils;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -71,10 +69,9 @@ public class IsomericSubspeciesFasHandler {
 
     public FattyAcid buildIsomericFa(LipidMapsParser.FaContext ctx, String faName, int position) {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
-        String modifications = "";
         if (ctx.fa_mod() != null) {
             if (ctx.fa_mod().modification() != null) {
-                modifications = ctx.fa_mod().modification().getText();
+                fa.modifications(faHelper.resolveModifications(ctx.fa_mod().modification()));
             }
         }
         if (ctx.fa_unmod() != null) {

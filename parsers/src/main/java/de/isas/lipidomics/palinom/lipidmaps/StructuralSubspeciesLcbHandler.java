@@ -15,7 +15,6 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
@@ -81,11 +80,9 @@ public class StructuralSubspeciesLcbHandler {
 
     public FattyAcid buildStructuralLcb(String headGroup, LipidMapsParser.LcbContext ctx, String faName, int position) {
         FattyAcid.StructuralFattyAcidBuilder fa = FattyAcid.structuralFattyAcidBuilder();
-        // FIXME handle these once they are defined
-        String modifications = "";
         if (ctx.lcb_fa().lcb_fa_mod() != null) {
             if (ctx.lcb_fa().lcb_fa_mod().modification() != null) {
-                modifications = ctx.lcb_fa().lcb_fa_mod().modification().getText();
+                fa.modifications(faHelper.resolveModifications(ctx.lcb_fa().lcb_fa_mod().modification()));
             }
         }
         if (ctx.lcb_fa().lcb_fa_unmod() != null) {

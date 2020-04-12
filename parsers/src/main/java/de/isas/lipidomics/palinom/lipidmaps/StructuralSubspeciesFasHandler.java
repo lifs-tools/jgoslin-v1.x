@@ -15,7 +15,6 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
@@ -69,27 +68,19 @@ public class StructuralSubspeciesFasHandler {
 
     public FattyAcid buildStructuralFa(LipidMapsParser.FaContext ctx, String faName, int position) {
         FattyAcid.StructuralFattyAcidBuilder fa = FattyAcid.structuralFattyAcidBuilder();
-        String modifications = "";
         if (ctx.fa_mod() != null) {
             if (ctx.fa_mod().modification() != null) {
-                modifications = ctx.fa_mod().modification().getText();
+                fa.modifications(faHelper.resolveModifications(ctx.fa_mod().modification()));
             }
         }
         if (ctx.fa_unmod() != null) {
             LipidFaBondType faBondType = faHelper.getLipidFaBondType(ctx);
-            int plasmenylEtherDbBondCorrection = 0;
-//            switch (faBondType) {
-//                case ETHER_PLASMENYL:
-//                    plasmenylEtherDbBondCorrection = 1;
-//                default:
-//                    plasmenylEtherDbBondCorrection = 0;
-//            }
             fa.lipidFaBondType(faBondType);
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 int nDoubleBonds = asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0);
-                fa.nDoubleBonds(plasmenylEtherDbBondCorrection + nDoubleBonds);
+                fa.nDoubleBonds(nDoubleBonds);
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null || nDoubleBonds == 0) {
                     return isfh.buildIsomericFa(ctx, faName, position);
                 }
