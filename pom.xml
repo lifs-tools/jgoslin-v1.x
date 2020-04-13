@@ -194,19 +194,9 @@
                     <version>3.0.0-M4</version>
                     <configuration>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        <!--<parallel>classes</parallel>-->
-                        <!--<argLine>-Xmx2048m -XX:MaxPermSize=256m</argLine>-->
-                        <!--<threadCount>2</threadCount>-->
                         <trimStackTrace>false</trimStackTrace>
                         <workingDirectory>${project.build.directory}/surefire-files</workingDirectory>
                     </configuration>
-                    <!--                    <dependencies>
-                        <dependency>
-                            <groupId>org.junit.platform</groupId>
-                            <artifactId>junit-platform-surefire-provider</artifactId>
-                            <version>1.3.2</version>
-                        </dependency>
-                    </dependencies>-->
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
@@ -215,14 +205,9 @@
                         <execution>
                             <configuration>
                                 <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                                <!--<parallel>classes</parallel>-->
-                                <!--<argLine>-Xmx2048m -XX:MaxPermSize=256m</argLine>-->
-                                <!--<threadCount>2</threadCount>-->
-                                <trimStackTrace>false</trimStackTrace>
+                                <argLine>-Xmx2048m -XX:MaxPermSize=256m</argLine>
+                                <trimStackTrace>true</trimStackTrace>
                                 <workingDirectory>${project.build.directory}/failsafe-files</workingDirectory>
-                                <!--                                <includes>
-                                    <include>**/*IT</include>
-                                </includes>-->
                             </configuration>
                             <goals>
                                 <goal>integration-test</goal>

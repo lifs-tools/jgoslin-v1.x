@@ -31,7 +31,7 @@ import org.junit.jupiter.params.provider.CsvFileSource;
  * @author nils.hoffmann
  */
 @Slf4j
-public class LipidMapsCompleteIT {
+public class LipidMapsComprehensiveIT {
 
     @ParameterizedTest(name = "{index} ==> ''{0}'' can be parsed with the lipidMaps grammar")
     @CsvFileSource(resources = "/de/isas/lipidomics/palinom/lipidmaps-names-Feb-10-2020.tsv", numLinesToSkip = 1, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")

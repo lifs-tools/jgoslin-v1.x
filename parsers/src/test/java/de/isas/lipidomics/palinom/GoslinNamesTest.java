@@ -30,37 +30,37 @@ import org.junit.jupiter.params.provider.CsvFileSource;
  * @author nils.hoffmann
  */
 @Slf4j
-public class LipidMapsNamesTest {
+public class GoslinNamesTest {
 
     @ParameterizedTest
-    @CsvFileSource(resources = "/de/isas/lipidomics/palinom/wenk-lm-lipids.txt", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
-    public void isValidLipidMapsNameForSingaporeanStudy(String lipidMapsName) throws ParsingException {
+    @CsvFileSource(resources = "/de/isas/lipidomics/palinom/testfiles/goslin-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
+    public void isValidGoslinName(String lipidMapsName) throws ParsingException {
         CharStream charStream = CharStreams.fromString(lipidMapsName);
-        LipidMapsLexer lexer = new LipidMapsLexer(charStream);
+        GoslinLexer lexer = new GoslinLexer(charStream);
         TokenStream tokens = new CommonTokenStream(lexer);
-        log.info("Parsing lipid maps identifier: {}", lipidMapsName);
-        LipidMapsParser parser = new LipidMapsParser(tokens);
+        log.info("Parsing Goslin identifier: {}", lipidMapsName);
+        GoslinParser parser = new GoslinParser(tokens);
         SyntaxErrorListener listener = new SyntaxErrorListener();
         parser.addErrorListener(listener);
         parser.setBuildParseTree(true);
-        LipidMapsParser.LipidContext context = parser.lipid();
+        GoslinParser.LipidContext context = parser.lipid();
         if (parser.getNumberOfSyntaxErrors() > 0) {
             throw new ParsingException("Parsing of " + lipidMapsName + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
         }
     }
     
     @ParameterizedTest
-    @CsvFileSource(resources = "/de/isas/lipidomics/palinom/testfiles/lipid-maps-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
-    public void isValidLipidMapsNameForLipidMapsTest(String lipidMapsName) throws ParsingException {
+    @CsvFileSource(resources = "/de/isas/lipidomics/palinom/testfiles/goslin-short.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
+    public void isValidShortGoslinName(String lipidMapsName) throws ParsingException {
         CharStream charStream = CharStreams.fromString(lipidMapsName);
-        LipidMapsLexer lexer = new LipidMapsLexer(charStream);
+        GoslinLexer lexer = new GoslinLexer(charStream);
         TokenStream tokens = new CommonTokenStream(lexer);
-        log.info("Parsing lipid maps identifier: {}", lipidMapsName);
-        LipidMapsParser parser = new LipidMapsParser(tokens);
+        log.info("Parsing Goslin identifier: {}", lipidMapsName);
+        GoslinParser parser = new GoslinParser(tokens);
         SyntaxErrorListener listener = new SyntaxErrorListener();
         parser.addErrorListener(listener);
         parser.setBuildParseTree(true);
-        LipidMapsParser.LipidContext context = parser.lipid();
+        GoslinParser.LipidContext context = parser.lipid();
         if (parser.getNumberOfSyntaxErrors() > 0) {
             throw new ParsingException("Parsing of " + lipidMapsName + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
         }
