@@ -29,6 +29,7 @@ import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
 import de.isas.lipidomics.palinom.goslinfragments.GoslinFragmentsVisitorParser;
+import de.isas.lipidomics.palinom.hmdb.HmdbVisitorParser;
 import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
 import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
 import java.io.BufferedWriter;
@@ -169,7 +170,7 @@ public class CmdLineParser {
     private static class ValidationResult {
 
         public static enum Grammar {
-            GOSLIN, GOSLIN_FRAGMENTS, LIPIDMAPS, SWISSLIPIDS
+            GOSLIN, GOSLIN_FRAGMENTS, LIPIDMAPS, SWISSLIPIDS, HMDB
         };
 
         private String lipidName;
@@ -283,6 +284,9 @@ public class CmdLineParser {
             case SWISSLIPIDS:
                 parser = new SwissLipidsVisitorParser();
                 break;
+            case HMDB:
+                parser = new HmdbVisitorParser();
+                break;
             default:
                 throw new ConstraintViolationException("Unsupported grammar: " + grammar);
         }
@@ -322,25 +326,13 @@ public class CmdLineParser {
         results.add(lipidMapsResult.getValue());
         Pair<String, ValidationResult> swissLipidsResult = parseNameWith(lipidName, ValidationResult.Grammar.SWISSLIPIDS);
         results.add(swissLipidsResult.getValue());
+        Pair<String, ValidationResult> hmdbResult = parseNameWith(lipidName, ValidationResult.Grammar.HMDB);
+        results.add(hmdbResult.getValue());
         return Pair.of(lipidName, results);
     }
 
     private static void extractFas(LipidAdduct la, ValidationResult result) {
-        switch (la.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel()) {
-            case MOLECULAR_SUBSPECIES:
-                LipidMolecularSubspecies lms = (LipidMolecularSubspecies) la.getLipid();
-                result.setFattyAcids(lms.getFa());
-                break;
-            case STRUCTURAL_SUBSPECIES:
-                LipidStructuralSubspecies lss = (LipidStructuralSubspecies) la.getLipid();
-                result.setFattyAcids(lss.getFa());
-                break;
-            case ISOMERIC_SUBSPECIES:
-                LipidIsomericSubspecies lis = (LipidIsomericSubspecies) la.getLipid();
-                result.setFattyAcids(lis.getFa());
-                break;
-            default:
-        }
+        result.setFattyAcids(la.getLipid().getFa());
     }
 
     private static List<String> toStringMessages(SyntaxErrorListener listener) {
