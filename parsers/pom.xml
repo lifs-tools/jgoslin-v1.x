@@ -28,7 +28,7 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <executions>
-<!--                    <execution>
+                    <execution>
                         <id>add-db-resource</id>
                         <phase>generate-sources</phase>
                         <goals>
@@ -39,14 +39,14 @@
                                 <resource>
                                     <directory>src/main/antlr4/de/isas/lipidomics/palinom</directory>
                                     <includes>
-                                        <include>*.tsv</include>
-                                        <include>*.csv</include>
+                                        <!--<include>*.tsv</include>-->
+                                        <include>lipid-list.csv</include>
                                         <include>**/*.g4</include>
                                     </includes>
                                 </resource>
                             </resources>
                         </configuration>
-                    </execution> -->
+                    </execution> 
                     <execution>
                         <id>add-test-resource</id>
                         <phase>generate-test-sources</phase>
