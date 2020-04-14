@@ -4,10 +4,13 @@
     <parent>
         <groupId>de.isas.lipidomics</groupId>
         <artifactId>jgoslin</artifactId>
-        <version>0.9.9.5</version>
+        <version>0.9.9.6</version>
     </parent>
     <artifactId>jgoslin-cli</artifactId>
     <packaging>jar</packaging>
+    <properties>
+        <assembly.dir>jgoslin-cli</assembly.dir>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
