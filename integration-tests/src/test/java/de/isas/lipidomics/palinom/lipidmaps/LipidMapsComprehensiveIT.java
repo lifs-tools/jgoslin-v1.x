@@ -17,7 +17,6 @@ package de.isas.lipidomics.palinom.lipidmaps;
 
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,7 @@ public class LipidMapsComprehensiveIT {
 
     @ParameterizedTest(name = "{index} ==> ''{0}'' can be parsed with the lipidMaps grammar")
     @CsvFileSource(resources = "/de/isas/lipidomics/palinom/lipidmaps-names-Feb-10-2020.tsv", numLinesToSkip = 1, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
-    public void isValidLipidMapsNameForCurrentLipidMapsForVisitorParser(
+    public void isValidLipidMapsName(
             String lipidMapsId,
             String lipidMapsName,
             String systematicName,

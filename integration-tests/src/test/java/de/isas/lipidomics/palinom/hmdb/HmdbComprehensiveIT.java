@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom.swisslipids;
+package de.isas.lipidomics.palinom.hmdb;
 
+import de.isas.lipidomics.palinom.swisslipids.*;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -32,35 +33,27 @@ import org.junit.jupiter.params.provider.CsvFileSource;
  * @author nils.hoffmann
  */
 @Slf4j
-public class SwissLipidsComprehensiveIT {
+public class HmdbComprehensiveIT {
 
     @ParameterizedTest(name = "{index} ==> ''{0}'' can be parsed with the swiss lipids grammar")
-    @CsvFileSource(resources = "/de/isas/lipidomics/palinom/swisslipids-names-Feb-10-2020.tsv", numLinesToSkip = 1, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
-    public void isValidSwissLipidsName(
-            String swissLipidsId,
-            String swissLipidsLevel,
-            String swissLipidsName,
-            String swissLipidsAbbreviation,
-            String swissLipidsSynonyms1,
-            String swissLipidsSynonyms2,
-            String swissLipidsSynonyms3,
-            String swissLipidsSynonyms4,
-            String swissLipidsSynonyms5
+    @CsvFileSource(resources = "/de/isas/lipidomics/palinom/testfiles/hmdb-parsed.csv", numLinesToSkip = 1, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
+    public void isValidHmdbName(
+            String hmdbName
     ) throws ParsingException, IOException {
-        String lipidName = swissLipidsAbbreviation;
+        String lipidName = hmdbName;
         SwissLipidsVisitorParser parser = new SwissLipidsVisitorParser();
         LipidAdduct lipidAdduct;
         if (lipidName == null) {
-            log.warn("Skipping row, abbreviation was null for id={}, level={}, name={}", swissLipidsId, swissLipidsLevel, swissLipidsName);
+            log.warn("Skipping row, abbreviation was null for name={}", hmdbName);
         } else {
             try {
                 lipidAdduct = parser.parse(lipidName);
                 LipidSpecies ls = lipidAdduct.getLipid();
                 assertNotNull(ls);
             } catch (ParsingException ex) {
-                fail("Parsing current SwissLipids identifier: " + swissLipidsAbbreviation + " with transformed name " + lipidName + " failed - name unsupported in grammar!");
+                fail("Parsing current HMDB identifier: " + hmdbName + " failed - name unsupported in grammar!");
             } catch (ParseTreeVisitorException pve) {
-                fail("Parsing current SwissLipids identifier: " + swissLipidsAbbreviation + " with transformed name " + lipidName + " failed - incomplete implementation: " + pve.getMessage());
+                fail("Parsing current HMDB identifier: " + hmdbName + " failed - incomplete implementation: " + pve.getMessage());
             }
         }
     }

@@ -205,7 +205,6 @@
                         <execution>
                             <configuration>
                                 <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                                <argLine>-Xmx2048m -XX:MaxPermSize=256m</argLine>
                                 <trimStackTrace>true</trimStackTrace>
                                 <workingDirectory>${project.build.directory}/failsafe-files</workingDirectory>
                             </configuration>
