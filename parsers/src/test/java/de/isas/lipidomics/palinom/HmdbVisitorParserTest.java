@@ -14,11 +14,16 @@ import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
+import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.hmdb.HmdbVisitorParser;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +37,7 @@ public class HmdbVisitorParserTest {
     @Test
     public void testNAPE() throws ParsingException {
         String ref = "NAPE (2:0/4:0/14:0)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("NAPE", lipidAdduct.getLipid().getHeadGroup());
@@ -49,7 +54,7 @@ public class HmdbVisitorParserTest {
     @Test
     public void testPE_Structural() throws ParsingException {
         String ref = "PE(18:1/18:1(11Z))";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("PE", lipidAdduct.getLipid().getHeadGroup());
@@ -62,7 +67,7 @@ public class HmdbVisitorParserTest {
     @Test
     public void testPE_Isomeric() throws ParsingException {
         String ref = "PE(18:0/18:1(11Z))";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("PE", lipidAdduct.getLipid().getHeadGroup());
@@ -75,7 +80,7 @@ public class HmdbVisitorParserTest {
     @Test
     public void testCh() throws ParsingException {
         String ref = "CE(12:1)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("CE", lipidAdduct.getLipid().getHeadGroup());
@@ -89,10 +94,10 @@ public class HmdbVisitorParserTest {
     @Test
     public void testFas() throws ParsingException {
         String ref = "FA(18:4)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertNotNull(lipidAdduct);
-        System.out.println(lipidAdduct);
+        log.info("" + lipidAdduct);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("FA", lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
@@ -106,20 +111,20 @@ public class HmdbVisitorParserTest {
     public void testMediators() throws ParsingException {
         String ref1 = "11,12-DiHETrE";
         String ref2 = "5,6-EpETrE";
-        System.out.println("Testing first mediator name " + ref1);
+        log.info("Testing first mediator name " + ref1);
         LipidAdduct lipidAdduct = parseLipidName(ref1);
         assertNotNull(lipidAdduct);
-        System.out.println(lipidAdduct);
+        log.info("" + lipidAdduct);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals(ref1, lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
         assertEquals(LipidClass.forHeadGroup(ref1).get(), lipidAdduct.getLipid().getLipidClass().get());
         assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
 
-        System.out.println("Testing second mediator name " + ref2);
+        log.info("Testing second mediator name " + ref2);
         lipidAdduct = parseLipidName(ref2);
         assertNotNull(lipidAdduct);
-        System.out.println(lipidAdduct);
+        log.info("" + lipidAdduct);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals(ref2, lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
@@ -131,12 +136,12 @@ public class HmdbVisitorParserTest {
     public void testPL_hyphen() throws ParsingException {
 
         String ref = "PE(18:3_16:2)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertNotNull(lipidAdduct);
         LipidMolecularSubspecies lipid = LipidMolecularSubspecies.class.cast(lipidAdduct.getLipid());
         assertNotNull(lipid);
-        System.out.println(lipid);
+        log.info("" + lipid);
         assertEquals("PE", lipid.getHeadGroup());
         assertEquals("FA1", lipid.getFa().
                 get("FA1").
@@ -167,12 +172,12 @@ public class HmdbVisitorParserTest {
     @Test
     public void testLysoPL() throws ParsingException {
         String ref1 = "LPE(18:0)";
-        System.out.println("Testing lysolipid name " + ref1);
+        log.info("Testing lysolipid name " + ref1);
         LipidAdduct lipidAdduct1 = parseLipidName(ref1);
         assertNotNull(lipidAdduct1);
         LipidSpecies lipid1 = lipidAdduct1.getLipid();
         assertNotNull(lipid1);
-        System.out.println(lipid1);
+        log.info("" + lipid1);
         assertEquals("LPE", lipid1.getHeadGroup());
         LipidSpeciesInfo li = lipid1.getInfo().get();
 //        assertEquals("FA1", li.getFa().
@@ -188,14 +193,13 @@ public class HmdbVisitorParserTest {
 
     @Test
     public void testFailForImplicitLyso() throws ParsingException {
-//        assertThrows(ConstraintViolationException.class, () -> {
         String ref2 = "PE(18:0_0:0)";
-        System.out.println("Testing implicit lysolipid name " + ref2);
+        log.info("Testing implicit lysolipid name " + ref2);
         LipidAdduct lipidAdduct2 = parseLipidName(ref2);
         assertNotNull(lipidAdduct2);
         LipidMolecularSubspecies lipid2 = (LipidMolecularSubspecies) lipidAdduct2.getLipid();
         assertNotNull(lipid2);
-        System.out.println(lipid2);
+        log.info("" + lipid2);
         assertEquals("PE", lipid2.getHeadGroup());
         assertEquals("FA1", lipid2.getFa().
                 get("FA1").
@@ -222,29 +226,28 @@ public class HmdbVisitorParserTest {
         assertEquals(0, lipid2.getFa().
                 get("FA2").
                 getNHydroxy());
-//        });
     }
 
     @Test
     public void testPG_isomeric() throws ParsingException {
         String ref = "PG(0:0/16:2(9Z,12Z))";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertNotNull(lipidAdduct);
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
-        System.out.println(lipid);
+        log.info("" + lipid);
     }
 
     @Test
     public void testPE_plasmanyl() throws ParsingException {
         String ref = "PE(O-18:3/16:2)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertNotNull(lipidAdduct);
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
-        System.out.println(lipid);
+        log.info("" + lipid);
         assertEquals(LipidCategory.GP, lipid.getLipidCategory());
         assertEquals(LipidClass.PE, lipid.getLipidClass().get());
         assertEquals("PE", lipid.getHeadGroup());
@@ -279,12 +282,12 @@ public class HmdbVisitorParserTest {
     @Test
     public void testPE_plasmenyl() throws ParsingException {
         String ref = "PE(P-18:0/16:2)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertNotNull(lipidAdduct);
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
-        System.out.println(lipid);
+        log.info("" + lipid);
         assertEquals(LipidCategory.GP, lipid.getLipidCategory());
         assertEquals(LipidClass.PE, lipid.getLipidClass().get());
         assertEquals("PE", lipid.getHeadGroup());
@@ -322,7 +325,7 @@ public class HmdbVisitorParserTest {
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertNotNull(lipidAdduct);
         LipidMolecularSubspecies lipid = (LipidMolecularSubspecies) lipidAdduct.getLipid();
-        System.out.println(lipid);
+        log.info("" + lipid);
         assertEquals(3, lipid.getFa().size());
         assertEquals(14, lipid.getFa().get("FA1").getNCarbon());
         assertEquals(0, lipid.getFa().get("FA1").getNDoubleBonds());
@@ -342,7 +345,7 @@ public class HmdbVisitorParserTest {
     @Test
     public void testSmSpeciesHydroxy() throws ParsingException {
         String ref = "SM(d32:0)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("SM", lipidAdduct.getLipid().getHeadGroup());
@@ -356,7 +359,7 @@ public class HmdbVisitorParserTest {
     @Test
     public void testSmSpeciesPlain() throws ParsingException {
         String ref = "SM(d32:0)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("SM", lipidAdduct.getLipid().getHeadGroup());
@@ -370,7 +373,7 @@ public class HmdbVisitorParserTest {
     @Test
     public void testMhdg() throws ParsingException {
         String ref = "MHDG (18:3/16:1)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("MHDG", lipidAdduct.getLipid().getHeadGroup());
@@ -384,7 +387,7 @@ public class HmdbVisitorParserTest {
     @Test
     public void testDhdg() throws ParsingException {
         String ref = "DHDG (16:0/16:1)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("DHDG", lipidAdduct.getLipid().getHeadGroup());
@@ -398,7 +401,7 @@ public class HmdbVisitorParserTest {
     @Test
     public void testHex2Cer() throws ParsingException {
         String ref = "Hex2Cer(d18:1/16:0)";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("Hex2Cer", lipidAdduct.getLipid().getHeadGroup());
@@ -412,7 +415,7 @@ public class HmdbVisitorParserTest {
     @Test
     public void testIsomericSubspecies() throws ParsingException {
         String ref = "TG(16:0/20:2(11Z,14Z)/22:4(7Z,10Z,13Z,16Z))";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("TG", lipidAdduct.getLipid().getHeadGroup());
@@ -426,11 +429,11 @@ public class HmdbVisitorParserTest {
         assertEquals(6, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
     }
-    
+
     @Test
     public void testIsomericSubspecies2() throws ParsingException {
         String ref = "PE(30:5(15Z,18Z,21Z,24Z,27Z)/20:3(8Z,11Z,14Z))";
-        System.out.println("Testing lipid name " + ref);
+        log.info("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("PE", lipidAdduct.getLipid().getHeadGroup());
@@ -443,6 +446,49 @@ public class HmdbVisitorParserTest {
         assertEquals(8, nDoubleBonds);
         assertEquals(8, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
+
+    @Test
+    public void testFuranFaShoudThrowParseTreeVisitorException() throws ParsingException {
+        String ref = "PE-NMe2(9D5/13D5)";
+        log.info("Testing lipid name " + ref);
+        assertThrows(ParseTreeVisitorException.class, () -> {
+            LipidAdduct lipidAdduct = parseLipidName(ref);
+        });
+    }
+
+    @Test
+    public void testInterlinkFaShouldThrowParseTreeVisitorException() throws ParsingException {
+        String ref = "PC(DiMe(11,3)/DiMe(11,3))";
+        log.info("Testing lipid name " + ref);
+        assertThrows(ParseTreeVisitorException.class, () -> {
+            LipidAdduct lipidAdduct = parseLipidName(ref);
+        });
+    }
+
+    @Test
+    public void testLipidSuffixShouldThrowParseTreeVisitorException() throws ParsingException {
+        String ref = "TG(a-21:0/i-15:0/14:0)[rac]";
+        assertThrows(ParseTreeVisitorException.class, () -> {
+            LipidAdduct lipidAdduct = parseLipidName(ref);
+        });
+    }
+    
+    @Test
+    public void testMatchFuranLipid() {
+        String ref = "CE(13D3)";
+        String regex = ".*\\([MD0-9]+(/[MD0-9]+)?(/[0-9:]+)?\\).*";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(ref);
+        assertTrue(m.matches());
+        
+        ref = "PE-NMe(9D3/9D5)";
+        m = p.matcher(ref);
+        assertTrue(m.matches());
+        
+        ref = "PE-NMe(9D3/9D5/21:0)";
+        m = p.matcher(ref);
+        assertTrue(m.matches());
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

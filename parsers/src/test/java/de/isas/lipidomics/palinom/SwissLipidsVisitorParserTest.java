@@ -434,7 +434,7 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(6, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
     }
-    
+
     @Test
     public void testIsomericSubspecies2() throws ParsingException {
         String ref = "PE(30:5(15Z,18Z,21Z,24Z,27Z)/20:3(8Z,11Z,14Z))";
@@ -457,24 +457,5 @@ public class SwissLipidsVisitorParserTest {
         SwissLipidsVisitorParser parser = new SwissLipidsVisitorParser();
         LipidAdduct lipid = parser.parse(ref);
         return lipid;
-    }
-
-    static Stream<String> provideWenkSwissLipidsNamesForVisitorParser() throws IOException {
-        URL u = SwissLipidsVisitorParserTest.class.getClassLoader().getResource("de/isas/lipidomics/palinom/wenk-lm-lipids.txt");
-        try (InputStreamReader ir = new InputStreamReader(u.openStream())) {
-            try (BufferedReader br = new BufferedReader(ir)) {
-                return br.lines();
-            }
-        }
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideWenkSwissLipidsNamesForVisitorParser")
-    public void isValidSwissLipidsNameForVisitorParser(String lipidMapsName1) throws ParsingException {
-        log.info("Parsing lipid maps identifier: {}", lipidMapsName1);
-        SwissLipidsVisitorParser parser = new SwissLipidsVisitorParser();
-        LipidAdduct lipidAdduct = parser.parse(lipidMapsName1);
-        LipidSpecies ls = lipidAdduct.getLipid();
-        log.info("Swiss lipids name {}:{}", lipidMapsName1, ls.getLipidString());
     }
 }

@@ -81,6 +81,8 @@ public class StructuralSubspeciesFasHandler {
             return fa.name(faName).position(position).build();
         } else if (ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() != null) { //handling of lcbs
             throw new RuntimeException("Support for lcbs is implemented in " + StructuralSubspeciesLcbHandler.class.getSimpleName() + "!");
+        } else if (ctx.furan_fa() != null) {
+            throw new ParseTreeVisitorException("Furan FAs are currently unsupported! Please contact the developers at https://lifs.isas.de/support for assistance.");
         } else {
             throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }

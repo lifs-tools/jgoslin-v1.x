@@ -462,7 +462,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(2, lipidAdduct.getLipid().getInfo().get().getModifications().size());
         assertEquals("FA 6:0(OH,Ke)", lipidAdduct.getLipid().getLipidString());
     }
-    
+
     @Test
     public void testPip2IsomericSubspeciesLevel() throws ParsingException {
         String ref = "PIP2[3',5'](16:0/18:2(9Z,12Z))";
@@ -486,22 +486,4 @@ public class LipidMapsVisitorParserTest {
         return lipid;
     }
 
-    static Stream<String> provideWenkLipidMapsNamesForVisitorParser() throws IOException {
-        URL u = LipidMapsVisitorParserTest.class.getClassLoader().getResource("de/isas/lipidomics/palinom/wenk-lm-lipids.txt");
-        try (InputStreamReader ir = new InputStreamReader(u.openStream())) {
-            try (BufferedReader br = new BufferedReader(ir)) {
-                return br.lines();
-            }
-        }
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideWenkLipidMapsNamesForVisitorParser")
-    public void isValidLipidMapsNameForVisitorParser(String lipidMapsName1) throws ParsingException {
-        log.info("Parsing lipid maps identifier: {}", lipidMapsName1);
-        LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
-        LipidAdduct lipidAdduct = parser.parse(lipidMapsName1);
-        LipidSpecies ls = lipidAdduct.getLipid();
-        log.info("Lipid maps name {}:{}", lipidMapsName1, ls.getLipidString());
-    }
 }

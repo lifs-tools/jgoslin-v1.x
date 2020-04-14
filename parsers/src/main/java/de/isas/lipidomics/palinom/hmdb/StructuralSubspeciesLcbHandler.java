@@ -37,10 +37,12 @@ public class StructuralSubspeciesLcbHandler {
 
     private final StructuralSubspeciesFasHandler ssfh;
     private final IsomericSubspeciesLcbHandler islh;
+    private final FattyAcylHelper faHelper;
 
-    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh, IsomericSubspeciesLcbHandler islh) {
+    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh, IsomericSubspeciesLcbHandler islh, FattyAcylHelper faHelper) {
         this.ssfh = ssfh;
         this.islh = islh;
+        this.faHelper = faHelper;
     }
 
     public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, HMDBParser.LcbContext lcbContext, List<HMDBParser.FaContext> faContexts) {
@@ -80,25 +82,7 @@ public class StructuralSubspeciesLcbHandler {
         HMDBParser.Lcb_coreContext pureCtx = ctx.lcb_core();
         FattyAcid.StructuralFattyAcidBuilder fa = FattyAcid.structuralFattyAcidBuilder();
         fa.nCarbon(HandlerUtils.asInt(pureCtx.carbon(), 0));
-        Integer hydroxyl = 0;
-        if (pureCtx != null) {
-            if (pureCtx.hydroxyl() != null) {
-                switch (pureCtx.hydroxyl().getText()) {
-                    case "t":
-                        hydroxyl = 3;
-                        break;
-                    case "d":
-                        hydroxyl = 2;
-                        break;
-                    case "m":
-                        hydroxyl = 1;
-                        break;
-                    default:
-                        throw new ParseTreeVisitorException("Unsupported old hydroxyl prefix: " + pureCtx.hydroxyl().getText());
-                }
-            }
-        }
-        fa.nHydroxy(hydroxyl);
+        fa.nHydroxy(faHelper.getNHydroxyl(ctx));
         if (pureCtx.db() != null) {
             int nDoubleBonds = HandlerUtils.asInt(pureCtx.db().db_count(), 0);
             fa.nDoubleBonds(nDoubleBonds);

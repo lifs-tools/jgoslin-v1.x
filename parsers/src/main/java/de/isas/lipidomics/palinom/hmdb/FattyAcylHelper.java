@@ -65,8 +65,8 @@ public class FattyAcylHelper {
             } else if ("P-".equals(faContext.fa_core().ether().getText())) {
                 lfbt = LipidFaBondType.ETHER_PLASMENYL;
             } else if ("i-".equals(faContext.fa_core().ether().getText()) || "a-".equals(faContext.fa_core().ether().getText())) {
-                lfbt = LipidFaBondType.ETHER_UNSPECIFIED;
-                throw new ParseTreeVisitorException("Unsupported FA prefix: " + faContext.fa_core().ether().getText()+". Please contact us at https://lifs.isas.de/support for assistance.");
+//                lfbt = LipidFaBondType.ETHER_UNSPECIFIED;
+                throw new ParseTreeVisitorException("Unsupported FA prefix: " + faContext.fa_core().ether().getText()+". Please contact the developers at https://lifs.isas.de/support for assistance.");
             } else {
                 throw new ParseTreeVisitorException("Unknown ether context value: " + faContext.fa_core().ether());
             }

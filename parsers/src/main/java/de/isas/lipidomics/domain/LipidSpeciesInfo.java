@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Data;
@@ -62,6 +63,24 @@ public class LipidSpeciesInfo extends FattyAcid {
     @Builder(builderMethodName = "lipidSpeciesInfoBuilder")
     public LipidSpeciesInfo(LipidLevel level, String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications) {
         super(name, position, nCarbon, nHydroxy, nDoubleBonds, lipidFaBondType, lcb, modifications);
+        this.level = level;
+    }
+
+    /**
+     *
+     * @param level
+     * @param name
+     * @param position
+     * @param nCarbon
+     * @param nHydroxy
+     * @param lipidFaBondType
+     * @param lcb
+     * @param modifications
+     * @param doubleBondPositions 
+     */
+    @Builder(builderMethodName = "lipidSubspeciesInfoBuilder", builderClassName = "LipidSubspeciesInfoBuilder")
+    public LipidSpeciesInfo(LipidLevel level, String name, int position, int nCarbon, int nHydroxy, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications, Map<Integer, String> doubleBondPositions) {
+        super(name, position, nCarbon, nHydroxy, lipidFaBondType, lcb, modifications, doubleBondPositions);
         this.level = level;
     }
 

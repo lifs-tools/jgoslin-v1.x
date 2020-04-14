@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.isas.lipidomics.palinom;
+package de.isas.lipidomics.palinom.comparison;
 
+import de.isas.lipidomics.domain.LipidAdduct;
+import de.isas.lipidomics.palinom.LipidMapsLexer;
+import de.isas.lipidomics.palinom.LipidMapsParser;
+import de.isas.lipidomics.palinom.SyntaxErrorListener;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
+import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
+import org.junit.jupiter.api.Assertions;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -30,40 +36,26 @@ import org.junit.jupiter.params.provider.CsvFileSource;
  * @author nils.hoffmann
  */
 @Slf4j
-public class LipidMapsNamesTest {
+public class LipidMapsComparisonTest {
 
     @ParameterizedTest
-    @CsvFileSource(resources = "/de/isas/lipidomics/palinom/wenk-lm-lipids.txt", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
-    public void isValidLipidMapsNameForSingaporeanStudy(String lipidMapsName) throws ParsingException {
-        CharStream charStream = CharStreams.fromString(lipidMapsName);
-        LipidMapsLexer lexer = new LipidMapsLexer(charStream);
-        TokenStream tokens = new CommonTokenStream(lexer);
-        log.info("Parsing lipid maps identifier: {}", lipidMapsName);
-        LipidMapsParser parser = new LipidMapsParser(tokens);
-        SyntaxErrorListener listener = new SyntaxErrorListener();
-        parser.addErrorListener(listener);
-        parser.setBuildParseTree(true);
-        LipidMapsParser.LipidContext context = parser.lipid();
-        if (parser.getNumberOfSyntaxErrors() > 0) {
-            throw new ParsingException("Parsing of " + lipidMapsName + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
-        }
-    }
-    
-    @ParameterizedTest
     @CsvFileSource(resources = "/de/isas/lipidomics/palinom/testfiles/lipid-maps-test.csv", numLinesToSkip = 0, delimiter = '\t', encoding = "UTF-8", lineSeparator = "\n")
-    public void isValidLipidMapsNameForLipidMapsTest(String lipidMapsName) throws ParsingException {
-        CharStream charStream = CharStreams.fromString(lipidMapsName);
+    public void isValidLipidNameForLipidMapsTest(String lipidName) throws ParsingException {
+        CharStream charStream = CharStreams.fromString(lipidName);
         LipidMapsLexer lexer = new LipidMapsLexer(charStream);
         TokenStream tokens = new CommonTokenStream(lexer);
-        log.info("Parsing lipid maps identifier: {}", lipidMapsName);
+        log.info("Parsing LipidMaps identifier: {}", lipidName);
         LipidMapsParser parser = new LipidMapsParser(tokens);
         SyntaxErrorListener listener = new SyntaxErrorListener();
         parser.addErrorListener(listener);
         parser.setBuildParseTree(true);
         LipidMapsParser.LipidContext context = parser.lipid();
         if (parser.getNumberOfSyntaxErrors() > 0) {
-            throw new ParsingException("Parsing of " + lipidMapsName + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
+            throw new ParsingException("Parsing of " + lipidName + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
         }
+        LipidMapsVisitorParser visitorParser = new LipidMapsVisitorParser();
+        LipidAdduct la = visitorParser.parse(lipidName, listener);
+        Assertions.assertNotNull(la);
     }
 
 }

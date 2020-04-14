@@ -62,6 +62,8 @@ public class FattyAcylHandler implements ParserRuleContextHandler<HMDBParser.Lip
 //                    }
                 String mediatorsSingleContext = faCtx.mediator().mediator_single().getText();
                 return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(mediatorsSingleContext).fa(new FattyAcid[0]).build();
+            } else if (faCtx.interlink_fa() != null) {
+                throw new ParseTreeVisitorException("Interlinked FAs '" + faCtx.interlink_fa().getText() + "' are currently unsupported. Please contact the developers at https://lifs.isas.de/support for assistance.");
             } else {
                 throw new ParseTreeVisitorException("Context for FA head group was null!");
             }
@@ -88,32 +90,58 @@ public class FattyAcylHandler implements ParserRuleContextHandler<HMDBParser.Lip
         if (faContext.fa_lcb_suffix() != null) {
             throw new ParseTreeVisitorException("Unsupported lcb suffix on fa: " + faContext.fa_lcb_suffix().getText());
         }
-        return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
-                level(LipidLevel.SPECIES).
-                name("FA").
-                position(-1).
-                nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).
-                nHydroxy(nHydroxyl).
-                nDoubleBonds(HandlerUtils.asInt(faContext.fa_core().db(), 0)).
-                lipidFaBondType(lfbt).
-                build()
-        );
+        if (faContext.fa_core().db().db_positions() != null) {
+            return Optional.of(LipidSpeciesInfo.lipidSubspeciesInfoBuilder().
+                    level(LipidLevel.MOLECULAR_SUBSPECIES).
+                    name("FA").
+                    position(-1).
+                    nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).
+                    nHydroxy(nHydroxyl).
+                    doubleBondPositions(helper.resolveDoubleBondPositions(faContext.fa_core().db().db_positions())).
+                    lipidFaBondType(lfbt).
+                    build()
+            );
+        } else {
+            return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+                    level(LipidLevel.SPECIES).
+                    name("FA").
+                    position(-1).
+                    nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).
+                    nHydroxy(nHydroxyl).
+                    nDoubleBonds(HandlerUtils.asInt(faContext.fa_core().db().db_count(), 0)).
+                    lipidFaBondType(lfbt).
+                    build()
+            );
+        }
     }
 
     public Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, HMDBParser.LcbContext lcbContext) {
         Integer nHydroxyl = 0;
         if (lcbContext.lcb_core() != null) {
-            nHydroxyl = helper.getNHydroxyl(lcbContext);
-            return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
-                    level(LipidLevel.SPECIES).
-                    name("LCB").
-                    position(-1).
-                    nCarbon(HandlerUtils.asInt(lcbContext.lcb_core().carbon(), 0)).
-                    nHydroxy(nHydroxyl).
-                    nDoubleBonds(HandlerUtils.asInt(lcbContext.lcb_core().db(), 0)).
-                    lipidFaBondType(helper.getLipidLcbBondType(headGroup, lcbContext)).
-                    build()
-            );
+            if (lcbContext.lcb_core().db().db_positions() != null) {
+                return Optional.of(LipidSpeciesInfo.lipidSubspeciesInfoBuilder().
+                        level(LipidLevel.MOLECULAR_SUBSPECIES).
+                        name("LCB").
+                        position(-1).
+                        nCarbon(HandlerUtils.asInt(lcbContext.lcb_core().carbon(), 0)).
+                        nHydroxy(nHydroxyl).
+                        doubleBondPositions(helper.resolveDoubleBondPositions(lcbContext.lcb_core().db().db_positions())).
+                        lipidFaBondType(helper.getLipidLcbBondType(headGroup, lcbContext)).
+                        build()
+                );
+            } else {
+                nHydroxyl = helper.getNHydroxyl(lcbContext);
+                return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+                        level(LipidLevel.SPECIES).
+                        name("LCB").
+                        position(-1).
+                        nCarbon(HandlerUtils.asInt(lcbContext.lcb_core().carbon().number(), 0)).
+                        nHydroxy(nHydroxyl).
+                        nDoubleBonds(HandlerUtils.asInt(lcbContext.lcb_core().db().db_count(), 0)).
+                        lipidFaBondType(helper.getLipidLcbBondType(headGroup, lcbContext)).
+                        build()
+                );
+            }
         }
         throw new ParseTreeVisitorException("Uninitialized lcb_core context!");
     }

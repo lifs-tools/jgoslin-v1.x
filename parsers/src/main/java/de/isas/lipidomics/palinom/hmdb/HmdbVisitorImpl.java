@@ -72,12 +72,12 @@ public class HmdbVisitorImpl extends HMDBBaseVisitor<LipidAdduct> {
             final IsomericSubspeciesFasHandler isfh = new IsomericSubspeciesFasHandler(faHelper);
             final StructuralSubspeciesFasHandler ssfh = new StructuralSubspeciesFasHandler(isfh, faHelper);
             final IsomericSubspeciesLcbHandler islh = new IsomericSubspeciesLcbHandler(isfh, faHelper);
-            final StructuralSubspeciesLcbHandler sslh = new StructuralSubspeciesLcbHandler(ssfh, islh);
+            final StructuralSubspeciesLcbHandler sslh = new StructuralSubspeciesLcbHandler(ssfh, islh, faHelper);
             final FattyAcylHandler faHandler = new FattyAcylHandler();
-            // TODO handle lipid Suffix in LipidSpecies
             String lipidSuffix = "";
             if (ctx.lipid_suffix() != null) {
                 lipidSuffix = ctx.lipid_suffix().getText();
+                throw new ParseTreeVisitorException("The lipid suffix '" + lipidSuffix + "' is currently unsupported. Please contact the developers at https://lifs.isas.de/support for assistance.");
             }
             LipidCategory contextCategory = LipidCategory.UNDEFINED;
             switch (bs.cardinality()) {

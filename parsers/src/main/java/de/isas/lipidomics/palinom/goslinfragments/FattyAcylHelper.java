@@ -17,9 +17,7 @@ package de.isas.lipidomics.palinom.goslinfragments;
 
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
-import de.isas.lipidomics.palinom.GoslinParser;
 import de.isas.lipidomics.palinom.HandlerUtils;
-import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedHashMap;
 import java.util.Map;
