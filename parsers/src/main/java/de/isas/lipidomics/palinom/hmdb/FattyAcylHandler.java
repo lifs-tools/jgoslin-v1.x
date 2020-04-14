@@ -51,7 +51,6 @@ public class FattyAcylHandler implements ParserRuleContextHandler<HMDBParser.Lip
                     throw new ParseTreeVisitorException("Context for FA fa was null!");
                 }
             } else if (faCtx.mediator() != null) {
-                // mediator fron positions, e.g 11,12-DiHETrE
                 String mediatorPositions = "";
                 if (faCtx.mediator().med_positions() != null) {
                     mediatorPositions = faCtx.mediator().med_positions().getText();
