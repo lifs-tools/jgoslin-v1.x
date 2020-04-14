@@ -27,12 +27,12 @@ import java.util.Optional;
  * @author nilshoffmann
  */
 public class FattyAcylHelper {
-    
+
     public LipidFaBondType getLipidLcbBondType(String headGroup, HMDBParser.LcbContext lcbContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         return lfbt;
     }
-    
+
     public Integer getNHydroxyl(HMDBParser.LcbContext lcbContext) {
         Integer hydroxyl = 0;
         if (lcbContext.lcb_core() != null) {
@@ -56,25 +56,25 @@ public class FattyAcylHelper {
         }
         throw new ParseTreeVisitorException("Uninitialized lcb_core context!");
     }
-    
+
     public LipidFaBondType getLipidFaBondType(HMDBParser.FaContext faContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         if (faContext.fa_core() != null && faContext.fa_core().ether() != null) {
-            //'o-' | 'O-' | 'P-' | 'i-' | 'a-'
             if ("O-".equals(faContext.fa_core().ether().getText().toUpperCase())) {
                 lfbt = LipidFaBondType.ETHER_PLASMANYL;
             } else if ("P-".equals(faContext.fa_core().ether().getText())) {
                 lfbt = LipidFaBondType.ETHER_PLASMENYL;
             } else if ("i-".equals(faContext.fa_core().ether().getText()) || "a-".equals(faContext.fa_core().ether().getText())) {
                 lfbt = LipidFaBondType.ETHER_UNSPECIFIED;
+                throw new ParseTreeVisitorException("Unsupported FA prefix: " + faContext.fa_core().ether().getText()+". Please contact us at https://lifs.isas.de/support for assistance.");
             } else {
                 throw new ParseTreeVisitorException("Unknown ether context value: " + faContext.fa_core().ether());
             }
         }
-        
+
         return lfbt;
     }
-    
+
     public Map<Integer, String> resolveDoubleBondPosition(HMDBParser.Db_positionContext dbContext, Map<Integer, String> doubleBondPositions) {
         if (dbContext.db_single_position() != null) {
             doubleBondPositions.put(

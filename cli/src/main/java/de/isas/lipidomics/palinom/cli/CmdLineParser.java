@@ -227,7 +227,6 @@ public class CmdLineParser {
         try {
             bw.write(header);
             bw.newLine();
-            //LIPIDNAME\tGRAMMAR\tLEVEL\tCATEGORY\tCLASS\tFAS\tMESSAGES
             results.stream().forEach((pair) -> {
                 Pair<String, List<ValidationResult>> resultPair = pair;
                 resultPair.getValue().stream().forEach((validationResult) -> {
