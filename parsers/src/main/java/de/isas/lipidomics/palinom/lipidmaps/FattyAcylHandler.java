@@ -72,18 +72,12 @@ public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParse
         for (int i = 0; i < fa2Contexts.size(); i++) {
             LipidMapsParser.Fa2Context fa2Ctx = fa2Contexts.get(i);
             if (fa2Ctx.fa2_sorted() != null) {
-//                    if (level == LipidLevel.MOLECULAR_SUBSPECIES) {
-//                        throw new ParseTreeVisitorException("CL second FAs group can not be on molecular level, first group was on structural level!");
-//                    }
                 level = LipidLevel.STRUCTURAL_SUBSPECIES;
                 for (int j = 0; j < fa2Ctx.fa2_sorted().fa().size(); j++) {
                     FattyAcid fa = ssfah.buildStructuralFa(fa2Ctx.fa2_sorted().fa().get(j), "FA" + ((i + 1) + j), i + 1);
                     fas.add(fa);
                 }
             } else if (fa2Ctx.fa2_unsorted() != null) {
-//                    if (level == LipidLevel.STRUCTURAL_SUBSPECIES) {
-//                        throw new ParseTreeVisitorException("CL second FAs group can not be on molecular level, first group was on structural level!");
-//                    }
                 level = LipidLevel.MOLECULAR_SUBSPECIES;
                 for (int j = 0; j < fa2Ctx.fa2_unsorted().fa().size(); j++) {
                     FattyAcid fa = msfah.buildMolecularFa(fa2Ctx.fa2_unsorted().fa().get(i), "FA" + ((i + 1) + j));
@@ -114,17 +108,30 @@ public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParse
         if (faContext.fa_mod() != null) {
             lsi.modifications(faHelper.resolveModification(faContext.fa_mod().modification(), new ModificationsList()));
         }
-        if (faContext.fa_unmod() != null) {
-            return Optional.of(
-                    lsi.
-                        position(-1).
-                        name(LipidLevel.SPECIES.name()).
-                        level(LipidLevel.SPECIES).
-                        lipidFaBondType(faHelper.getLipidFaBondType(faContext)).
-                        nCarbon(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().carbon(), 0)).
-                        nDoubleBonds(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().db(), 0)).
-                        nHydroxy(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().hydroxyl(), 0)).build()
+        if (faContext.fa_unmod().fa_pure().db().db_positions() != null) {
+            return Optional.of(LipidSpeciesInfo.lipidSubspeciesInfoBuilder().
+                    level(LipidLevel.ISOMERIC_SUBSPECIES).
+                    name("FA").
+                    position(-1).
+                    nCarbon(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().carbon(), 0)).
+                    nHydroxy(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().hydroxyl(), 0)).
+                    doubleBondPositions(faHelper.resolveDoubleBondPositions(faContext.fa_unmod().fa_pure().db().db_positions())).
+                    lipidFaBondType(faHelper.getLipidFaBondType(faContext)).
+                    build()
             );
+        } else {
+            if (faContext.fa_unmod() != null) {
+                return Optional.of(
+                        lsi.
+                                position(-1).
+                                name(LipidLevel.SPECIES.name()).
+                                level(LipidLevel.SPECIES).
+                                lipidFaBondType(faHelper.getLipidFaBondType(faContext)).
+                                nCarbon(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().carbon(), 0)).
+                                nDoubleBonds(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().db(), 0)).
+                                nHydroxy(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().hydroxyl(), 0)).build()
+                );
+            }
         }
         throw new ParseTreeVisitorException("Unknown fa context value: " + faContext.getText());
     }

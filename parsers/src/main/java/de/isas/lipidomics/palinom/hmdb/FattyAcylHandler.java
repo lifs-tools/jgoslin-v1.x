@@ -91,7 +91,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<HMDBParser.Lip
         }
         if (faContext.fa_core().db().db_positions() != null) {
             return Optional.of(LipidSpeciesInfo.lipidSubspeciesInfoBuilder().
-                    level(LipidLevel.MOLECULAR_SUBSPECIES).
+                    level(LipidLevel.ISOMERIC_SUBSPECIES).
                     name("FA").
                     position(-1).
                     nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).

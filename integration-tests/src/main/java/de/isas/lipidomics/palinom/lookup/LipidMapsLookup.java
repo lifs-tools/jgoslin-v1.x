@@ -37,9 +37,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class LipidMapsLookup {
-
+    
     public static void main(String[] args) throws IOException {
-        URL lipidMapsTable = LipidMapsLookup.class.getClassLoader().getResource("lipidmaps-names-Feb-10-2020.tsv");
+        log.info("Parsing ", args[0]);
+        URL lipidMapsTable = new File(args[0]).toURI().toURL();//LipidMapsLookup.class.getClassLoader().getResource("lipidmaps-names-Feb-10-2020.tsv");
         try (InputStream is = lipidMapsTable.openStream()) {
             try (InputStreamReader isr = new InputStreamReader(is, "UTF-8")) {
                 try (BufferedReader br = new BufferedReader(isr)) {
@@ -58,7 +59,7 @@ public class LipidMapsLookup {
                                     String.join(" | ", elements[4], elements[5], elements[6]),
                                     elements[3],
                                     elements[1],
-                                    parseAbbreviation(elements[3])
+                                    parseAbbreviation(elements[1], elements[3])
                             );
                         }).forEach((edr) -> {
                             StringBuilder sb = new StringBuilder();
@@ -81,20 +82,47 @@ public class LipidMapsLookup {
             }
         }
     }
-
-    public static String parseAbbreviation(String abbreviation) {
-        LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
-        String result;
-        try {
-            LipidAdduct la = parser.parse(abbreviation);
-            result = la.getLipid().getLipidString();
-        } catch (ParsingException ex) {
-            log.error("Exception while parsing " + abbreviation, ex);
-            result = "N.D.";
-        } catch (ParseTreeVisitorException pve) {
-            log.error("Exception in LipidMapsVisitorParser " + abbreviation, pve);
-            result = "N.I.";
+    
+    public static String parseAbbreviation(String fullName, String abbreviation) {
+        if(abbreviation==null || abbreviation.isEmpty()) {
+            log.info("Parsing fullName");
+            LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
+            String result;
+            try {
+                LipidAdduct la = parser.parse(fullName);
+                result = la.getLipid().getLipidString();
+            } catch (ParsingException ex) {
+                log.error("Exception while parsing " + fullName, ex);
+                result = "N.D.";
+            } catch (ParseTreeVisitorException pve) {
+                log.error("Exception in LipidMapsVisitorParser " + fullName, pve);
+                result = "N.I.";
+            } catch (NullPointerException npe) {
+                log.error("Exception in LipidMapsVisitorParser " + fullName, npe);
+                result = "N.I.";
+            } catch (RuntimeException re) {
+                log.error("Exception in LipidMapsVisitorParser " + fullName, re);
+                result = "N.I.";
+            }
+            return result;
+        } else {
+            log.info("Parsing abbreviation");
+            LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
+            String result;
+            try {
+                LipidAdduct la = parser.parse(abbreviation);
+                result = la.getLipid().getLipidString();
+            } catch (ParsingException ex) {
+                log.error("Exception while parsing " + abbreviation, ex);
+                result = "N.D.";
+            } catch (ParseTreeVisitorException pve) {
+                log.error("Exception in LipidMapsVisitorParser " + abbreviation, pve);
+                result = "N.I.";
+            } catch (NullPointerException npe) {
+                log.error("Exception in LipidMapsVisitorParser " + abbreviation, npe);
+                result = "N.I.";
+            }
+            return result;
         }
-        return result;
     }
 }

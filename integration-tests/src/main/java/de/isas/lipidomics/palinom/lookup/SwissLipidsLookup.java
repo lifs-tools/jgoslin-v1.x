@@ -40,7 +40,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SwissLipidsLookup {
 
     public static void main(String[] args) throws IOException {
-        URL swissLipidsTable = SwissLipidsLookup.class.getClassLoader().getResource("swisslipids-names-Feb-10-2020.tsv");
+        log.info("Parsing ", args[0]);
+        URL swissLipidsTable = new File(args[0]).toURI().toURL();
         try (InputStream is = swissLipidsTable.openStream()) {
             try (InputStreamReader isr = new InputStreamReader(is, "UTF-8")) {
                 try (BufferedReader br = new BufferedReader(isr)) {
@@ -58,7 +59,7 @@ public class SwissLipidsLookup {
                                     elements[1],
                                     elements[3],
                                     elements[2],
-                                    parseAbbreviation(elements[3])
+                                    parseAbbreviation(elements[2])
                             );
                         }).forEach((edr) -> {
                             StringBuilder sb = new StringBuilder();
@@ -93,6 +94,9 @@ public class SwissLipidsLookup {
             result = "N.D.";
         } catch (ParseTreeVisitorException pve) {
             log.error("Exception in GoslinVisitorParser " + abbreviation, pve);
+            result = "N.I.";
+        } catch (NumberFormatException nfe) {
+            log.error("Exception in GoslinVisitorParser " + abbreviation, nfe);
             result = "N.I.";
         }
         return result;

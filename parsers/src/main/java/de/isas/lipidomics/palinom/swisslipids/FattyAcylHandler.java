@@ -89,16 +89,29 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
         if (faContext.fa_lcb_suffix() != null) {
             throw new ParseTreeVisitorException("Unsupported lcb suffix on fa: " + faContext.fa_lcb_suffix().getText());
         }
-        return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
-                level(LipidLevel.SPECIES).
-                name("FA").
-                position(-1).
-                nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).
-                nHydroxy(nHydroxyl).
-                nDoubleBonds(HandlerUtils.asInt(faContext.fa_core().db(), 0)).
-                lipidFaBondType(lfbt).
-                build()
-        );
+        if (faContext.fa_core().db().db_positions() != null) {
+            return Optional.of(LipidSpeciesInfo.lipidSubspeciesInfoBuilder().
+                    level(LipidLevel.ISOMERIC_SUBSPECIES).
+                    name("FA").
+                    position(-1).
+                    nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).
+                    nHydroxy(nHydroxyl).
+                    doubleBondPositions(helper.resolveDoubleBondPositions(faContext.fa_core().db().db_positions())).
+                    lipidFaBondType(lfbt).
+                    build()
+            );
+        } else {
+            return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+                    level(LipidLevel.SPECIES).
+                    name("FA").
+                    position(-1).
+                    nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).
+                    nHydroxy(nHydroxyl).
+                    nDoubleBonds(HandlerUtils.asInt(faContext.fa_core().db(), 0)).
+                    lipidFaBondType(lfbt).
+                    build()
+            );
+        }
     }
 
     public Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, SwissLipidsParser.LcbContext lcbContext) {
