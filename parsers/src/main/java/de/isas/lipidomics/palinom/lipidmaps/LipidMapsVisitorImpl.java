@@ -84,7 +84,7 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             final StructuralSubspeciesFasHandler ssfh = new StructuralSubspeciesFasHandler(isfh, faHelper);
             final IsomericSubspeciesLcbHandler islh = new IsomericSubspeciesLcbHandler(isfh, faHelper);
             final StructuralSubspeciesLcbHandler sslh = new StructuralSubspeciesLcbHandler(ssfh, islh, faHelper);
-            final FattyAcylHandler faHandler = new FattyAcylHandler(msfh, ssfh, faHelper);
+            final FattyAcylHandler faHandler = new FattyAcylHandler(msfh, ssfh, sslh, faHelper);
             LipidCategory contextCategory = LipidCategory.UNDEFINED;
             switch (bs.cardinality()) {
                 case 0:

@@ -27,7 +27,9 @@ import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.LipidMapsParser;
+import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -40,11 +42,13 @@ public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParse
 
     private final MolecularSubspeciesFasHandler msfah;
     private final StructuralSubspeciesFasHandler ssfah;
+    private final StructuralSubspeciesLcbHandler sslah;
     private final FattyAcylHelper faHelper;
 
-    public FattyAcylHandler(MolecularSubspeciesFasHandler msfah, StructuralSubspeciesFasHandler ssfah, FattyAcylHelper faHelper) {
+    public FattyAcylHandler(MolecularSubspeciesFasHandler msfah, StructuralSubspeciesFasHandler ssfah, StructuralSubspeciesLcbHandler sslah, FattyAcylHelper faHelper) {
         this.msfah = msfah;
         this.ssfah = ssfah;
+        this.sslah = sslah;
         this.faHelper = faHelper;
     }
 
@@ -59,11 +63,35 @@ public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParse
     }
 
     public Optional<LipidSpecies> visitSpeciesLcb(String headGroup, LipidMapsParser.LcbContext lcbContext) {
-        return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(lcbContext)));
+        Optional<LipidSpeciesInfo> lsi = getSpeciesInfo(lcbContext);
+        if (lsi.isPresent()) {
+            switch (lsi.get().getLevel()) {
+                case SPECIES:
+                    return Optional.of(new LipidSpecies(headGroup, lsi));
+                case STRUCTURAL_SUBSPECIES:
+                case ISOMERIC_SUBSPECIES:
+                    return sslah.visitStructuralSubspeciesLcb(headGroup, lcbContext);
+                default:
+                    throw new ParseTreeVisitorException("Unexpected FA level " + lsi.get().getLevel());
+            }
+        }
+        return Optional.of(new LipidSpecies(headGroup, lsi));
     }
 
     public Optional<LipidSpecies> visitSpeciesFas(String headGroup, LipidMapsParser.FaContext faContext) {
-        return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(headGroup, faContext)));
+        Optional<LipidSpeciesInfo> lsi = getSpeciesInfo(headGroup, faContext);
+        if (lsi.isPresent()) {
+            switch (lsi.get().getLevel()) {
+                case SPECIES:
+                    return Optional.of(new LipidSpecies(headGroup, lsi));
+                case STRUCTURAL_SUBSPECIES:
+                case ISOMERIC_SUBSPECIES:
+                    return ssfah.visitStructuralSubspeciesFas(headGroup, Arrays.asList(faContext));
+                default:
+                    throw new ParseTreeVisitorException("Unexpected FA level " + lsi.get().getLevel());
+            }
+        }
+        return Optional.of(new LipidSpecies(headGroup, lsi));
     }
 
     public Optional<LipidSpecies> visitSubspeciesFas2(String headGroup, List<LipidMapsParser.Fa2Context> fa2Contexts) {

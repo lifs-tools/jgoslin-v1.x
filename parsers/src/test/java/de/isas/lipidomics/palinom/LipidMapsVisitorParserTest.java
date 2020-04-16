@@ -12,20 +12,12 @@ import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
-import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  *
@@ -145,7 +137,6 @@ public class LipidMapsVisitorParserTest {
     @Test
     public void testMediators() throws ParsingException {
         String ref1 = "11,12-DHET";
-        String ref2 = "5(6)-EET";
         System.out.println("Testing lipid name " + ref1);
         LipidAdduct lipidAdduct = parseLipidName(ref1);
         assertNotNull(lipidAdduct);
@@ -153,9 +144,6 @@ public class LipidMapsVisitorParserTest {
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals(ref1, lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
-//        assertEquals("",lipidAdduct.getAdduct().getAdductString());
-//        assertEquals(Integer.valueOf(1),lipidAdduct.getAdduct().getCharge());
-//        assertEquals(Integer.valueOf(1),lipidAdduct.getAdduct().getChargeSign());
     }
 
     @Test
@@ -166,9 +154,6 @@ public class LipidMapsVisitorParserTest {
         assertNotNull(lipidAdduct);
         System.out.println(lipidAdduct);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
-//        assertEquals("",lipidAdduct.getAdduct().getAdductString());
-//        assertEquals(Integer.valueOf(1),lipidAdduct.getAdduct().getCharge());
-//        assertEquals(Integer.valueOf(1),lipidAdduct.getAdduct().getChargeSign());
     }
 
     @Test
@@ -232,10 +217,8 @@ public class LipidMapsVisitorParserTest {
                 getNHydroxy());
     }
 
-    //LPE O-16:1p/12:0
     @Test
     public void testFailForImplicitLyso() throws ParsingException {
-//        assertThrows(ConstraintViolationException.class, () -> {
         String ref2 = "PE 18:0-0:0";
         System.out.println("Testing implicit lysolipid name " + ref2);
         LipidAdduct lipidAdduct2 = parseLipidName(ref2);
@@ -269,7 +252,6 @@ public class LipidMapsVisitorParserTest {
         assertEquals(0, lipid2.getFa().
                 get("FA2").
                 getNHydroxy());
-//        });
     }
 
     @Test
@@ -291,7 +273,6 @@ public class LipidMapsVisitorParserTest {
         assertEquals(18, lipid.getFa().
                 get("FA1").
                 getNCarbon());
-        // these are actually 3 + 1 (double bond after ether)
         assertEquals(3, lipid.getFa().
                 get("FA1").
                 getNDoubleBonds());
@@ -331,7 +312,6 @@ public class LipidMapsVisitorParserTest {
         assertEquals(18, lipid.getFa().
                 get("FA1").
                 getNCarbon());
-        // these are actually 0 + 1 (double bond after ether)
         assertEquals(0, lipid.getFa().
                 get("FA1").
                 getNDoubleBonds());
@@ -443,7 +423,6 @@ public class LipidMapsVisitorParserTest {
         assertEquals(58, lipidAdduct.getLipid().getInfo().get().getNCarbon());
         assertEquals(6, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
-//        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA3").getModifications().size());
     }
 
     @Test

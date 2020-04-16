@@ -180,9 +180,6 @@ public class HmdbVisitorParserTest {
         log.info("" + lipid1);
         assertEquals("LPE", lipid1.getHeadGroup());
         LipidSpeciesInfo li = lipid1.getInfo().get();
-//        assertEquals("FA1", li.getFa().
-//                get("FA1").
-//                getName());
         assertEquals(18, li.
                 getNCarbon());
         assertEquals(0, li.
@@ -258,7 +255,6 @@ public class HmdbVisitorParserTest {
         assertEquals(18, lipid.getFa().
                 get("FA1").
                 getNCarbon());
-        // these are actually 3 + 1 (double bond after ether)
         assertEquals(3, lipid.getFa().
                 get("FA1").
                 getNDoubleBonds());
@@ -298,7 +294,6 @@ public class HmdbVisitorParserTest {
         assertEquals(18, lipid.getFa().
                 get("FA1").
                 getNCarbon());
-        // these are actually 0 + 1 (double bond after ether)
         assertEquals(0, lipid.getFa().
                 get("FA1").
                 getNDoubleBonds());

@@ -94,7 +94,6 @@ public class GoslinVisitorParserTest {
     @Test
     public void testMediators() throws ParsingException {
         String ref1 = "11,12-DHET";
-        String ref2 = "5(6)-EET";
         System.out.println("Testing lipid name " + ref1);
         LipidAdduct lipidAdduct = parseLipidName(ref1);
         assertNotNull(lipidAdduct);
@@ -103,9 +102,6 @@ public class GoslinVisitorParserTest {
         assertEquals(ref1, lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
         assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
-//        assertEquals("",lipidAdduct.getAdduct().getAdductString());
-//        assertEquals(Integer.valueOf(1),lipidAdduct.getAdduct().getCharge());
-//        assertEquals(Integer.valueOf(1),lipidAdduct.getAdduct().getChargeSign());
     }
 
     @Test
@@ -191,7 +187,6 @@ public class GoslinVisitorParserTest {
 
     @Test
     public void testImplicitLyso() throws ParsingException {
-//        assertThrows(ConstraintViolationException.class, () -> {
         String ref2 = "PE 18:0-0:0";
         System.out.println("Testing implicit lysolipid name " + ref2);
         LipidAdduct lipidAdduct = parseLipidName(ref2);

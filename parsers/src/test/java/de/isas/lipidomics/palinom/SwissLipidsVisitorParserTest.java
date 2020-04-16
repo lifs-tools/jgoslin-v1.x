@@ -9,26 +9,18 @@ import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
-import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  *
@@ -183,9 +175,6 @@ public class SwissLipidsVisitorParserTest {
         System.out.println(lipid1);
         assertEquals("LPE", lipid1.getHeadGroup());
         LipidSpeciesInfo li = lipid1.getInfo().get();
-//        assertEquals("FA1", li.getFa().
-//                get("FA1").
-//                getName());
         assertEquals(18, li.
                 getNCarbon());
         assertEquals(0, li.
@@ -196,7 +185,6 @@ public class SwissLipidsVisitorParserTest {
 
     @Test
     public void testFailForImplicitLyso() throws ParsingException {
-//        assertThrows(ConstraintViolationException.class, () -> {
         String ref2 = "PE(18:0_0:0)";
         System.out.println("Testing implicit lysolipid name " + ref2);
         LipidAdduct lipidAdduct2 = parseLipidName(ref2);
@@ -230,7 +218,6 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(0, lipid2.getFa().
                 get("FA2").
                 getNHydroxy());
-//        });
     }
 
     @Test
@@ -263,7 +250,6 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(18, lipid.getFa().
                 get("FA1").
                 getNCarbon());
-        // these are actually 3 + 1 (double bond after ether)
         assertEquals(3, lipid.getFa().
                 get("FA1").
                 getNDoubleBonds());
@@ -303,7 +289,6 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(18, lipid.getFa().
                 get("FA1").
                 getNCarbon());
-        // these are actually 0 + 1 (double bond after ether)
         assertEquals(0, lipid.getFa().
                 get("FA1").
                 getNDoubleBonds());

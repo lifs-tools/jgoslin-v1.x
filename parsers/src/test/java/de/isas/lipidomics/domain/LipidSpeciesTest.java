@@ -15,6 +15,8 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.domain.FattyAcid.MolecularFattyAcidBuilder;
+import de.isas.lipidomics.domain.LipidMolecularSubspecies.LipidMolecularSubspeciesBuilder;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
@@ -34,20 +36,43 @@ public class LipidSpeciesTest {
         );
         String expectedSpecies = "PG 20:2;1";
         assertEquals(expectedSpecies, lss.getLipidString(LipidLevel.SPECIES));
-        
+
         try {
             String expectedMolSubSpecies = "PG 8:1_12:1;1";
             assertEquals(expectedMolSubSpecies, lss.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
-        } catch(RuntimeException e) {
+        } catch (RuntimeException e) {
             //should fail, can not generate a structural sub species from the molecular species level
         }
-        
+
         try {
             String expectedStructuralSubSpecies = "PG 8:1_12:1;1";
             assertEquals(expectedStructuralSubSpecies, lss.getLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
-        } catch(RuntimeException e) {
+        } catch (RuntimeException e) {
             //should fail, can not generate a structural sub species from the molecular species level
         }
+    }
+
+    @Test
+    public void testGetNormalizedLipidString() {
+
+        LipidSpecies lss = new LipidSpecies(
+                "TG",
+                Optional.of(new LipidSpeciesInfo(LipidLevel.SPECIES, 20, 1, 2, LipidFaBondType.ESTER))
+        );
+        String expectedSpecies = "TAG 20:2;1";
+        assertEquals(expectedSpecies, lss.getLipidString(LipidLevel.SPECIES, true));
+
+        String expectedMolSubSpecies = "TG 8:1_12:1_18:0";
+        String expectedNormalizedMolSubSpecies = "TAG 8:1_12:1_18:0";
+        MolecularFattyAcidBuilder mfab = FattyAcid.molecularFattyAcidBuilder();
+        LipidMolecularSubspeciesBuilder lmsb = LipidMolecularSubspecies.builder();
+        LipidMolecularSubspecies lms = lmsb.headGroup("TG").fa(new FattyAcid[]{
+            mfab.nCarbon(8).nDoubleBonds(1).lipidFaBondType(LipidFaBondType.ESTER).name("FA1").build(),
+            mfab.nCarbon(12).nDoubleBonds(1).lipidFaBondType(LipidFaBondType.ESTER).name("FA2").build(),
+            mfab.nCarbon(18).nDoubleBonds(0).lipidFaBondType(LipidFaBondType.ESTER).name("FA3").build()}).build();
+        assertEquals(expectedMolSubSpecies, lms.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES, false));
+        assertEquals(expectedNormalizedMolSubSpecies, lms.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES, true));
+
     }
 
 }

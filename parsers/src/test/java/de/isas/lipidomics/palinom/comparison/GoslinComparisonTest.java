@@ -21,8 +21,6 @@ import de.isas.lipidomics.palinom.GoslinLexer;
 import de.isas.lipidomics.palinom.GoslinParser;
 import de.isas.lipidomics.palinom.SyntaxErrorListener;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
-import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
-import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;

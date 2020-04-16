@@ -17,8 +17,9 @@ package de.isas.lipidomics.palinom.lookup;
 
 import de.isas.lipidomics.domain.ExternalDatabaseReference;
 import de.isas.lipidomics.domain.LipidAdduct;
+import de.isas.lipidomics.domain.LipidLevel;
+import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
-import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.io.BufferedReader;
@@ -88,7 +89,7 @@ public class SwissLipidsLookup {
         String result;
         try {
             LipidAdduct la = parser.parse(abbreviation);
-            result = la.getLipid().getLipidString();
+            result = la.getLipid().getLipidString(la.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel(), true);
         } catch (ParsingException ex) {
             log.error("Exception while parsing " + abbreviation, ex);
             result = "N.D.";

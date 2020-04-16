@@ -61,18 +61,29 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
 
     @Override
     public String getLipidString(LipidLevel level) {
+        return this.getLipidString(level, false);
+    }
+
+    @Override
+    public String getLipidString(LipidLevel level, boolean normalizeHeadGroup) {
+        String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup();
         switch (level) {
             case STRUCTURAL_SUBSPECIES:
-                return super.buildLipidSubspeciesName(level, "/");
+                return super.buildLipidSubspeciesName(level, "/", headGroup);
             case MOLECULAR_SUBSPECIES:
             case CATEGORY:
             case CLASS:
             case SPECIES:
-                return super.getLipidString(level);
+                return super.getLipidString(level, normalizeHeadGroup);
             default:
                 LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();
-                throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
+                throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a normalized string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
         }
+    }
+
+    @Override
+    public String getNormalizedLipidString() {
+        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel(), true);
     }
 
     @Override

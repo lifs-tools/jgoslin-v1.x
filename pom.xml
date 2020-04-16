@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.isas.lipidomics</groupId>
     <artifactId>jgoslin</artifactId>
-    <version>0.9.9.8</version>
+    <version>0.9.9.9</version>
     <packaging>pom</packaging>
     <url>https://gitlab.isas.de/lifs/palinom</url>	
     <licenses>

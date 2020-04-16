@@ -8,7 +8,7 @@ Nils Hoffmann <nils.hoffmann@isas.de>
 //https://pubs.acs.org/doi/10.1021/acs.analchem.9b01987[N. Hoffmann et al., Analytical Chemistry 2019; Oct 15;91(20):12615-12618..] https://www.ncbi.nlm.nih.gov/pubmed/31525911[PubMed record].
 
 
-This project is a parser, validator and normalizer implementation for shorthand lipid nomenclatures, base on the https://github.com/lifs-tools/goslin[Grammar of Succinct Lipid Nomenclatures project].
+This project is a parser, validator and normalizer implementation for shorthand lipid nomenclatures, based on the https://github.com/lifs-tools/goslin[Grammar of Succinct Lipid Nomenclatures project].
 
 Goslin defines multiple grammers compatible with https://www.antlr.org/[ANTLRv4] for different sources of shorthand lipid nomenclature. This allows to generate parsers based on the defined grammars,
 which provide immediate feedback whether a processed lipid shorthand notation string is compliant with a particular grammar, or not.

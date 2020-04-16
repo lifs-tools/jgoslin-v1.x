@@ -141,12 +141,32 @@ public class LipidSpecies {
      * Returns a lipid string representation for the given {@link LipidLevel},
      * e.g. Category, Species, etc. Please note that this method is overridden
      * by specific implementations for molecular, structural and isomeric
-     * subspecies levels.
+     * subspecies levels. This method does not normalize the head group.
      *
      * @param level the lipid level to report the name of this lipid on.
      * @return the lipid name.
      */
     public String getLipidString(LipidLevel level) {
+        return this.buildLipidString(level, headGroup);
+    }
+
+    /**
+     * Returns a lipid string representation for the given {@link LipidLevel},
+     * e.g. Category, Species, etc. Please note that this method is overridden
+     * by specific implementations for molecular, structural and isomeric
+     * subspecies levels. This method normalizes the head group to the primary
+     * class-specific synonym. E.g. TG would be normalized to TAG.
+     *
+     * @param level the lipid level to report the name of this lipid on.
+     * @param normalizeHeadGroup if true, use class specific synonym for
+     * headGroup, if false, use head group as parsed.
+     * @return the lipid name.
+     */
+    public String getLipidString(LipidLevel level, boolean normalizeHeadGroup) {
+        return this.buildLipidString(level, normalizeHeadGroup ? getNormalizedHeadGroup() : headGroup);
+    }
+
+    protected String buildLipidString(LipidLevel level, String headGroup) throws ConstraintViolationException {
         switch (level) {
             case CATEGORY:
                 return this.lipidCategory.name();
@@ -182,6 +202,33 @@ public class LipidSpecies {
                 LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();
                 throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
         }
+    }
+
+    /**
+     * Returns a lipid string representation for the head group of this lipid.
+     * This method normalizes the original head group name to the class specific
+     * primary alias, if the level and class are known. E.g. TG is normalized to
+     * TAG.
+     *
+     * @return the normalized lipid head group.
+     */
+    public String getNormalizedHeadGroup() {
+        if (lipidClass.isPresent()) {
+            return lipidClass.get().getSynonyms().get(0);
+        }
+        return headGroup;
+    }
+
+    /**
+     * Returns a lipid string representation for the native {@link LipidLevel},
+     * e.g. Category, Species, etc, as returned by {@link #getInfo()} of this
+     * lipid. This method normalizes the head group to the primary
+     * class-specific synonym. E.g. TG would be normalized to TAG.
+     *
+     * @return the normalized lipid name.
+     */
+    public String getNormalizedLipidString() {
+        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel(), true);
     }
 
     /**

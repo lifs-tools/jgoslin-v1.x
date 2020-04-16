@@ -71,6 +71,5 @@ public class HmdbComparisonTest {
             LipidAdduct la = visitorParser.parse(lipidName, listener);
             Assertions.assertNotNull(la);
         }
-        String ce = "CE(13D3)";
     }
 }
