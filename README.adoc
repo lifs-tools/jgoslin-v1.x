@@ -8,7 +8,7 @@ Nils Hoffmann <nils.hoffmann@isas.de>
 //https://pubs.acs.org/doi/10.1021/acs.analchem.9b01987[N. Hoffmann et al., Analytical Chemistry 2019; Oct 15;91(20):12615-12618..] https://www.ncbi.nlm.nih.gov/pubmed/31525911[PubMed record].
 
 
-This project is a parser, validator and normalizer implementation for shorthand lipid nomenclatures, based on the https://github.com/lifs-tools/goslin[Grammar of Succinct Lipid Nomenclatures project].
+This project is a parser, validator and normalizer implementation for shorthand lipid nomenclatures, base on the https://github.com/lifs-tools/goslin[Grammar of Succinct Lipid Nomenclatures project].
 
 Goslin defines multiple grammers compatible with https://www.antlr.org/[ANTLRv4] for different sources of shorthand lipid nomenclature. This allows to generate parsers based on the defined grammars,
 which provide immediate feedback whether a processed lipid shorthand notation string is compliant with a particular grammar, or not.
@@ -104,12 +104,34 @@ arguments that you would pass normally will work in the same way (please replace
 
   docker run -v <YOUR_DATA_DIR>:/home/data:rw lifs/jgoslin-cli:<VERSION> -c <YOUR_MZTABM_FILE>
 
-== Using the project code releases via Maven Central
+== Using the project code releases via Bintray
 
-The library release artifacts are available from Maven Central.
+The library release artifacts are available from Bintray.
 If you want to use them, add the following lines to your own Maven pom file :
 
-To use the IO libraries (reading, writing and structural and logical validation) in your own Maven projects, use the following dependency:
+  <profile>
+    <id>lifs-repos</id>
+    <repositories>
+     <repository>
+         <snapshots>
+             <enabled>false</enabled>
+         </snapshots>
+         <id>bintray-lifs</id>
+         <name>bintray-lifs</name>
+         <url>https://dl.bintray.com/lifs/maven</url>
+     </repository>
+    </repositories>
+  </profile>
+
+To compile jgoslin against the LIFS Bintray repository, please add the following entry to you ~/.m2/settings.xml file:
+
+  <activeProfiles>
+    <activeProfile>lifs-repos</activeProfile>
+  </activeProfiles>
+
+or use the `-Plifs-repos` command line switch when running Maven to enable the LIFS Bintray maven repositories for parent pom and artifact resolution.
+
+To use the parser libraries (reading and validation) in your own Maven projects, use the following dependency:
 
   <dependency>
     <groupId>de.isas.lipidomics</groupId>
@@ -125,116 +147,34 @@ where `jgoslin.version` is the version of jgoslin you wish to use, e.g. for a re
 
 as defined in the properties section of your pom file.
 
-== Using development snapshots
-
-The library development artifacts are available as SNAPSHOT (development versions) from Sonatype's OSSRH repository.
-If you want to use them, add the following lines to your own Maven pom file:
-
-  <repositories>
-    <repository>
-      <name>Sonatype Snapshot Repository</name>
-      <id>oss-sonatype-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-   ...
-  </repositories>
-
-The project coordinates for the api module are
-
-    <dependency>
-      <groupId>de.isas.lipidomics</groupId>
-      <artifactId>jgoslin-api</artifactId>
-      <version>${jgoslin.version}</version>
-      <type>jar</type>
-    </dependency>
-
-and
-
-    <dependency>
-      <groupId>de.isas.lipidomics</groupId>
-      <artifactId>jgoslin-io</artifactId>
-      <version>${jgoslin.version}</version>
-      <type>jar</type>
-    </dependency>
-
-for the io module, where `jgoslin.version` is the version of jgoslin you wish to use, e.g. for a `SNAPSHOT` version:
-
-  <properties>
-    <jgoslin.version>1.0.5-SNAPSHOT</jgoslin.version>
-  </properties>
-
-as defined in the properties section of your pom file.
-
-The SNAPSHOTS are also available from https://oss.sonatype.org/content/repositories/snapshots/de.isas.lipidomics/.
-
 == Using the API programmatically
 
 === Reading a Shorthand Lipid Name with a given Parser
 
-The following snippet will parse a shorthand lipid name with the SwissLipidsParser:
+The following snippet shows how to parse a shorthand lipid name with the different parsers:
 
-  import uk.ac.ebi.pride.jgoslin2.*;
-  import uk.ac.ebi.pride.jgoslin2.utils.*;
-  import uk.ac.ebi.pride.jgoslin2.utils.errors.*;
-  import de.isas.lipidomics.io.*;
-  import de.isas.lipidomics.model.*;
-  ...
-  File mzTabFile = new File("/path/to/my/file.goslin");
-  MzTabFileParser parser = new MzTabFileParser(mzTabFile);
-  //will report a maxmimum of 500 errors on Error, Warn and Info levels
-  //will output errors to System.err (onto your terminal)
-  parser.parse(System.err, MZTabErrorType.Level.Info, 500);
-  //inspect the output of the parse and errors
-  MZTabErrorList errors = parser.getErrorList();
-  //converting the MZTabErrorList into a list of ValidationMessage
-  List<ValidationMessage> messages = errors.toValidationMessages()
-  //access the file after parsing
-  MzTab mzTab = parser.getMZTabFile();
-
-=== Accessing the structural representation with a visitor parser
-
-The mzTab domain model uses a _builder_ pattern, but also conforms to the usual JAVA _bean style_ pattern. The _builder_ pattern allows for a more fluent definition of your object structure. However, especially for cross references with the file, you will need to define e.g. MsRun objects separately since inline referencing within the builder code will not work.
-
-The following code will create the first parts of an mzTab-M file programmatically:
-
-  import de.isas.lipidomics.model.*;
-  ...
-  MzTab goslin = new MzTab();
-  Metadata mtd = new Metadata();
-  mtd.mzTabVersion("2.0.0-M");
-  mtd.mzTabID("1");
-  mtd.addSoftwareItem(new Software().id(1).
-      parameter(new Parameter().id(1).
-          name("LipidDataAnalyzer").
-          value("2.6.3_nightly")));
-  MsRun msrun1 = new MsRun().id(1).
-      location(
-          "file://D:/Experiment1/Orbitrap_CID/negative/50/014_Ex1_Orbitrap_CID_neg_50.chrom");
-  mtd.addMsRunItem(msrun1);
-  Assay a1 = new Assay().id(1).
-      addMsRunRefItem(msrun1);
-  Assay a2 = new Assay().id(2).
-      addMsRunRefItem(msrun2);
-  mtd.addAssayItem(a1).addAssayItem(a2);
+  import de.isas.lipidomics.domain.*; // contains Domain objects like LipidAdduct, LipidSpecies ...
+  import de.isas.lipidomics.palinom.*; // contains the parser implementations
   ...
 
-== Exploring the test suite
+  String ref = "";
 
-The use-cases that were described in the previous sections are also covered in the unit tests. Particularly, the following classes are of interest:
-
-* https://github.com/lifs-tools/jmzTab-m/blob/master/api/src/test/java/de.isas.lipidomics/model/MzTabTest.java[MzTabTest] - creation and serialization of MzTab object trees using the Jackson JSON serializer.
-* https://github.com/lifs-tools/jmzTab-m/blob/master/io/src/test/java/de.isas.lipidomics/io/MZTabFileParserTest.java[MZTabFileParserTest] - test for reading of mzTab-m files.
-* https://github.com/lifs-tools/jmzTab-m/blob/master/io/src/test/java/de.isas.lipidomics/io/MzTabValidatingWriterTest.java[MzTabValidatingWriterTest] - writing with structural and syntactic validation.
-* https://github.com/lifs-tools/jmzTab-m/blob/master/io/src/test/java/de.isas.lipidomics/io/MzTabWriterTest.java[MzTabWriterTest] - plain writing of MzTab and roundtrip read/write/read testing.
-* https://github.com/lifs-tools/jmzTab-m/blob/master/validation/src/test/java/de.isas.lipidomics/validation/ExampleFilesValidationTestIT.java[ExampleFilesValidationTestIT] - semantic validation using a mapping file and parameter validation rules.
-* https://github.com/lifs-tools/jmzTab-m/blob/master/validation/src/test/java/de.isas.lipidomics/validation/JxPathTest.java[JxPathTest] - Object selection in MzTab models via the JxPath library.
+  // use the SwissLipids parser
+  SwissLipidsVisitorParser slParser = new SwissLipidsVisitorParser();
+  LipidAdduct sllipid = slParser.parse(ref);
+  // use the LipidMAPS parser
+  LipidMapsVisitorParser lmParser = new LipidMapsVisitorParser();
+  LipidAdduct lmlipid = lmParser.parse(ref);
+  // use the shorthand notation parser GOSLIN
+  GoslinVisitorParser goslinParser = new GoslinVisitorParser();
+  LipidAdduct golipid = goslinParser.parse(ref);
+  // use the shorthand notation parser with support for fragments GOSLIN_FRAGMENTS
+  GoslinFragmentsVisitorParser goslinFragmentsParser = new GoslinFragmentsVisitorParser();
+  LipidAdduct gflipid = goslinFragmentsParser.parse(ref);
 
 == References
 
-//This project is the reference implementation for the mzTab-M 2.0 standard:
+//This project is the Java implementation for Goslin.
 
 //  * **https://pubs.acs.org/doi/10.1021/acs.analchem.8b04310[N. Hoffmann et al., Analytical Chemistry 2019; Jan;91(5):3302-3310.] https://pubs.acs.org/doi/pdf/10.1021/acs.analchem.8b04310[PDF File.] https://www.ncbi.nlm.nih.gov/pubmed/30688441[PubMed record].**
 
