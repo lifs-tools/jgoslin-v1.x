@@ -31,29 +31,13 @@ In order to build the client code and run the unit tests, execute the following 
 
 	./mvnw install
 
-This generates the necessary domain specific code for a number of different languages, e.g. for Python, JAVA and R.
-In general, any language and framework for which swagger-codegen has templates available may be used. For details, please
-look at the `api/pom.xml` file and at the https://github.com/swagger-api/swagger-codegen[swagger-codegen repository and documentation].
-
-The generated code is available in the zip archives below the `api/target` directory:
-
-. goslin-api-python https://github.com/lifs-tools/pymzTab-m[GitHub project]
-. goslin-api-r https://github.com/lifs-tools/rmzTab-m[GitHub project]
-
-The generated JAVA code is available in a jar archive below the `api/target` directory:
-
-. jgoslin-api-<VERSION>.jar
-
-The generated client libraries only contain the basic domain object code. Parsing from mzTab and writing to mzTab still need to be
-implemented separately. The library provides this functionality for JAVA in the `io` sub-project.
+This generates the necessary domain specific code for Java. 
 
 == Running a validation with the command-line interface
-The `cli` sub-project provides a command line interface for validation of files using the mzTab 2.0 draft validator.
+The `cli` sub-project provides a command line interface for parsing of lipid names either from the command line or from a file with one lipid name per line.
 
-NOTE: Currently, we do not plan to provide a CLI-based validator for mzTab 1.0, since that is still being provided by the original https://github.com/PRIDE-Utilities/jmzTab[jmzTab project].
-
-After building the project as mentioned above with `./mvnw install`, the `cli/target` folder will contain the `cli-<version>-jgoslin-deployment.zip` file. Alternatively, you can download the latest
-cli zip file from Maven central: https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.isas.lipidomics%22%20AND%20a%3A%22jgoslin-cli%22%20[Search for latest cli artefact] and click on "bin.zip" to download.
+After building the project as mentioned above with `./mvnw install`, the `cli/target` folder will contain the `jgoslin-cli-<version>-bin.zip` file. Alternatively, you can download the latest
+cli zip file from Bintray: https://bintray.com/lifs/maven/jgoslin-cli[Search for latest jgoslin-cli-<version>-bin.zip artefact] and click to download.
 
 In order to run the validator, unzip that file, change into the unzipped folder and run
 
@@ -61,18 +45,25 @@ In order to run the validator, unzip that file, change into the unzipped folder 
 
 to see the available options.
 
-To validate a particular file with a given level (one of: Info, Warn, Error, where Info includes Warn and Error), run
+To parse a single lipid name from the command line, run
 
-  java -jar jgoslin-cli-<VERSION>.jar -c examples/MTBLS263.goslin -level Info
+  java -jar jgoslin-cli-<VERSION>.jar -n "Cer(d31:1/20:1)"
 
-To run a semantic validation based on a controlled vocabulary term mapping file, run
+To parse multiple lipid names from a file via the commmand line, run
 
-  java -jar jgoslin-cli-<VERSION>.jar -c examples/MTBLS263.goslin -level Info -s cv-mapping/mzTab-M-mapping.xml
+  java -jar jgoslin-cli-<VERSION>.jar -f lipidNames.txt
+
+To use a specific grammar, instead of trying all, run
+
+  java -jar jgoslin-cli-<VERSION>.jar -f lipidNames.txt -g GOSLIN
+
+To write output to the tab-separated output file 'goslin-out.tsv', run
+
+
 
 == Running the Web Application for Validation
 
-The validator web application code has been moved into a separate project: https://github.com/lifs-tools/goslin-webapp
-The application is available at: https://apps.lifs.isas.de/goslin
+The goslin web application is available at: https://apps.lifs.isas.de/goslin
 
 == Building the Docker Image
 

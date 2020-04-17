@@ -18,11 +18,8 @@ package de.isas.lipidomics.palinom.cli;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidClass;
-import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
-import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
-import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.palinom.SyntaxErrorListener;
 import de.isas.lipidomics.palinom.VisitorParser;
 import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
@@ -41,8 +38,13 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -146,7 +148,7 @@ public class CmdLineParser {
             } else {
                 results = parseNames(lipidNames);
             }
-            if(results.isEmpty()) {
+            if (results.isEmpty()) {
                 log.info("No results generated. Please check input file or lipid names passed on the cli!");
                 System.exit(1);
             }
@@ -222,31 +224,65 @@ public class CmdLineParser {
         }
     }
 
+    protected static String toTable(List<Pair<String, List<ValidationResult>>> results) {
+        StringBuilder sb = new StringBuilder();
+        HashSet<String> keys = new LinkedHashSet<>();
+        List<ValidationResult> validationResults = results.stream().map((t) -> {
+            return t.getValue();
+        }).flatMap(List::stream).collect(Collectors.toList());
+        List<Map<String, String>> entries = validationResults.stream().map((t) -> {
+            Map<String, String> m = new LinkedHashMap<>();
+            m.put("Normalized Name", Optional.ofNullable(t.getGoslinName()).orElse(""));
+            m.put("Original Name", t.getLipidName());
+            m.put("Grammar", t.getGrammar().name());
+            m.put("Message", t.getMessages().stream().collect(Collectors.joining(" | ")));
+//           m.put("Adduct",t.getLipidAdduct().getAdduct().toString());
+//           m.put("Sum Formula", t.getLipidAdduct().getSumFormula());
+            if (t.getLipidAdduct() != null) {
+                m.put("Lipid Maps Category", t.getLipidAdduct().getLipid().getLipidCategory().getFullName() + " [" + t.getLipidAdduct().getLipid().getLipidCategory().name() + "]");
+                LipidClass lclass = t.getLipidAdduct().getLipid().getLipidClass().orElse(LipidClass.UNDEFINED);
+                m.put("Lipid Maps Main Class", lclass.getLipidMapsClassName());
+                m.put("Functional Class Abbr", "[" + lclass.getAbbreviation() + "]");
+                m.put("Functional Class Synonyms", "[" + lclass.getSynonyms().stream().collect(Collectors.joining(", ")) + "]");
+                m.put("Level", t.getLipidSpeciesInfo().getLevel().toString());
+                m.put("Total #C", t.getLipidSpeciesInfo().getNCarbon() + "");
+                m.put("Total #OH", t.getLipidSpeciesInfo().getNHydroxy() + "");
+                m.put("Total #DB", t.getLipidSpeciesInfo().getNDoubleBonds() + "");
+                for (FattyAcid fa : t.getFattyAcids().values()) {
+                    m.put(fa.getName() + " SN Position", fa.getPosition() + "");
+                    m.put(fa.getName() + " #C", fa.getNCarbon() + "");
+                    m.put(fa.getName() + " #OH", fa.getNHydroxy() + "");
+                    m.put(fa.getName() + " #DB", fa.getNDoubleBonds() + "");
+                    m.put(fa.getName() + " Bond Type", fa.getLipidFaBondType() + "");
+                }
+            } else {
+                m.put("Lipid Maps Category", "");
+                m.put("Lipid Maps Main Class", "");
+                m.put("Functional Class Abbr", "");
+                m.put("Functional Class Synonyms", "");
+                m.put("Level", "");
+                m.put("Total #C", "");
+                m.put("Total #OH", "");
+                m.put("Total #DB", "");
+            }
+            keys.addAll(m.keySet());
+            return m;
+        }).collect(Collectors.toList());
+        sb.append(keys.stream().collect(Collectors.joining("\t"))).append("\n");
+        for (Map<String, String> m : entries) {
+            List<String> l = new LinkedList();
+            for (String key : keys) {
+                l.add(m.getOrDefault(key, ""));
+            }
+            sb.append(l.stream().collect(Collectors.joining("\t"))).append("\n");
+        }
+        return sb.toString();
+    }
+
     protected static void writeToWriter(BufferedWriter bw, List<Pair<String, List<ValidationResult>>> results) {
-        String header = "ORIGINAL_NAME\tNORMALIZED_NAME\tGRAMMAR\tLEVEL\tLM_CATEGORY\tLM_CLASS\tFAS\tMESSAGES";
         try {
-            bw.write(header);
+            bw.write(toTable(results));
             bw.newLine();
-            results.stream().forEach((pair) -> {
-                Pair<String, List<ValidationResult>> resultPair = pair;
-                resultPair.getValue().stream().forEach((validationResult) -> {
-                    StringBuilder rowBuilder = new StringBuilder();
-                    rowBuilder.append(validationResult.getLipidName()).append("\t");
-                    rowBuilder.append(validationResult.getGoslinName()).append("\t");
-                    rowBuilder.append(validationResult.getGrammar()).append("\t");
-                    rowBuilder.append(validationResult.getLevel()).append("\t");
-                    rowBuilder.append(validationResult.getLipidMapsCategory()).append("\t");
-                    rowBuilder.append(validationResult.getLipidMapsClass()).append("\t");
-                    rowBuilder.append("").append("\t");
-                    rowBuilder.append(validationResult.getMessages().stream().collect(Collectors.joining("\\|")));
-                    try {
-                        bw.write(rowBuilder.toString());
-                        bw.newLine();
-                    } catch (IOException ex) {
-                        log.error("Caught exception while trying to write validation results to buffered writer.", ex);
-                    }
-                });
-            });
         } catch (IOException ex) {
             log.error("Caught exception while trying to write validation results to buffered writer.", ex);
         }
@@ -303,13 +339,14 @@ public class CmdLineParser {
                 String normalizedName = la.getLipid().getLipidString();
                 validationResult.setGoslinName(normalizedName);
             } catch (RuntimeException re) {
-                log.warn("Parsing error for {}!", lipidName);
+                log.debug("Parsing error for {}!", lipidName);
             }
             extractFas(la, validationResult);
         } catch (ParsingException ex) {
             validationResult.setLipidName(lipidName);
             validationResult.setMessages(toStringMessages(listener));
-            log.warn("Caught exception while parsing " + lipidName + " with " + grammar + " grammar: ", ex);
+            validationResult.setGrammar(grammar);
+            log.debug("Caught exception while parsing " + lipidName + " with " + grammar + " grammar: ", ex);
 
         }
         return Pair.of(lipidName, validationResult);
