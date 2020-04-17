@@ -2,7 +2,7 @@
 Nils Hoffmann <nils.hoffmann@isas.de>
 :toc: macro
 
-image::https://api.bintray.com/packages/lifs/maven/jgoslin/images/download.svg[link="https://bintray.com/lifs/maven/jgoslin/_latestVersion"]
+image::https://api.bintray.com/packages/lifs/maven/jgoslin-cli/images/download.svg[link="https://bintray.com/lifs/maven/jgoslin-cli/_latestVersion"]
 //image:https://travis-ci.org/lifs-tools/jmzTab-m.svg?branch=master["Build Status", link="https://travis-ci.org/lifs-tools/jmzTab-m"] image:https://img.shields.io/maven-central/v/de.isas.lipidomics/jgoslin-cli.svg["Maven Central", link="https://search.maven.org/search?q=a:jgoslin-cli"] image:https://img.shields.io/github/release/lifs-tools/jmzTab-m.svg["Latest Release", link="https://github.com/lifs-tools/jmzTab-m/releases/latest"] image:https://zenodo.org/badge/107954666.svg["DOI", link="https://zenodo.org/badge/latestdoi/107954666"] image:https://img.shields.io/docker/pulls/lifs/jgoslin-cli.svg["Docker Hub Pulls", link="https://hub.docker.com/r/lifs/jgoslin-cli"] image:https://anaconda.org/bioconda/jgoslin-m/badges/installer/conda.svg["Install with Conda", link="https://anaconda.org/bioconda/jgoslin-m"]
 
 //NOTE: If you use the jGoslin library or the web application, please cite the following paper: +
