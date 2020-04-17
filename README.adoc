@@ -77,16 +77,10 @@ To show the coordinates of the image, call
 
   docker image ls | grep "jgoslin-cli"
 
-# == Pulling the latest Docker Image
-
-#The latest Docker image is now hosted at docker hub. To retrieve the latest version, run:
-
-#  docker pull lifs/jgoslin-cli
-
 == Running the Docker Image
 
 If you have not done so, please build the Docker image of the validator cli or pull it from the docker hub (see previous sections).
-Then, run the following command, replacing `<VERSION>` with the current version, e.g. `1.0.4`) and `<DATA_DIR>` with the **local** directory containing your mzTab-M files:
+Then, run the following command, replacing `<VERSION>` with the current version, e.g. `1.0.0`) and `<DATA_DIR>` with the **local** directory containing your lipid name files:
 
   docker run -v <YOUR_DATA_DIR>:/home/data:rw lifs/jgoslin-cli:<VERSION>
 
@@ -133,7 +127,7 @@ To use the parser libraries (reading and validation) in your own Maven projects,
 where `jgoslin.version` is the version of jgoslin you wish to use, e.g. for a release version:
 
   <properties>
-    <jgoslin.version>1.0.4</jgoslin.version>
+    <jgoslin.version>1.0.0</jgoslin.version>
   </properties>
 
 as defined in the properties section of your pom file.
