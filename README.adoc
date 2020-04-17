@@ -37,7 +37,7 @@ This generates the necessary domain specific code for Java.
 The `cli` sub-project provides a command line interface for parsing of lipid names either from the command line or from a file with one lipid name per line.
 
 After building the project as mentioned above with `./mvnw install`, the `cli/target` folder will contain the `jgoslin-cli-<version>-bin.zip` file. Alternatively, you can download the latest
-cli zip file from Bintray: https://bintray.com/lifs/maven/jgoslin-cli[Search for latest jgoslin-cli-<version>-bin.zip artefact] and click to download.
+cli zip file from Bintray: https://bintray.com/lifs/maven/jgoslin-cli[Search for latest jgoslin-cli-<VERSION>-bin.zip artefact] and click to download.
 
 In order to run the validator, unzip that file, change into the unzipped folder and run
 
@@ -77,11 +77,11 @@ To show the coordinates of the image, call
 
   docker image ls | grep "jgoslin-cli"
 
-== Pulling the latest Docker Image
+# == Pulling the latest Docker Image
 
-The latest Docker image is now hosted at docker hub. To retrieve the latest version, run:
+#The latest Docker image is now hosted at docker hub. To retrieve the latest version, run:
 
-  docker pull lifs/jgoslin-cli
+#  docker pull lifs/jgoslin-cli
 
 == Running the Docker Image
 
@@ -144,24 +144,50 @@ as defined in the properties section of your pom file.
 
 The following snippet shows how to parse a shorthand lipid name with the different parsers:
 
-  import de.isas.lipidomics.domain.*; // contains Domain objects like LipidAdduct, LipidSpecies ...
-  import de.isas.lipidomics.palinom.*; // contains the parser implementations
-  ...
+	import de.isas.lipidomics.domain.*; // contains Domain objects like LipidAdduct, LipidSpecies ...
+	import de.isas.lipidomics.palinom.*; // contains the parser implementations
+	...
 
-  String ref = "";
+	String ref = "Cer(d18:1/20:2)";
+	try {
+		// use the SwissLipids parser
+		SwissLipidsVisitorParser slParser = new SwissLipidsVisitorParser();
+		LipidAdduct sllipid = slParser.parse(ref);
+		System.out.println(sllipid.getLipidString()); // to print the lipid name to the console
+	} catch (ParsingException pe) {
+	// catch this for any syntactical issues with the name during parsing with a particular parser
+		pe.printStackTrace();
+	} catch (ParseTreeVisitorException ptve) {
+	// catch this for any structural issues with the name during parsing with a particular parser
+		ptve.printStackTrace();
+	}	
 
-  // use the SwissLipids parser
-  SwissLipidsVisitorParser slParser = new SwissLipidsVisitorParser();
-  LipidAdduct sllipid = slParser.parse(ref);
-  // use the LipidMAPS parser
-  LipidMapsVisitorParser lmParser = new LipidMapsVisitorParser();
-  LipidAdduct lmlipid = lmParser.parse(ref);
-  // use the shorthand notation parser GOSLIN
-  GoslinVisitorParser goslinParser = new GoslinVisitorParser();
-  LipidAdduct golipid = goslinParser.parse(ref);
-  // use the shorthand notation parser with support for fragments GOSLIN_FRAGMENTS
-  GoslinFragmentsVisitorParser goslinFragmentsParser = new GoslinFragmentsVisitorParser();
-  LipidAdduct gflipid = goslinFragmentsParser.parse(ref);
+	//alternatively, use the other parsers. Don't forget to place try catch blocks around the following lines, as for the SwissLipids parser example
+	// use the LipidMAPS parser
+	LipidMapsVisitorParser lmParser = new LipidMapsVisitorParser();
+	LipidAdduct lmlipid = lmParser.parse(ref);
+	// use the shorthand notation parser GOSLIN
+	GoslinVisitorParser goslinParser = new GoslinVisitorParser();
+	LipidAdduct golipid = goslinParser.parse(ref);
+	// use the shorthand notation parser with support for fragments GOSLIN_FRAGMENTS
+	GoslinFragmentsVisitorParser goslinFragmentsParser = new GoslinFragmentsVisitorParser();
+	LipidAdduct gflipid = goslinFragmentsParser.parse(ref);
+
+To retrieve a parsed lipid name on a higher hierarchy of lipid level, simply define the
+level when requesting the lipid name:
+
+	System.out.println(sllipid.getLipidString(LipidLevel.CATEGORY));
+	System.out.println(sllipid.getLipidString(LipidLevel.CLASS));
+	System.out.println(sllipid.getLipidString(LipidLevel.SPECIES));
+	System.out.println(sllipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
+	System.out.println(sllipid.getLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
+	System.out.println(sllipid.getLipidString(LipidLevel.ISOMERIC_SUBSPECIES)); // will throw a ConstraintViolationException since this lipid is only on structural subspecies level
+
+This functionality allows easy computation of aggregate statistics of lipids
+on lipid class, category or arbitrary levels. Requesting a lipid name on a lower level than the
+provided will raise an exception.
+
+For more examples how the API works, please consult the tests, especially in the `parsers` module.
 
 == References
 

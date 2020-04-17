@@ -61,7 +61,8 @@ public class LipidSpeciesTest {
         );
         String expectedSpecies = "TAG 20:2;1";
         assertEquals(expectedSpecies, lss.getLipidString(LipidLevel.SPECIES, true));
-
+        assertEquals(expectedSpecies, new LipidAdduct(lss, Adduct.NONE, "", Fragment.NONE).getNormalizedLipidString(LipidLevel.SPECIES));
+        assertEquals("TG 20:2;1", new LipidAdduct(lss, Adduct.NONE, "", Fragment.NONE).toString());
         String expectedMolSubSpecies = "TG 8:1_12:1_18:0";
         String expectedNormalizedMolSubSpecies = "TAG 8:1_12:1_18:0";
         MolecularFattyAcidBuilder mfab = FattyAcid.molecularFattyAcidBuilder();

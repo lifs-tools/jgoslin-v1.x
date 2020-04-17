@@ -39,4 +39,8 @@ public class Fragment {
     public static final Fragment NONE = new None();
 
     private String name;
+    
+    public String getLipidString() {
+        return name;
+    }
 }

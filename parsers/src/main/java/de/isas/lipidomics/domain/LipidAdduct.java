@@ -36,4 +36,80 @@ public class LipidAdduct {
     private String sumFormula;
     private Fragment fragment;
 
+    public String getLipidString(LipidLevel level) {
+        StringBuilder sb = new StringBuilder();
+        if (lipid != null) {
+            sb.append(lipid.getLipidString(level));
+        } else {
+            return "";
+        }
+
+        if (adduct != null) {
+            sb.append(adduct.getLipidString());
+        }
+        return sb.toString();
+    }
+
+    public String getNormalizedLipidString(LipidLevel level) {
+        StringBuilder sb = new StringBuilder();
+        if (lipid != null) {
+            sb.append(lipid.getLipidString(level, true));
+        } else {
+            return "";
+        }
+
+        if (adduct != null) {
+            sb.append(adduct.getLipidString());
+        }
+        return sb.toString();
+    }
+
+    public String getClassName() {
+        if (lipid != null) {
+            return lipid.getLipidClass().orElse(LipidClass.UNDEFINED).getAbbreviation();
+        } else {
+            return "";
+        }
+    }
+
+    public String getLipidFragmentString(LipidLevel level) {
+        StringBuilder sb = new StringBuilder();
+        if (lipid != null) {
+            sb.append(getLipidString(level));
+        } else {
+            return "";
+        }
+        if (adduct != null) {
+            sb.append(adduct.getLipidString());
+        }
+        if (fragment != null) {
+            sb.append(" - ").append(fragment.getLipidString());
+        }
+        return sb.toString();
+    }
+
+    public String getNormalizedLipidFragmentString(LipidLevel level) {
+        StringBuilder sb = new StringBuilder();
+        if (lipid != null) {
+            sb.append(getNormalizedLipidString(level));
+        } else {
+            return "";
+        }
+        if (adduct != null) {
+            sb.append(adduct.getLipidString());
+        }
+        if (fragment != null) {
+            sb.append(" - ").append(fragment.getLipidString());
+        }
+        return sb.toString();
+    }
+    
+    @Override
+    public String toString() {
+        if(lipid!=null) {
+            return getLipidString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+        }
+        return "";
+    }
+
 }

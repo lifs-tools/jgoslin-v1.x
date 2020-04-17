@@ -41,6 +41,9 @@ public class Adduct {
     }
     
     public String getLipidString() {
+        if (adductString==null || adductString.isEmpty()) {
+            return "";
+        }
         if (charge == 0){
             return "[M]";
         }
