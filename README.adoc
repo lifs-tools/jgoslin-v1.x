@@ -24,6 +24,15 @@ The Maven site with JavaDoc is available https://lifs-tools.github.io/jgoslin[he
 
 The web-based application is available https://github.com/lifs-tools/goslin-webapp[here].
 
+== Related Projects
+
+. https://github.com/lifs-tools/jgoslin[This project]
+. http://github.com/lifs-tools/goslin[Goslin grammars and test files]
+. https://github.com/lifs-tools/cppgoslin[C++ implementation]
+. https://github.com/lifs-tools/pygoslin[Python implementation]
+. https://github.com/lifs-tools/rgoslin[R implementation]
+. https://github.com/lifs-tools/goslin-webapp[Webapplication and REST API]
+
 toc::[]
 
 == Building the project and generating client code from the command-line
