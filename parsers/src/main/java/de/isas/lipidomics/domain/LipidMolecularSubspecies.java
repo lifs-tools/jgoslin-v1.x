@@ -27,9 +27,13 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * A molecular subspecies. Child of LipidSpecies. Individual FAs are known,
+ * but neither their sn positions nor double bond positions.
+ * 
  * Example: Phosphatidylinositol (8:0-8:0) or PI(8:0-8:0)
  *
  * @author nils.hoffmann
+ * @see LipidSpecies
  */
 @Slf4j
 @Data

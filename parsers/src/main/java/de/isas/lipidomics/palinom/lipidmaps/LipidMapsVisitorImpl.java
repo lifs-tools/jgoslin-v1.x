@@ -32,6 +32,9 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Base visitor implementation for the LipidMaps grammar.
+ * 
+ *
  * Overriding implementation of {@link LipidMapsBaseVisitor}. Creates
  * {@link LipidAdduct} instances from the provided context.
  *
@@ -42,12 +45,12 @@ import lombok.extern.slf4j.Slf4j;
 class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
 
     /**
-     *
+     * Produces a LipidAdduct given the LipidContext.
      * @throws ParseTreeVisitorException for structural or state-related issues
      * while trying to process a parsing context.
      * @throws RuntimeException
      * @param ctx
-     * @return
+     * @return a LipidAdduct.
      */
     @Override
     public LipidAdduct visitLipid(LipidMapsParser.LipidContext ctx) {

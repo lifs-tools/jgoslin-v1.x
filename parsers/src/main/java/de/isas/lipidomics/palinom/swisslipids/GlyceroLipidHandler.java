@@ -23,6 +23,7 @@ import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Optional;
 
 /**
+ * Handler implementation for Glycerolipids.
  *
  * @author nilshoffmann
  */
@@ -73,8 +74,8 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
             if (dsl.gl_fa().fa3().fa3_unsorted() != null) {
                 return msfh.visitMolecularSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_unsorted().fa());
             } else if (dsl.gl_fa().fa3().fa3_sorted() != null) {
-                if(dsl.gl_fa().fa3().fa3_sorted().fa() != null) {
-                    if(fhf.isIsomericFa(dsl.gl_fa().fa3().fa3_sorted().fa())) {
+                if (dsl.gl_fa().fa3().fa3_sorted().fa() != null) {
+                    if (fhf.isIsomericFa(dsl.gl_fa().fa3().fa3_sorted().fa())) {
                         return isfh.visitIsomericSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_sorted().fa());
                     } else {
                         return ssfh.visitStructuralSubspeciesFas(headGroup, dsl.gl_fa().fa3().fa3_sorted().fa());
@@ -98,12 +99,12 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
             } else if (lsl.gl_mono_fa().fa2() != null) {
                 if (lsl.gl_mono_fa().fa2().fa2_unsorted() != null) {
                     return msfh.visitMolecularSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_unsorted().fa());
-                } else if(lsl.gl_mono_fa().fa2().fa2_sorted() != null) {
-                    if(lsl.gl_mono_fa().fa2().fa2_sorted() .fa() != null) {
-                        if(fhf.isIsomericFa(lsl.gl_mono_fa().fa2().fa2_sorted().fa())) {
+                } else if (lsl.gl_mono_fa().fa2().fa2_sorted() != null) {
+                    if (lsl.gl_mono_fa().fa2().fa2_sorted().fa() != null) {
+                        if (fhf.isIsomericFa(lsl.gl_mono_fa().fa2().fa2_sorted().fa())) {
                             return isfh.visitIsomericSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_sorted().fa());
                         } else {
-                            return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_sorted().fa());   
+                            return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_mono_fa().fa2().fa2_sorted().fa());
                         }
                     } else {
                         throw new ParseTreeVisitorException("Unhandled context state in Gl mono FA2 sorted!");
@@ -126,11 +127,11 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
                 if (lsl.gl_molecular_fa().fa2().fa2_unsorted() != null) {
                     return msfh.visitMolecularSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_unsorted().fa());
                 } else if (lsl.gl_molecular_fa().fa2().fa2_sorted() != null) {
-                    if(lsl.gl_molecular_fa().fa2().fa2_sorted().fa() != null) {
-                        if(fhf.isIsomericFa(lsl.gl_molecular_fa().fa2().fa2_sorted().fa())) {
+                    if (lsl.gl_molecular_fa().fa2().fa2_sorted().fa() != null) {
+                        if (fhf.isIsomericFa(lsl.gl_molecular_fa().fa2().fa2_sorted().fa())) {
                             return isfh.visitIsomericSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_sorted().fa());
                         } else {
-                            return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_sorted().fa());   
+                            return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.gl_molecular_fa().fa2().fa2_sorted().fa());
                         }
                     } else {
                         throw new ParseTreeVisitorException("Unhandled context state in GL regular FA2 sorted!");

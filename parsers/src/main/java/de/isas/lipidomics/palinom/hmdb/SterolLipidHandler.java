@@ -15,7 +15,6 @@
  */
 package de.isas.lipidomics.palinom.hmdb;
 
-import de.isas.lipidomics.palinom.swisslipids.*;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.HMDBParser.Lipid_pureContext;
@@ -25,6 +24,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
+ * Handler implementation for Sterollipids.
  *
  * @author nilshoffmann
  */

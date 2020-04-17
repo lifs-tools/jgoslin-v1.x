@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * Handler for Structural FAs.
  *
  * @author nilshoffmann
  */

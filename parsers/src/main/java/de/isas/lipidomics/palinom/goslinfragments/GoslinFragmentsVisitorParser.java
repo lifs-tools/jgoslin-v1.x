@@ -20,7 +20,7 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.PredictionMode;
 
 /**
- *
+ * Parser implementation for the GoslinFragments grammar.
  * @author nils.hoffmann
  */
 @Slf4j

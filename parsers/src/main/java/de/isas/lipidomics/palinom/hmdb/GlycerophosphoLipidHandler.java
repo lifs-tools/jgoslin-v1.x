@@ -23,6 +23,7 @@ import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Optional;
 
 /**
+ * Handler implementation for Glycero-phospholipids.
  *
  * @author nilshoffmann
  */
@@ -73,14 +74,14 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
             if (dsl.pl_fa().fa2().fa2_unsorted() != null) {
                 return msfh.visitMolecularSubspeciesFas(headGroup, dsl.pl_fa().fa2().fa2_unsorted().fa());
             } else if (dsl.pl_fa().fa2().fa2_sorted() != null) {
-                if(dsl.pl_fa().fa2().fa2_sorted().fa() != null) {
-                    if(fhf.isIsomericFa(dsl.pl_fa().fa2().fa2_sorted().fa())) {
+                if (dsl.pl_fa().fa2().fa2_sorted().fa() != null) {
+                    if (fhf.isIsomericFa(dsl.pl_fa().fa2().fa2_sorted().fa())) {
                         return isfh.visitIsomericSubspeciesFas(headGroup, dsl.pl_fa().fa2().fa2_sorted().fa());
                     } else {
                         return ssfh.visitStructuralSubspeciesFas(headGroup, dsl.pl_fa().fa2().fa2_sorted().fa());
                     }
                 } else {
-                    throw new ParseTreeVisitorException("Unhandled context state in GP regular FA2 sorted!");    
+                    throw new ParseTreeVisitorException("Unhandled context state in GP regular FA2 sorted!");
                 }
             } else {
                 throw new ParseTreeVisitorException("Unhandled context state in GP regular FA2!");
@@ -99,8 +100,8 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
                 if (lsl.pl_three_fa().fa3().fa3_unsorted() != null) {
                     return msfh.visitMolecularSubspeciesFas(headGroup, lsl.pl_three_fa().fa3().fa3_unsorted().fa());
                 } else if (lsl.pl_three_fa().fa3().fa3_sorted() != null) {
-                    if(lsl.pl_three_fa().fa3().fa3_sorted().fa() != null) {
-                        if(fhf.isIsomericFa(lsl.pl_three_fa().fa3().fa3_sorted().fa())) {
+                    if (lsl.pl_three_fa().fa3().fa3_sorted().fa() != null) {
+                        if (fhf.isIsomericFa(lsl.pl_three_fa().fa3().fa3_sorted().fa())) {
                             return isfh.visitIsomericSubspeciesFas(headGroup, lsl.pl_three_fa().fa3().fa3_sorted().fa());
                         } else {
                             return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.pl_three_fa().fa3().fa3_sorted().fa());
@@ -128,8 +129,8 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
                 if (lsl.pl_four_fa().fa2().fa2_unsorted() != null) {
                     return msfh.visitMolecularSubspeciesFas(headGroup, lsl.pl_four_fa().fa2().fa2_unsorted().fa());
                 } else if (lsl.pl_four_fa().fa2().fa2_sorted() != null) {
-                    if(lsl.pl_four_fa().fa2().fa2_sorted().fa() != null) {
-                        if(fhf.isIsomericFa(lsl.pl_four_fa().fa2().fa2_sorted().fa())) {
+                    if (lsl.pl_four_fa().fa2().fa2_sorted().fa() != null) {
+                        if (fhf.isIsomericFa(lsl.pl_four_fa().fa2().fa2_sorted().fa())) {
                             return isfh.visitIsomericSubspeciesFas(headGroup, lsl.pl_four_fa().fa2().fa2_sorted().fa());
                         } else {
                             return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.pl_four_fa().fa2().fa2_sorted().fa());
@@ -144,15 +145,15 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
                 if (lsl.pl_four_fa().fa4().fa4_unsorted() != null) {
                     return msfh.visitMolecularSubspeciesFas(headGroup, lsl.pl_four_fa().fa4().fa4_unsorted().fa());
                 } else if (lsl.pl_four_fa().fa4().fa4_sorted() != null) {
-                     if(lsl.pl_four_fa().fa4().fa4_sorted().fa() != null) {
-                        if(fhf.isIsomericFa(lsl.pl_four_fa().fa4().fa4_sorted().fa())) {
+                    if (lsl.pl_four_fa().fa4().fa4_sorted().fa() != null) {
+                        if (fhf.isIsomericFa(lsl.pl_four_fa().fa4().fa4_sorted().fa())) {
                             return isfh.visitIsomericSubspeciesFas(headGroup, lsl.pl_four_fa().fa4().fa4_sorted().fa());
                         } else {
                             return ssfh.visitStructuralSubspeciesFas(headGroup, lsl.pl_four_fa().fa4().fa4_sorted().fa());
                         }
-                     } else {
+                    } else {
                         throw new ParseTreeVisitorException("Unhandled context state in GP four FA4 sorted!");
-                     }
+                    }
                 } else {
                     throw new ParseTreeVisitorException("Unhandled context state in GP four FA4!");
                 }

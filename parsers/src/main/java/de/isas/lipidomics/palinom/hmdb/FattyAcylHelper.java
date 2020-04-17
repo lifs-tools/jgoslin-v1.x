@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
+ * Helper class for FA and LCB handling.
  *
  * @author nilshoffmann
  */
@@ -66,7 +67,7 @@ public class FattyAcylHelper {
                 lfbt = LipidFaBondType.ETHER_PLASMENYL;
             } else if ("i-".equals(faContext.fa_core().ether().getText()) || "a-".equals(faContext.fa_core().ether().getText())) {
 //                lfbt = LipidFaBondType.ETHER_UNSPECIFIED;
-                throw new ParseTreeVisitorException("Unsupported FA prefix: " + faContext.fa_core().ether().getText()+". Please contact the developers at https://lifs.isas.de/support for assistance.");
+                throw new ParseTreeVisitorException("Unsupported FA prefix: " + faContext.fa_core().ether().getText() + ". Please contact the developers at https://lifs.isas.de/support for assistance.");
             } else {
                 throw new ParseTreeVisitorException("Unknown ether context value: " + faContext.fa_core().ether());
             }
@@ -91,12 +92,10 @@ public class FattyAcylHelper {
     }
 
     /**
-     * db_positions : ROB db_position RCB; db_position : db_single_position |
-     * db_position db_position_separator db_position; db_single_position :
-     * db_position_number | db_position_number cistrans; db_position_number :
-     * number;
+     * Resolve double bond positions from the given Db_positionsContext.
      *
-     * @return
+     * @param context the double bond context.
+     * @return a map of position to double bond configuration mappings.
      */
     public Map<Integer, String> resolveDoubleBondPositions(HMDBParser.Db_positionsContext context) {
         Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();

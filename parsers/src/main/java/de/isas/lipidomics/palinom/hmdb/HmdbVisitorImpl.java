@@ -30,21 +30,23 @@ import java.util.BitSet;
 import java.util.Optional;
 
 /**
- * Overriding implementation of {@link SwissLipidsBaseVisitor}. Creates
+ * Base visitor implementation for the GoslinFragments grammar.
+ * 
+ * Overriding implementation of {@link HMDBBaseVisitor}. Creates
  * {@link LipidAdduct} instances from the provided context.
  *
- * @see SwissLipidsVisitorParser
+ * @see HmdbVisitorParser
  * @author nils.hoffmann
  */
 public class HmdbVisitorImpl extends HMDBBaseVisitor<LipidAdduct> {
 
     /**
-     *
+     * Produces a LipidAdduct given the LipidContext.
      * @throws ParseTreeVisitorException for structural or state-related issues
      * while trying to process a parsing context.
      * @throws RuntimeException
      * @param ctx
-     * @return
+     * @return a LipidAdduct.
      */
     @Override
     public LipidAdduct visitLipid(HMDBParser.LipidContext ctx) {

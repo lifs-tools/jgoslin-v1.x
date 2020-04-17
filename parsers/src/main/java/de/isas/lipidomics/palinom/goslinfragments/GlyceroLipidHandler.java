@@ -25,7 +25,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- *
+ * Handler implementation for Glycerolipids.
  * @author nilshoffmann
  */
 @Slf4j

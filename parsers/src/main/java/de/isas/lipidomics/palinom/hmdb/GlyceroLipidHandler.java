@@ -23,7 +23,7 @@ import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Optional;
 
 /**
- *
+ * Handler implementation for Glycerolipids.
  * @author nilshoffmann
  */
 public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {

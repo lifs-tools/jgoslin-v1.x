@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
+ * Helper class for FA and LCB handling.
  *
  * @author nilshoffmann
  */
@@ -73,12 +74,10 @@ public class FattyAcylHelper {
     }
 
     /**
-     * db_positions : ROB db_position RCB; db_position : db_single_position |
-     * db_position db_position_separator db_position; db_single_position :
-     * db_position_number | db_position_number cistrans; db_position_number :
-     * number;
+     * Resolve double bond positions from the given Db_positionsContext.
      *
-     * @return
+     * @param context the double bond context.
+     * @return a map of position to double bond configuration mappings.
      */
     public Map<Integer, String> resolveDoubleBondPositions(GoslinFragmentsParser.Db_positionsContext context) {
         Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();

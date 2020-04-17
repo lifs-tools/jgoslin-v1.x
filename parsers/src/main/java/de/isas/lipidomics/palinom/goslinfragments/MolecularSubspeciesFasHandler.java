@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Handler for Molecular FAs.
  *
  * @author nilshoffmann
  */

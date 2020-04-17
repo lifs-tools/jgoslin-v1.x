@@ -18,8 +18,7 @@ import lombok.Setter;
  * knowledge, apart from the head group, is first encoded in the lipid species.
  *
  * A typical lipid species is
- * <a href="https://www.swisslipids.org/#/entity/SLM:000056493" target="_blank" title="PC 32:0">PC
- * 32:0</a>, where the head group is defined as PC (Glycerophosphocholines),
+ * PC 32:0 (SwissLipids SLM:000056493), where the head group is defined as PC (Glycerophosphocholines),
  * with fatty acyl chains of unknown individual composition, but known total
  * composition (32 carbon atoms, zero double bonds, no hydroxylations).
  *

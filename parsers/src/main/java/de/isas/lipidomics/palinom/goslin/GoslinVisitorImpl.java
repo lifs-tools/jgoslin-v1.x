@@ -31,19 +31,24 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Base visitor implementation for the Goslin grammar.
+ * 
  *
+ * Overriding implementation of {@link GoslinBaseVisitor}. Creates
+ * {@link LipidAdduct} instances from the provided context.
+ * 
  * @author nils.hoffmann
  */
 @Slf4j
 class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
     /**
-     *
+     * Produces a LipidAdduct given the LipidContext.
      * @throws ParseTreeVisitorException for structural or state-related issues
      * while trying to process a parsing context.
      * @throws RuntimeException
      * @param ctx
-     * @return
+     * @return a LipidAdduct.
      */
     @Override
     public LipidAdduct visitLipid(GoslinParser.LipidContext ctx) {

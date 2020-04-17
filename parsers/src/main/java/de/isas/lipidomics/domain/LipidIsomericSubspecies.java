@@ -23,18 +23,23 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
+ * An isomeric subspecies. Child of LipidStructuralSubspecies. Individual FAs,
+ * their sn positions, and the double bond positions are known.
+ *
  * Example: PE(P-18:0/22:6(4Z,7Z,10Z,13Z,16Z,19Z))
  *
  * @author nils.hoffmann
+ * @see LipidStructuralSubspecies
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
 
     /**
+     * Creates a new LipidIsomericSubspecies.
      *
-     * @param headGroup
-     * @param fa
+     * @param headGroup the head group for this lipid.
+     * @param fa the FattyAcids attached to this lipid.
      */
     @Builder(builderMethodName = "lipidIsomericSubspeciesBuilder")
     public LipidIsomericSubspecies(String headGroup, FattyAcid... fa) {

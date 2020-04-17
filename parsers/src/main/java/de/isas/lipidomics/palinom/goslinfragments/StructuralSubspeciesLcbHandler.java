@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * Handler for Structural LCBs.
  *
  * @author nilshoffmann
  */

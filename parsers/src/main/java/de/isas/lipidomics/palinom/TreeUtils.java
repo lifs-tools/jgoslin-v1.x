@@ -6,19 +6,34 @@ import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.Trees;
 
+/**
+ * Utilities to pretty print a parse tree tree.
+ *
+ * @author nilshoffmann
+ */
 public class TreeUtils {
 
-    /** Platform dependent end-of-line marker */
+    /**
+     * Platform dependent end-of-line marker
+     */
     public static final String Eol = System.lineSeparator();
-    /** The literal indent char(s) used for pretty-printing */
+    /**
+     * The literal indent char(s) used for pretty-printing
+     */
     public static final String Indents = "  ";
     private static int level;
 
-    private TreeUtils() {}
+    private TreeUtils() {
+    }
 
     /**
-     * Pretty print out a whole tree. {@link #getNodeText} is used on the node payloads to get the text
-     * for the nodes. (Derived from Trees.toStringTree(....))
+     * Pretty print out a whole tree. {@link Trees#getNodeText} is used on the node
+     * payloads to get the text for the nodes. (Derived from
+     * Trees.toStringTree(....))
+     *
+     * @param t the tree.
+     * @param ruleNames a list of rules names.
+     * @return the pretty printed tree.
      */
     public static String toPrettyTree(final Tree t, final List<String> ruleNames) {
         level = 0;
@@ -26,7 +41,9 @@ public class TreeUtils {
     }
 
     private static String process(final Tree t, final List<String> ruleNames) {
-        if (t.getChildCount() == 0) return Utils.escapeWhitespace(Trees.getNodeText(t, ruleNames), false);
+        if (t.getChildCount() == 0) {
+            return Utils.escapeWhitespace(Trees.getNodeText(t, ruleNames), false);
+        }
         StringBuilder sb = new StringBuilder();
         sb.append(lead(level));
         level++;

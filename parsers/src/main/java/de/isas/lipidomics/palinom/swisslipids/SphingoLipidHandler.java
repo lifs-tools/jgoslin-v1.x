@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Handler implementation for Sphingolipids.
  *
  * @author nilshoffmann
  */
@@ -60,7 +61,7 @@ public class SphingoLipidHandler implements ParserRuleContextHandler<Lipid_pureC
         } else if (slc.sl_lcb() != null && slc.sl_lcb().sl_lcb_subspecies() != null) { // subspecies level
             SwissLipidsParser.Sl_lcb_subspeciesContext slsc = slc.sl_lcb().sl_lcb_subspecies();
             List<SwissLipidsParser.FaContext> faContexts = Arrays.asList(slsc.fa());
-            if(fhf.isIsomericFa(slsc.fa())) {
+            if (fhf.isIsomericFa(slsc.fa())) {
                 return isfh.visitIsomericSubspeciesLcb(headGroup, slsc.lcb(), faContexts);
             } else {
                 return sslh.visitStructuralSubspeciesLcb(headGroup, slsc.lcb(), faContexts);

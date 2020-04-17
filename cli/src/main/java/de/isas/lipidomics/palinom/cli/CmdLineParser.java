@@ -60,6 +60,7 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
+ * Create a new command line parser for parsing of lipid names.
  *
  * @author nils.hoffmann
  */
@@ -111,8 +112,8 @@ public class CmdLineParser {
      * <p>
      * Runs the command line parser for jgoslin, including validation.</p>
      *
-     * @param args an array of {@link java.lang.String} objects.
-     * @throws java.lang.Exception if any.
+     * @param args an array of {@link java.lang.String} lipid names.
+     * @throws java.lang.Exception if any unexpected errors occur.
      */
     @SuppressWarnings("static-access")
     public static void main(String[] args) throws Exception {

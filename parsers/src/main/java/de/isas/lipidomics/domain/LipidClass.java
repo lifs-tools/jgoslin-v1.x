@@ -28,7 +28,7 @@ import java.util.Optional;
  * described head groups are categorized in LipidMAPS, or only occur in other
  * databases, so they do not have such an association at the moment.
  *
- * Example: Category=Glyerophospholipids -> Class=Glycerophosphoinositols (PI)
+ * Example: Category=Glyerophospholipids maps to Class=Glycerophosphoinositols (PI)
  *
  * @author nils.hoffmann
  */

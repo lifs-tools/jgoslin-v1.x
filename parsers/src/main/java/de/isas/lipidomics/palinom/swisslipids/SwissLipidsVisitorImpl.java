@@ -28,6 +28,9 @@ import java.util.BitSet;
 import java.util.Optional;
 
 /**
+ * 
+ * Base visitor implementation for the SwissLipids grammar.
+ * 
  * Overriding implementation of {@link SwissLipidsBaseVisitor}. Creates
  * {@link LipidAdduct} instances from the provided context.
  *
@@ -37,12 +40,12 @@ import java.util.Optional;
 public class SwissLipidsVisitorImpl extends SwissLipidsBaseVisitor<LipidAdduct> {
 
     /**
-     *
+     * Produces a LipidAdduct given the LipidContext.
      * @throws ParseTreeVisitorException for structural or state-related issues
      * while trying to process a parsing context.
      * @throws RuntimeException
      * @param ctx
-     * @return
+     * @return a LipidAdduct.
      */
     @Override
     public LipidAdduct visitLipid(SwissLipidsParser.LipidContext ctx) {

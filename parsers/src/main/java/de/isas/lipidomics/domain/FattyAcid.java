@@ -15,6 +15,10 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
+ * A fatty acid with a specific type. This object defines the name, position,
+ * number of carbon atoms, hydroxyls and double bonds, as well as the bond type
+ * to the head group. A FattyAcid can carry optional modifications and can
+ * report double bond positions.
  *
  * @author nils.hoffmann
  */
@@ -33,15 +37,17 @@ public class FattyAcid {
     private final Map<Integer, String> doubleBondPositions;
 
     /**
+     * Create a new isomeric level FattyAcid.
      *
-     * @param name
-     * @param position
-     * @param nCarbon
-     * @param nHydroxy
-     * @param lipidFaBondType
-     * @param lcb
-     * @param modifications
-     * @param doubleBondPositions
+     * @param name the name, e.g. FA1 for the first FA.
+     * @param position the sn position. -1 if undefined or unknown.
+     * @param nCarbon the number of carbons in this FA.
+     * @param nHydroxy the number of hydroxyls on this FA.
+     * @param lipidFaBondType the bond type, e.g. ESTER.
+     * @param lcb true if this is a long-chain base, e.g. in a Ceramide.
+     * @param modifications optional modifications for this FA.
+     * @param doubleBondPositions double bond positions in this FA.
+     * @see LipidFaBondType
      */
     @Builder(builderMethodName = "isomericFattyAcidBuilder", builderClassName = "IsomericFattyAcidBuilder")
     public FattyAcid(String name, int position, int nCarbon, int nHydroxy, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications, Map<Integer, String> doubleBondPositions) {
@@ -73,15 +79,16 @@ public class FattyAcid {
     }
 
     /**
+     * Create a new structural level FattyAcid.
      *
-     * @param name
-     * @param position
-     * @param nCarbon
-     * @param nHydroxy
-     * @param nDoubleBonds
-     * @param lipidFaBondType
-     * @param lcb
-     * @param modifications
+     * @param name the name, e.g. FA1 for the first FA.
+     * @param position the sn position. -1 if undefined or unknown.
+     * @param nCarbon the number of carbons in this FA.
+     * @param nHydroxy the number of hydroxyls on this FA.
+     * @param lipidFaBondType the bond type, e.g. ESTER.
+     * @param lcb true if this is a long-chain base, e.g. in a Ceramide.
+     * @param modifications optional modifications for this FA.
+     * @see LipidFaBondType
      */
     @Builder(builderMethodName = "structuralFattyAcidBuilder", builderClassName = "StructuralFattyAcidBuilder")
     public FattyAcid(String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications) {
@@ -110,14 +117,15 @@ public class FattyAcid {
     }
 
     /**
+     * Create a new molecular level FattyAcid.
      *
-     * @param name
-     * @param nCarbon
-     * @param nHydroxy
-     * @param nDoubleBonds
-     * @param lipidFaBondType
-     * @param lcb
-     * @param modifications
+     * @param name the name, e.g. FA1 for the first FA.
+     * @param nCarbon the number of carbons in this FA.
+     * @param nHydroxy the number of hydroxyls on this FA.
+     * @param lipidFaBondType the bond type, e.g. ESTER.
+     * @param lcb true if this is a long-chain base, e.g. in a Ceramide.
+     * @param modifications optional modifications for this FA.
+     * @see LipidFaBondType
      */
     @Builder(builderMethodName = "molecularFattyAcidBuilder", builderClassName = "MolecularFattyAcidBuilder")
     public FattyAcid(String name, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications) {
@@ -148,7 +156,7 @@ public class FattyAcid {
     /**
      * Build the name of this substructure.
      *
-     * @param the structural lipid level to return this substructure's name on.
+     * @param level the structural lipid level to return this substructure's name on.
      * @return the name of this substructure.
      */
     public String buildSubstructureName(LipidLevel level) {

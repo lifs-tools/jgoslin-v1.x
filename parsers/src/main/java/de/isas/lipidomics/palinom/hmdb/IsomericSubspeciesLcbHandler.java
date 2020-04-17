@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- *
+ * Handler for Isomeric LCBs.
  * @author nilshoffmann
  */
 public class IsomericSubspeciesLcbHandler {

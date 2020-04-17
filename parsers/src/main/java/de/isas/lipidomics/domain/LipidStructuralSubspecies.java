@@ -22,9 +22,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
+ * A structural subspecies. Child of LipidMolecularSubspecies. Individual FAs
+ * and their sn positions are known, but not the double bond positions.
+ *
  * Example: Phosphatidylinositol (8:0/8:0) or PI(8:0/8:0)
  *
  * @author nils.hoffmann
+ * @see LipidMolecularSubspecies
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

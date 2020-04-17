@@ -49,16 +49,18 @@ public class LipidSpeciesInfo extends FattyAcid {
     private final LipidLevel level;
 
     /**
+     * Create a new LipidSpeciesInfo on the provided level.
      *
-     * @param level
-     * @param name
-     * @param position
-     * @param nCarbon
-     * @param nHydroxy
-     * @param nDoubleBonds
-     * @param lipidFaBondType
-     * @param lcb
-     * @param modifications
+     * @param level the level of the species info.
+     * @param name the name, e.g. FA1 for the first FA.
+     * @param position the sn position. -1 if undefined or unknown.
+     * @param nCarbon the number of carbons in this FA.
+     * @param nHydroxy the number of hydroxyls on this FA.
+     * @param nDoubleBonds the number of double bonds in this FA.
+     * @param lipidFaBondType the bond type, e.g. ESTER.
+     * @param lcb true if this is a long-chain base, e.g. in a Ceramide.
+     * @param modifications optional modifications for this FA.
+     * @see LipidFaBondType
      */
     @Builder(builderMethodName = "lipidSpeciesInfoBuilder")
     public LipidSpeciesInfo(LipidLevel level, String name, int position, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications) {
@@ -67,16 +69,18 @@ public class LipidSpeciesInfo extends FattyAcid {
     }
 
     /**
+     * Create a new LipidSpeciesInfo on the provided level.
      *
-     * @param level
-     * @param name
-     * @param position
-     * @param nCarbon
-     * @param nHydroxy
-     * @param lipidFaBondType
-     * @param lcb
-     * @param modifications
-     * @param doubleBondPositions 
+     * @param level the level of the species info.
+     * @param name the name, e.g. FA1 for the first FA.
+     * @param position the sn position. -1 if undefined or unknown.
+     * @param nCarbon the number of carbons in this FA.
+     * @param nHydroxy the number of hydroxyls on this FA.
+     * @param lipidFaBondType the bond type, e.g. ESTER.
+     * @param lcb true if this is a long-chain base, e.g. in a Ceramide.
+     * @param modifications optional modifications for this FA.
+     * @param doubleBondPositions double bond positions in this FA.
+     * @see LipidFaBondType
      */
     @Builder(builderMethodName = "lipidSubspeciesInfoBuilder", builderClassName = "LipidSubspeciesInfoBuilder")
     public LipidSpeciesInfo(LipidLevel level, String name, int position, int nCarbon, int nHydroxy, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications, Map<Integer, String> doubleBondPositions) {
@@ -85,12 +89,13 @@ public class LipidSpeciesInfo extends FattyAcid {
     }
 
     /**
+     * Create a new LipidSpeciesInfo on the provided level. The name is inferred
+     * from the level.
      *
-     * @param level
-     * @param nCarbon
-     * @param nHydroxy
-     * @param nDoubleBonds
-     * @param lipidFaBondType
+     * @param level the level of the species info.
+     * @param nCarbon the number of carbons in this FA.
+     * @param nHydroxy the number of hydroxyls on this FA.
+     * @param lipidFaBondType the bond type, e.g. ESTER.
      */
     public LipidSpeciesInfo(LipidLevel level, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType) {
         this(level, level.name(), -1, nCarbon, nHydroxy, nDoubleBonds, lipidFaBondType, false, ModificationsList.NONE);

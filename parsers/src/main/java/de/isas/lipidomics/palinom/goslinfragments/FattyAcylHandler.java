@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * ParserRuleContextHandler for FattyAcyls.
  *
  * @author nilshoffmann
  */

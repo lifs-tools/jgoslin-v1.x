@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
+ * Handler implementation for Glycero-phospholipids.
  *
  * @author nilshoffmann
  */

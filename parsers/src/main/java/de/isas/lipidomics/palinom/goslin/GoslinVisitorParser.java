@@ -18,7 +18,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.TokenStream;
 
 /**
- *
+ * Parser implementation for the Goslin grammar.
  * @author nils.hoffmann
  */
 @Slf4j
