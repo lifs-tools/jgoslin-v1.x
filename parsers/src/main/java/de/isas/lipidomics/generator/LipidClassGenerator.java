@@ -114,7 +114,7 @@ public class LipidClassGenerator {
                 + "described head groups are categorized in LipidMAPS, or only occur in other\n"
                 + "databases, so they do not have such an association at the moment.\n"
                 + "\n"
-                + "Example: Category=Glyerophospholipids -> Class=Glycerophosphoinositols (PI)\n"
+                + "Example: Category=Glyerophospholipids maps to Class=Glycerophosphoinositols (PI)\n"
                 + "\n"
                 + "@author nils.hoffmann"
         ).
