@@ -14,7 +14,7 @@ This project is a parser, validator and normalizer implementation for shorthand 
 Goslin defines multiple grammers compatible with https://www.antlr.org/[ANTLRv4] for different sources of shorthand lipid nomenclature. This allows to generate parsers based on the defined grammars,
 which provide immediate feedback whether a processed lipid shorthand notation string is compliant with a particular grammar, or not.
 
-jGoslin uses the Goslin grammars and the generateg parser to support the following general tasks:
+jGoslin uses the Goslin grammars and the generated parser to support the following general tasks:
 
 . Facilitate the parsing of shorthand lipid names dialects.
 . Provide a structural representation of the shorthand lipid after parsing.
@@ -200,5 +200,5 @@ For more examples how the API works, please consult the tests, especially in the
 
 //  * **https://pubs.acs.org/doi/10.1021/acs.analchem.8b04310[N. Hoffmann et al., Analytical Chemistry 2019; Jan;91(5):3302-3310.] https://pubs.acs.org/doi/pdf/10.1021/acs.analchem.8b04310[PDF File.] https://www.ncbi.nlm.nih.gov/pubmed/30688441[PubMed record].**
 
-* https://doi.org/10.1101/2020.04.17.046656[D. Kopczynski et al., Biorxiv]
+* https://doi.org/10.1101/2020.04.17.046656[D. Kopczynski et al., Biorxiv, April 20th, 2020]
 
