@@ -34,11 +34,11 @@ public class LipidMolecularSubspeciesTest {
         );
         String expectedSpecies = "PG 20:2;1";
         assertEquals(expectedSpecies, lss.getLipidString(LipidLevel.SPECIES));
-        String expectedMolSubSpecies = "PG 8:1_12:1;1";
+        String expectedMolSubSpecies = "PG 8:1-12:1;1";
         assertEquals(expectedMolSubSpecies, lss.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
         
         try {
-            String expectedStructuralSubSpecies = "PG 8:1_12:1;1";
+            String expectedStructuralSubSpecies = "PG 8:1-12:1;1";
             assertEquals(expectedStructuralSubSpecies, lss.getLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
         } catch(RuntimeException e) {
             //should fail, can not generate a structural sub species from the molecular species level

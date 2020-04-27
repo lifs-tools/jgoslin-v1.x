@@ -105,7 +105,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup();
         switch (level) {
             case MOLECULAR_SUBSPECIES:
-                return buildLipidSubspeciesName(level, "_", headGroup);
+                return buildLipidSubspeciesName(level, "-", headGroup);
             case CATEGORY:
             case CLASS:
             case SPECIES:

@@ -500,7 +500,7 @@ public class GoslinVisitorParserTest {
         assertEquals(1, lipid.getFa().get("FA3").getNDoubleBonds());
         assertEquals(0, lipid.getFa().get("FA3").getNHydroxy());
 
-        assertEquals(ref, lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
+        assertEquals("TAG 14:0-16:0-18:1", lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
         assertEquals(LipidCategory.GL, lipid.getLipidCategory());
         assertEquals(LipidClass.TAG, lipid.getLipidClass().get());
     }
@@ -512,6 +512,12 @@ public class GoslinVisitorParserTest {
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("TAG", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals("GL", lipidAdduct.getLipidString(LipidLevel.CATEGORY));
+        assertEquals("TAG", lipidAdduct.getLipidString(LipidLevel.CLASS));
+        assertEquals("TAG 58:6", lipidAdduct.getLipidString(LipidLevel.SPECIES));
+        assertEquals("TAG 16:0-20:2(11Z,14Z)-22:4(7Z,10Z,13Z,16Z)", lipidAdduct.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
+        assertEquals("TAG 16:0/20:2(11Z,14Z)/22:4(7Z,10Z,13Z,16Z)", lipidAdduct.getLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
+        assertEquals("TAG 16:0/20:2(11Z,14Z)/22:4(7Z,10Z,13Z,16Z)", lipidAdduct.getLipidString(LipidLevel.ISOMERIC_SUBSPECIES));
         assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
         assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
         assertEquals(58, lipidAdduct.getLipid().getInfo().get().getNCarbon());

@@ -521,7 +521,7 @@ public class GoslinFragmentsVisitorParserTest {
         assertEquals(1, lipid.getFa().get("FA3").getNDoubleBonds());
         assertEquals(0, lipid.getFa().get("FA3").getNHydroxy());
 
-        assertEquals(ref, lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
+        assertEquals("TAG 14:0-16:0-18:1", lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
         assertEquals(LipidCategory.GL, lipid.getLipidCategory());
         assertEquals(LipidClass.TAG, lipid.getLipidClass().get());
     }

@@ -352,7 +352,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(1, lipid.getFa().get("FA3").getNDoubleBonds());
         assertEquals(0, lipid.getFa().get("FA3").getNHydroxy());
 
-        assertEquals("TG 14:0_16:0_18:1", lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
+        assertEquals("TG 14:0-16:0-18:1", lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
     }
 
     @Test

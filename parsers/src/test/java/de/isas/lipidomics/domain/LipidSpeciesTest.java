@@ -38,14 +38,14 @@ public class LipidSpeciesTest {
         assertEquals(expectedSpecies, lss.getLipidString(LipidLevel.SPECIES));
 
         try {
-            String expectedMolSubSpecies = "PG 8:1_12:1;1";
+            String expectedMolSubSpecies = "PG 8:1-12:1;1";
             assertEquals(expectedMolSubSpecies, lss.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
         } catch (RuntimeException e) {
             //should fail, can not generate a structural sub species from the molecular species level
         }
 
         try {
-            String expectedStructuralSubSpecies = "PG 8:1_12:1;1";
+            String expectedStructuralSubSpecies = "PG 8:1-12:1;1";
             assertEquals(expectedStructuralSubSpecies, lss.getLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
         } catch (RuntimeException e) {
             //should fail, can not generate a structural sub species from the molecular species level
@@ -63,8 +63,8 @@ public class LipidSpeciesTest {
         assertEquals(expectedSpecies, lss.getLipidString(LipidLevel.SPECIES, true));
         assertEquals(expectedSpecies, new LipidAdduct(lss, Adduct.NONE, "", Fragment.NONE).getNormalizedLipidString(LipidLevel.SPECIES));
         assertEquals("TG 20:2;1", new LipidAdduct(lss, Adduct.NONE, "", Fragment.NONE).toString());
-        String expectedMolSubSpecies = "TG 8:1_12:1_18:0";
-        String expectedNormalizedMolSubSpecies = "TAG 8:1_12:1_18:0";
+        String expectedMolSubSpecies = "TG 8:1-12:1-18:0";
+        String expectedNormalizedMolSubSpecies = "TAG 8:1-12:1-18:0";
         MolecularFattyAcidBuilder mfab = FattyAcid.molecularFattyAcidBuilder();
         LipidMolecularSubspeciesBuilder lmsb = LipidMolecularSubspecies.builder();
         LipidMolecularSubspecies lms = lmsb.headGroup("TG").fa(new FattyAcid[]{
