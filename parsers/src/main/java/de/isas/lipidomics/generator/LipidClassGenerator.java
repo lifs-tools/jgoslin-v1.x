@@ -66,6 +66,7 @@ public class LipidClassGenerator {
         private final String lipidDescription;
         private final Integer maxNumFa;
         private final String allowedNumFa;
+        private final String sumFormula;
         private final List<String> synonyms;
     }
 
@@ -79,7 +80,7 @@ public class LipidClassGenerator {
                 String[] s = iter.next();
                 int len = s.length;
                 List<String> synonyms = new ArrayList<>();
-                for (int i = 5; i < len; i++) {
+                for (int i = 6; i < len; i++) {
                     if (!s[i].trim().isEmpty()) {
                         synonyms.add(s[i]);
                     }
@@ -90,6 +91,7 @@ public class LipidClassGenerator {
                         s[2],
                         Integer.parseInt(s[3]),
                         s[4],
+                        s[5],
                         synonyms
                 );
                 System.out.println("Entry: " + entry);
@@ -128,6 +130,7 @@ public class LipidClassGenerator {
         TypeName listOfIntegers = ParameterizedTypeName.get(list, integersClass);
         lipidClassBuilder.addField(listOfIntegers, "allowedNumFa", Modifier.PRIVATE, Modifier.FINAL);
         lipidClassBuilder.addField(Integer.class, "maxNumFa", Modifier.PRIVATE, Modifier.FINAL);
+        lipidClassBuilder.addField(String.class, "sumFormula", Modifier.PRIVATE, Modifier.FINAL);
         ClassName arrayList = ClassName.get("java.util", "ArrayList");
         TypeName listOfSynonyms = ParameterizedTypeName.get(list, synonymsClass);
         lipidClassBuilder.addField(listOfSynonyms, "synonyms", Modifier.PRIVATE, Modifier.FINAL);
@@ -152,6 +155,8 @@ public class LipidClassGenerator {
                         addStatement("this.$N = $N", "maxNumFa", "maxNumFa").
                         addParameter(String.class, "allowedNumFaStr").
                         addStatement("this.$N = $N", "allowedNumFaStr", "allowedNumFaStr").
+                        addParameter(String.class, "sumFormula").
+                        addStatement("this.$N = $N", "sumFormula", "sumFormula").
                         addParameter(String[].class, "synonyms").
                         addStatement(
                                 CodeBlock.of(
@@ -184,6 +189,9 @@ public class LipidClassGenerator {
         );
         lipidClassBuilder.addMethod(
                 MethodSpec.methodBuilder("getAllowedNumFa").addModifiers(Modifier.PUBLIC).returns(listOfIntegers).addCode("return this.$N;", "allowedNumFa").build()
+        );
+        lipidClassBuilder.addMethod(
+                MethodSpec.methodBuilder("getSumFormula").addModifiers(Modifier.PUBLIC).returns(String.class).addCode("return this.$N;", "sumFormula").build()
         );
         lipidClassBuilder.addMethod(
                 MethodSpec.methodBuilder("getSynonyms").addModifiers(Modifier.PUBLIC).returns(listOfSynonyms).addCode("return this.$N;", "synonyms").build()
@@ -241,7 +249,8 @@ public class LipidClassGenerator {
                             "\"" + lipidClassEntry.lipidDescription + "\"",
                             lipidClassEntry.maxNumFa + "",
                             "\"" + lipidClassEntry.allowedNumFa + "\"",
-                            "\"" + lipidClassEntry.lipidName + "\""
+                            "\"" + lipidClassEntry.lipidName + "\"",
+                            "\"" + lipidClassEntry.sumFormula + "\""
                     )
             );
             template.addAll(lipidClassEntry.getSynonyms().stream().map((t) -> {
