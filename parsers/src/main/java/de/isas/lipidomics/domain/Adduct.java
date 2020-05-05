@@ -3,6 +3,11 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ParsingException;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -39,17 +44,37 @@ public class Adduct {
             throw new IllegalArgumentException("Sign can only be -1, 0, or 1");
         }
     }
-    
+
     public String getLipidString() {
-        if (adductString==null || adductString.isEmpty()) {
+        if (adductString == null || adductString.isEmpty()) {
             return "";
         }
-        if (charge == 0){
+        if (charge == 0) {
             return "[M]";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("[M").append(sumFormula).append(adductString).append("]").append(charge).append((chargeSign>0)? "+":"-");
+        sb.append("[M").append(sumFormula).append(adductString).append("]").append(charge).append((chargeSign > 0) ? "+" : "-");
         return sb.toString();
+    }
+
+    public ElementTable getElements() {
+        ElementTable elements = new ElementTable();
+        String adductName = Optional.ofNullable(adductString).map((t) -> {
+            return t.length() > 1 ? t.substring(1) : "";
+        }).orElse("");
+        try {
+            elements.accumulate(new ElementTable(adductName));
+        } catch (ParsingException ex) {
+            return elements;
+        }
+        if (adductString.length() > 0 && adductString.startsWith("-")) {
+            elements.keySet().stream().forEach(elements::decrement);
+        }
+        return elements;
+    }
+
+    public int getCharge() {
+        return charge * chargeSign;
     }
 
 }

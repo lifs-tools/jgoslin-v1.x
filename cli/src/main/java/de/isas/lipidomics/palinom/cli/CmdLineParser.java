@@ -304,7 +304,7 @@ public class CmdLineParser {
     }
 
     protected static Pair<String, ValidationResult> parseNameWith(String lipidName, ValidationResult.Grammar grammar) {
-        VisitorParser parser;
+        VisitorParser<LipidAdduct> parser;
         SyntaxErrorListener listener = new SyntaxErrorListener();
         ValidationResult validationResult = new ValidationResult();
         switch (grammar) {

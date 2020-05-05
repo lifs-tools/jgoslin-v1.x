@@ -27,6 +27,16 @@ import org.junit.jupiter.api.Test;
 public class LipidMapsVisitorParserTest {
 
     @Test
+    public void testNAPE() throws ParsingException {
+        String ref = "NAPE(34:2)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("NAPE", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+    }
+    
+    @Test
     public void testPK_Structural() throws ParsingException {
         String ref = "PHENOL(15:2)";
         System.out.println("Testing lipid name " + ref);
@@ -448,15 +458,15 @@ public class LipidMapsVisitorParserTest {
         System.out.println("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
-        assertEquals("PIP2", lipidAdduct.getLipid().getHeadGroup());
+        assertEquals("PIP2[3',5']", lipidAdduct.getLipid().getHeadGroup());
         assertEquals(LipidCategory.GP, lipidAdduct.getLipid().getLipidCategory());
         assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
         assertEquals(34, lipidAdduct.getLipid().getInfo().get().getNCarbon());
         assertEquals(2, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
         assertEquals(2, lipidAdduct.getLipid().getFa().get("FA2").getDoubleBondPositions().size());
-        assertEquals("PIP2 16:0/18:2(9Z,12Z)", lipidAdduct.getLipid().getLipidString());
-        assertEquals("PIP2 34:2", lipidAdduct.getLipid().getLipidString(LipidLevel.SPECIES));
+        assertEquals("PIP2[3',5'] 16:0/18:2(9Z,12Z)", lipidAdduct.getLipid().getLipidString());
+        assertEquals("PIP2[3',5'] 34:2", lipidAdduct.getLipid().getLipidString(LipidLevel.SPECIES));
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

@@ -15,7 +15,6 @@
  */
 package de.isas.lipidomics.palinom;
 
-import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 
 /**
@@ -23,12 +22,13 @@ import de.isas.lipidomics.palinom.exceptions.ParsingException;
  * ANTLRv4 generated parsers.
  *
  * @author nilshoffmann
+ * @param <T> the type of the visitor parser
  */
-public interface VisitorParser {
+public interface VisitorParser<T> {
 
-    LipidAdduct parse(String lipidString, SyntaxErrorListener listener) throws ParsingException;
+    T parse(String lipidString, SyntaxErrorListener listener) throws ParsingException;
 
-    default LipidAdduct parse(String lipidString) throws ParsingException {
+    default T parse(String lipidString) throws ParsingException {
         return parse(lipidString, new SyntaxErrorListener());
     }
 

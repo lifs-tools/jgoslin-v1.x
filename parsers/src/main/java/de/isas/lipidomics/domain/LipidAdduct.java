@@ -33,8 +33,41 @@ public class LipidAdduct {
 
     private LipidSpecies lipid;
     private Adduct adduct;
-    private String sumFormula;
+//    private String sumFormula;
     private Fragment fragment;
+
+    public Double getMass() {
+        ElementTable elements = getElements();
+        int charge = 0;
+        double mass = 0;
+
+        if (adduct != null) {
+            charge = adduct.getCharge();
+        }
+
+        mass = elements.getMass();
+
+        if (charge != 0) {
+            mass = (mass - charge * Element.ELECTRON_REST_MASS) / Math.abs(charge);
+        }
+
+        return mass;
+    }
+
+    public ElementTable getElements() {
+        ElementTable elements = new ElementTable();
+        if (lipid != null) {
+            elements.accumulate(lipid.getElements());
+        }
+        if (adduct != null) {
+            elements.accumulate(adduct.getElements());
+        }
+        return elements;
+    }
+
+    public String getSumFormula() {
+        return getElements().getSumFormula();
+    }
 
     public String getLipidString(LipidLevel level) {
         StringBuilder sb = new StringBuilder();
@@ -103,10 +136,10 @@ public class LipidAdduct {
         }
         return sb.toString();
     }
-    
+
     @Override
     public String toString() {
-        if(lipid!=null) {
+        if (lipid != null) {
             return getLipidString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
         }
         return "";

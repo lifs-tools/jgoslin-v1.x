@@ -22,7 +22,7 @@ import org.antlr.v4.runtime.TokenStream;
  * @author nils.hoffmann
  */
 @Slf4j
-public class GoslinVisitorParser implements VisitorParser {
+public class GoslinVisitorParser implements VisitorParser<LipidAdduct> {
 
     @Override
     public LipidAdduct parse(String lipidString, SyntaxErrorListener listener) throws ParsingException {

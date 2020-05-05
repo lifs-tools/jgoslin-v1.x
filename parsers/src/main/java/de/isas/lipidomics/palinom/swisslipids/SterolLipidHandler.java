@@ -91,18 +91,8 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
 
     private Optional<LipidSpecies> handleStFa2(SwissLipidsParser.St_sub2Context che) {
         String headGroup = che.st_sub2_hg().getText();
-        if (che.st_sub2_fa() != null) {
-            if (che.st_sub2_fa().fa2().fa2_unsorted() != null) {
-                return msfh.visitMolecularSubspeciesFas(headGroup, che.st_sub2_fa().fa2().fa2_unsorted().fa());
-            } else if (che.st_sub2_fa().fa2().fa2_sorted() != null) {
-                if (fhf.isIsomericFa(che.st_sub2_fa().fa2().fa2_sorted().fa())) {
-                    return isfh.visitIsomericSubspeciesFas(headGroup, che.st_sub2_fa().fa2().fa2_sorted().fa());
-                } else {
-                    return ssfh.visitStructuralSubspeciesFas(headGroup, che.st_sub2_fa().fa2().fa2_sorted().fa());
-                }
-            } else {
-                throw new ParseTreeVisitorException("Unhandled context state in sterol fa2 FAs!");
-            }
+        if (che.fa() != null) {
+            return ssfh.visitStructuralSubspeciesFas(headGroup, Arrays.asList(che.fa()));
         } else {
             throw new ParseTreeVisitorException("Unhandled context state in sterol fa2!");
         }

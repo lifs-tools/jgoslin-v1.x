@@ -60,7 +60,7 @@ class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
             return new LipidVisitor().visitLipid_pure(cc);
         }).orElse(LipidSpecies.NONE), adductTermContext.map((t) -> {
             return new AdductVisitor().visitAdduct_info(t);
-        }).orElse(Adduct.NONE), "", new Fragment(""));
+        }).orElse(Adduct.NONE), new Fragment(""));
         return la;
     }
 

@@ -58,7 +58,7 @@ public class GoslinFragmentsVisitorImpl extends GoslinFragmentsBaseVisitor<Lipid
             return new GoslinFragmentsVisitorImpl.LipidVisitor().visitLipid_pure(cc);
         }).orElse(LipidSpecies.NONE), adductTermContext.map((t) -> {
             return new GoslinFragmentsVisitorImpl.AdductVisitor().visitAdduct_info(t);
-        }).orElse(Adduct.NONE), "", fragmentContext.map((t) -> {
+        }).orElse(Adduct.NONE), fragmentContext.map((t) -> {
             return new Fragment(t.frag_char().getText());
         }).orElse(Fragment.NONE));
         return la;

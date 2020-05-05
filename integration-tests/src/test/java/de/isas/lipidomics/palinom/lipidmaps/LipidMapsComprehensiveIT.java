@@ -60,6 +60,7 @@ public class LipidMapsComprehensiveIT {
             LipidSpecies ls = lipidAdduct.getLipid();
             assertNotNull(ls);
         } catch (RuntimeException rex) {
+            rex.printStackTrace();
             fail("Parsing current LipidMAPS identifier: " + abbreviation + " failed - missing implementation!");
         } catch (ParsingException ex) {
             log.warn("Parsing current LipidMAPS identifier: " + abbreviation + " failed - name unsupported in grammar!");

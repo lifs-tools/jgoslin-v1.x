@@ -122,4 +122,17 @@ public class LipidSpeciesInfo extends FattyAcid {
         }
         return sb.toString();
     }
+
+    /**
+     * Returns the element table for this species info adjusted for oxygen and hydrogen.
+     *
+     * @param numFa the number of fatty acyls to account for.
+     * @return the element table.
+     */
+    public ElementTable getElements(int numFa) {
+        ElementTable elements = super.getElements();
+        elements.incrementBy(Element.ELEMENT_O, numFa - 1);
+        elements.incrementBy(Element.ELEMENT_H, -numFa - 1);
+        return elements;
+    }
 }

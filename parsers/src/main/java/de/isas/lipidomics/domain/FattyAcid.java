@@ -156,7 +156,8 @@ public class FattyAcid {
     /**
      * Build the name of this substructure.
      *
-     * @param level the structural lipid level to return this substructure's name on.
+     * @param level the structural lipid level to return this substructure's
+     * name on.
      * @return the name of this substructure.
      */
     public String buildSubstructureName(LipidLevel level) {
@@ -194,6 +195,38 @@ public class FattyAcid {
             sb.append(")");
         }
         return sb.toString();
+    }
+
+    public ElementTable getElements() {
+        ElementTable table = new ElementTable();
+        if (!lcb) {
+            if (nCarbon > 0 || nDoubleBonds > 0) {
+                table.incrementBy(Element.ELEMENT_C, nCarbon);// C
+                switch (lipidFaBondType) {
+                    case ESTER:
+                        table.incrementBy(Element.ELEMENT_H, 2 * nCarbon - 1 - 2 * nDoubleBonds); // H
+                        table.incrementBy(Element.ELEMENT_O, 1 + nHydroxy); // O
+                        break;
+                    case ETHER_PLASMENYL:
+                        table.incrementBy(Element.ELEMENT_H, 2 * nCarbon - 1 - 2 * nDoubleBonds + 2); // H
+                        table.incrementBy(Element.ELEMENT_O, nHydroxy); // O
+                        break;
+                    case ETHER_PLASMANYL:
+                        table.incrementBy(Element.ELEMENT_H, (nCarbon + 1) * 2 - 1 - 2 * nDoubleBonds); // H
+                        table.incrementBy(Element.ELEMENT_O, nHydroxy); // O
+                        break;
+                    default:
+                        throw new ConstraintViolationException("Mass cannot be computed for fatty acyl chain with bond type: " + lipidFaBondType);
+                }
+            }
+        } else {
+            // long chain base
+            table.incrementBy(Element.ELEMENT_C, nCarbon); // C
+            table.incrementBy(Element.ELEMENT_H, 2 * (nCarbon - nDoubleBonds) + 1); // H
+            table.incrementBy(Element.ELEMENT_O, nHydroxy); // O
+            table.incrementBy(Element.ELEMENT_N, 1); // N
+        }
+        return table;
     }
 
 }

@@ -54,8 +54,10 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
             return handleDpl(ctx.pl().dpl());
         } else if (ctx.pl().lpl() != null) {
             return handleLpl(ctx.pl().lpl());
+        } else if (ctx.pl().threepl() != null) {
+            return handleThreePl(ctx.pl().threepl());
         } else if (ctx.pl().fourpl() != null) {
-            throw new RuntimeException("Support for PAT16 / PAT18 not implemented yet!");
+            return handleFourPl(ctx.pl().fourpl());
         } else {
             throw new ParseTreeVisitorException("Unhandled context state in PL!");
         }
@@ -83,8 +85,9 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
         LipidMapsParser.Hg_ddplContext hg_ddplcontext = dpl.hg_ddpl();
         if (hg_ddplcontext != null) {
             String headGroup = hg_ddplcontext.hg_dplc().getText();
-            // TODO implement pip handling
-            //hg_ddplcontext.pip_position().pip_pos().
+            if(hg_ddplcontext.pip_position() != null) {
+                headGroup += hg_ddplcontext.pip_position().getText();
+            }
             if (dpl.dpl_species() != null) { //species level
                 //process species level
                 return fhf.visitSpeciesFas(headGroup, dpl.dpl_species().fa());
@@ -124,5 +127,55 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
         } else {
             throw new ParseTreeVisitorException("Unhandled context state in Lyso PL!");
         }
+    }
+    
+    private Optional<LipidSpecies> handleThreePl(LipidMapsParser.ThreeplContext tpl) {
+        LipidMapsParser.Hg_threeplcContext context = tpl.hg_threeplc();
+        if (context != null) {
+            String headGroup = context.hg_threepl().getText();
+            if (tpl.species_fa() != null) { //species level
+                //process species level
+                return fhf.visitSpeciesFas(headGroup, tpl.species_fa().fa());
+            } else if (tpl.fa3() != null) {
+                //process subspecies
+                if (tpl.fa3().fa3_sorted() != null) {
+                    //sorted => StructuralSubspecies
+                    return ssfh.visitStructuralSubspeciesFas(headGroup, tpl.fa3().fa3_sorted().fa());
+                } else if (tpl.fa3().fa3_unsorted() != null) {
+                    //unsorted => MolecularSubspecies
+                    return msfh.visitMolecularSubspeciesFas(headGroup, tpl.fa3().fa3_unsorted().fa());
+                }
+            } else {
+                throw new ParseTreeVisitorException("Unhandled context state in three PL!");
+            }
+        } else {
+            throw new ParseTreeVisitorException("Unhandled context state in three PL!");
+        }
+        return Optional.empty();
+    }
+    
+    private Optional<LipidSpecies> handleFourPl(LipidMapsParser.FourplContext fpl) {
+        LipidMapsParser.Hg_fourplcContext context = fpl.hg_fourplc();
+        if (context != null) {
+            String headGroup = context.hg_fourpl().getText();
+            if (fpl.fa4() != null) { //species level
+                //process species level
+                return fhf.visitSpeciesFas(headGroup, fpl.species_fa().fa());
+            } else if (fpl.fa4() != null) {
+                //process subspecies
+                if (fpl.fa4().fa4_sorted() != null) {
+                    //sorted => StructuralSubspecies
+                    return ssfh.visitStructuralSubspeciesFas(headGroup, fpl.fa4().fa4_sorted().fa());
+                } else if (fpl.fa4().fa4_unsorted() != null) {
+                    //unsorted => MolecularSubspecies
+                    return msfh.visitMolecularSubspeciesFas(headGroup, fpl.fa4().fa4_unsorted().fa());
+                }
+            } else {
+                throw new ParseTreeVisitorException("Unhandled context state in four PL!");
+            }
+        } else {
+            throw new ParseTreeVisitorException("Unhandled context state in four PL!");
+        }
+        return Optional.empty();
     }
 }

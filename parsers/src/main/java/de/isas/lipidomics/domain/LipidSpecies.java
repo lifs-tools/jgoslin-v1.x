@@ -3,6 +3,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import static de.isas.lipidomics.domain.Element.ELEMENT_H;
 import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.Collections;
 import java.util.Map;
@@ -17,10 +18,10 @@ import lombok.Setter;
  * and class are used as taxonomic roots of a lipid species. Partial structural
  * knowledge, apart from the head group, is first encoded in the lipid species.
  *
- * A typical lipid species is
- * PC 32:0 (SwissLipids SLM:000056493), where the head group is defined as PC (Glycerophosphocholines),
- * with fatty acyl chains of unknown individual composition, but known total
- * composition (32 carbon atoms, zero double bonds, no hydroxylations).
+ * A typical lipid species is PC 32:0 (SwissLipids SLM:000056493), where the
+ * head group is defined as PC (Glycerophosphocholines), with fatty acyl chains
+ * of unknown individual composition, but known total composition (32 carbon
+ * atoms, zero double bonds, no hydroxylations).
  *
  * @author nils.hoffmann
  * @see LipidCategory
@@ -248,6 +249,62 @@ public class LipidSpecies {
      */
     public Map<String, FattyAcid> getFa() {
         return Collections.emptyMap();
+    }
+
+    /**
+     * Returns the element count table for this lipid.
+     *
+     * @return the element count table.
+     */
+    public ElementTable getElements() {
+        ElementTable elements = new ElementTable();
+
+        //TODO implement
+//    if (use_head_group || (LipidClasses::get_instance().lipid_classes.find(lipid_class) == LipidClasses::get_instance().lipid_classes.end())){
+//        return elements;
+//    }
+        lipidClass.ifPresent((t) -> {
+            elements.accumulate(lipidClass.get().getElements());
+        });
+
+        info.ifPresent((t) -> {
+            switch (t.getLevel()) {
+                case MOLECULAR_SUBSPECIES:
+                case STRUCTURAL_SUBSPECIES:
+                case ISOMERIC_SUBSPECIES:
+                    int nTrueFa = 0;
+                    for (FattyAcid fa : getFa().values()) {
+                        ElementTable faElements = fa.getElements();
+                        if (fa.getNCarbon() != 0 || fa.getNDoubleBonds() != 0) {
+                            nTrueFa += 1;
+                        }
+                        elements.accumulate(faElements);
+                    }
+                    if (lipidClass.isPresent()) {
+                        if (lipidClass.get().getMaxNumFa() < nTrueFa) {
+                            throw new ConstraintViolationException("Inconsistency in number of fatty acyl chains for lipid '" + headGroup + "'. Expected at most: " + lipidClass.get().getMaxNumFa() + "; received: " + nTrueFa);
+                        }
+                        elements.incrementBy(Element.ELEMENT_H, lipidClass.get().getMaxNumFa() - nTrueFa);
+                    }
+                    break;
+                case SPECIES:
+                    int maxNumFa = 0;
+                    if (lipidClass.isPresent()) {
+                        maxNumFa = lipidClass.get().getMaxNumFa();
+                    }
+                    if (info.isPresent()) {
+                        int maxPossNumFa = lipidClass.get().getAllowedNumFa().stream().max(Integer::compareTo).orElse(0);
+                        ElementTable faElements = info.get().getElements(maxPossNumFa);
+                        elements.accumulate(faElements);
+                        elements.incrementBy(ELEMENT_H, maxNumFa - maxPossNumFa);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        return elements;
     }
 
     @Override

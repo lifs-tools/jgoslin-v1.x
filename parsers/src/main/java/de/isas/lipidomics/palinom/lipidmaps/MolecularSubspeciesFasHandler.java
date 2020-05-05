@@ -116,7 +116,7 @@ public class MolecularSubspeciesFasHandler {
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 fa.nDoubleBonds(plasmenylEtherDbBondCorrection + HandlerUtils.asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0));
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
-                    throw new RuntimeException("Support for double bond positions not implemented yet!");
+                    throw new RuntimeException("Support for double bond positions is implemented in " + IsomericSubspeciesFasHandler.class.getSimpleName() + "!");
                 }
             }
             return fa.name(faName).build();

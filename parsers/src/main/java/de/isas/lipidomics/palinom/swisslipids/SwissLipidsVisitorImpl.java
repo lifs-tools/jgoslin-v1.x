@@ -53,7 +53,7 @@ public class SwissLipidsVisitorImpl extends SwissLipidsBaseVisitor<LipidAdduct> 
 
         LipidAdduct la = new LipidAdduct(categoryContext.map((cc) -> {
             return new LipidVisitor().visitLipid_pure(cc);
-        }).orElse(LipidSpecies.NONE), Adduct.NONE, "", new Fragment(""));
+        }).orElse(LipidSpecies.NONE), Adduct.NONE, new Fragment(""));
         return la;
     }
 

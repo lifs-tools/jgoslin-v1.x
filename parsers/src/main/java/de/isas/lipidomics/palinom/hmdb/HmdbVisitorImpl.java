@@ -15,14 +15,12 @@
  */
 package de.isas.lipidomics.palinom.hmdb;
 
-import de.isas.lipidomics.palinom.swisslipids.*;
 import de.isas.lipidomics.domain.Adduct;
 import de.isas.lipidomics.domain.Fragment;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.HMDBBaseVisitor;
-import de.isas.lipidomics.palinom.SwissLipidsBaseVisitor;
 import de.isas.lipidomics.palinom.HMDBParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Arrays;
@@ -54,7 +52,7 @@ public class HmdbVisitorImpl extends HMDBBaseVisitor<LipidAdduct> {
 
         LipidAdduct la = new LipidAdduct(categoryContext.map((cc) -> {
             return new LipidVisitor().visitLipid_pure(cc);
-        }).orElse(LipidSpecies.NONE), Adduct.NONE, "", new Fragment(""));
+        }).orElse(LipidSpecies.NONE), Adduct.NONE, new Fragment(""));
         return la;
     }
 

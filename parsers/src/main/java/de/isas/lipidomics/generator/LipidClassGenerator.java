@@ -16,6 +16,7 @@
 package de.isas.lipidomics.generator;
 
 import com.opencsv.CSVReader;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -24,6 +25,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
+import de.isas.lipidomics.domain.ElementTable;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
 import java.io.IOException;
@@ -42,6 +44,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
@@ -105,7 +108,8 @@ public class LipidClassGenerator {
     }
 
     public String sanitizeToEnumConstant(String lipidName, String lipidCategory) {
-        return lipidName.replaceAll("[/\\-\\s(),.\\[\\]:;]", "_").replaceAll("'", "p").replaceAll("^([_0-9]+)", lipidCategory + "_$1").replaceAll("[_]+", "_").toUpperCase();
+        return lipidName.replaceAll("[/\\-\\s(),.\\[\\]:;]", "_").replaceAll("'", "p")
+                .replaceAll("^([_0-9]+)", lipidCategory + "_$1").replaceAll("[_]+", "_").toUpperCase();
     }
 
     public String getEnumFromTable(Stream<LipidClassEntry> stream) {
@@ -131,19 +135,12 @@ public class LipidClassGenerator {
         lipidClassBuilder.addField(listOfIntegers, "allowedNumFa", Modifier.PRIVATE, Modifier.FINAL);
         lipidClassBuilder.addField(Integer.class, "maxNumFa", Modifier.PRIVATE, Modifier.FINAL);
         lipidClassBuilder.addField(String.class, "sumFormula", Modifier.PRIVATE, Modifier.FINAL);
+        lipidClassBuilder.addField(ElementTable.class, "elementTable", Modifier.PRIVATE, Modifier.FINAL);
         ClassName arrayList = ClassName.get("java.util", "ArrayList");
         TypeName listOfSynonyms = ParameterizedTypeName.get(list, synonymsClass);
         lipidClassBuilder.addField(listOfSynonyms, "synonyms", Modifier.PRIVATE, Modifier.FINAL);
         TypeName optionalLipidClass = ParameterizedTypeName.get(Optional.class, LipidClass.class);
 
-//            private LipidClass(LipidCategory category, String lipidMapsClassName, String... synonyms) {
-//        this.category = category;
-//        this.lipidMapsClassName = lipidMapsClassName;
-//        if (synonyms.length == 0) {
-//            throw new IllegalArgumentException("Must supply at least one synonym!");
-//        }
-//        this.synonyms = Arrays.asList(synonyms);
-//    }
         lipidClassBuilder.addMethod(
                 MethodSpec.constructorBuilder().
                         addModifiers(Modifier.PRIVATE).
@@ -157,10 +154,23 @@ public class LipidClassGenerator {
                         addStatement("this.$N = $N", "allowedNumFaStr", "allowedNumFaStr").
                         addParameter(String.class, "sumFormula").
                         addStatement("this.$N = $N", "sumFormula", "sumFormula").
-                        addParameter(String[].class, "synonyms").
                         addStatement(
                                 CodeBlock.of(
-                                        "if ($N.length == 0) {\n"
+                                        "ElementTable et = new ElementTable();\n"
+                                        + "        if(this.sumFormula!=null && !this.sumFormula.isEmpty()) {\n"
+                                        + "            try {\n"
+                                        + "                et = new ElementTable(this.sumFormula);\n"
+                                        + "            } catch (de.isas.lipidomics.palinom.exceptions.ParsingException ex) {\n"
+                                        + "                et = new ElementTable();\n"
+                                        + "            }\n"
+                                        + "        };\n"
+                                        + "        this.elementTable = et;"
+                                )
+                        ).
+                        addParameter(listOfSynonyms, "synonyms").
+                        addStatement(
+                                CodeBlock.of(
+                                        "if ($N.isEmpty()) {\n"
                                         + " throw new IllegalArgumentException(\"Must supply at least one synonym!\");\n"
                                         + "}", "synonyms")
                         ).
@@ -170,8 +180,7 @@ public class LipidClassGenerator {
                                         + "   return Integer.parseInt(t);\n"
                                         + "}).collect(java.util.stream.Collectors.toList())", "allowedNumFa")
                         ).
-                        addStatement("this.$N = Arrays.asList($N)", "synonyms", "synonyms").
-                        varargs(true).
+                        addStatement("this.$N = $N", "synonyms", "synonyms").
                         build()
         );
 
@@ -191,7 +200,10 @@ public class LipidClassGenerator {
                 MethodSpec.methodBuilder("getAllowedNumFa").addModifiers(Modifier.PUBLIC).returns(listOfIntegers).addCode("return this.$N;", "allowedNumFa").build()
         );
         lipidClassBuilder.addMethod(
-                MethodSpec.methodBuilder("getSumFormula").addModifiers(Modifier.PUBLIC).returns(String.class).addCode("return this.$N;", "sumFormula").build()
+                MethodSpec.methodBuilder("getSumFormula").addModifiers(Modifier.PUBLIC).returns(String.class).addCode("return this.$N.getSumFormula();", "elementTable").build()
+        );
+        lipidClassBuilder.addMethod(
+                MethodSpec.methodBuilder("getElements").addModifiers(Modifier.PUBLIC).returns(ElementTable.class).addCode("return this.$N.copy();", "elementTable").build()
         );
         lipidClassBuilder.addMethod(
                 MethodSpec.methodBuilder("getSynonyms").addModifiers(Modifier.PUBLIC).returns(listOfSynonyms).addCode("return this.$N;", "synonyms").build()
@@ -236,8 +248,6 @@ public class LipidClassGenerator {
                         returns(optionalLipidClass).
                         build()
         );
-        //UNDEFINED(LipidCategory.UNDEFINED, "UNDEFINED", "Undefined lipid class"),
-//        helloWorld.addEnumConstant("UNDEFINED", TypeSpec.anonymousClassBuilder("$N, $S, $S", "LipidCategory.UNDEFINED", "UNDEFINED", "Undefined lipid class").build());
 
         stream.forEach((lipidClassEntry) -> {
             String sanitizedName = sanitizeToEnumConstant(lipidClassEntry.getLipidName(), lipidClassEntry.getLipidCategory());
@@ -249,13 +259,16 @@ public class LipidClassGenerator {
                             "\"" + lipidClassEntry.lipidDescription + "\"",
                             lipidClassEntry.maxNumFa + "",
                             "\"" + lipidClassEntry.allowedNumFa + "\"",
-                            "\"" + lipidClassEntry.lipidName + "\"",
+//                            "\"" + lipidClassEntry.lipidName + "\"",
                             "\"" + lipidClassEntry.sumFormula + "\""
                     )
             );
-            template.addAll(lipidClassEntry.getSynonyms().stream().map((t) -> {
+            List<String> synonyms = new ArrayList<>();
+            synonyms.add("\"" + lipidClassEntry.lipidName + "\"");
+            synonyms.addAll(lipidClassEntry.getSynonyms().stream().map((t) -> {
                 return "\"" + t + "\"";
             }).collect(Collectors.toList()));
+            template.add("java.util.Arrays.asList(" + synonyms.stream().collect(Collectors.joining(",")) + ")");
             CodeBlock cb = CodeBlock.of(String.join(", ", template));
             lipidClassBuilder.addEnumConstant(sanitizedName, TypeSpec.anonymousClassBuilder(cb).build());
         });
