@@ -15,7 +15,6 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
@@ -23,6 +22,10 @@ import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.FattyAcidType;
+import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.LipidIsomericSubspecies;
+import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -38,15 +41,31 @@ import java.util.Optional;
 public class MolecularSubspeciesFasHandler {
 
     private final FattyAcylHelper faHelper;
+    private final StructuralSubspeciesFasHandler ssfh;
 
-    public MolecularSubspeciesFasHandler(FattyAcylHelper faHelper) {
+    public MolecularSubspeciesFasHandler(StructuralSubspeciesFasHandler ssfh, FattyAcylHelper faHelper) {
+        this.ssfh = ssfh;
         this.faHelper = faHelper;
     }
 
     public LipidSpecies handlePureFaContext(LipidMapsParser.Pure_faContext ctx) {
-
         if (ctx.fa_no_hg() != null && ctx.fa_no_hg().fa() != null) {
             FattyAcid fa = buildMolecularFa(ctx.fa_no_hg().fa(), "FA1");
+            switch (fa.getType()) {
+                case ISOMERIC:
+                    return new LipidIsomericSubspecies(
+                            new HeadGroup(
+                                    "FA"),
+                            fa
+                    );
+                case STRUCTURAL:
+                case MOLECULAR:
+                    return new LipidStructuralSubspecies(
+                            new HeadGroup(
+                                    "FA"),
+                            fa
+                    );
+            }
             LipidSpeciesInfo.LipidSpeciesInfoBuilder builder = LipidSpeciesInfo.lipidSpeciesInfoBuilder();
             LipidSpeciesInfo lsi = builder.level(LipidLevel.SPECIES).
                     nCarbon(fa.getNCarbon()).
@@ -54,11 +73,11 @@ public class MolecularSubspeciesFasHandler {
                     nDoubleBonds(fa.getNDoubleBonds()).
                     lipidFaBondType(LipidFaBondType.UNDEFINED).
                     modifications(fa.getModifications()).
-                build();
+                    build();
             LipidSpecies ls = new LipidSpecies(
-                    ctx.hg_fa().getText(),
-                    LipidCategory.FA,
-                    LipidClass.forHeadGroup(ctx.hg_fa().getText()),
+                    new HeadGroup(
+                            "FA"
+                    ),
                     Optional.of(lsi)
             );
             return ls;
@@ -66,6 +85,22 @@ public class MolecularSubspeciesFasHandler {
             LipidMapsParser.Pure_fa_speciesContext speciesContext = ctx.pure_fa_species();
             if (speciesContext != null) {
                 FattyAcid fa = buildMolecularFa(speciesContext.fa(), "FA1");
+                switch (fa.getType()) {
+                    case ISOMERIC:
+                        return new LipidIsomericSubspecies(
+                                new HeadGroup(
+                                        ctx.hg_fa().getText()),
+                                fa
+                        );
+                    case STRUCTURAL:
+                    case MOLECULAR:
+                        return new LipidStructuralSubspecies(
+                                new HeadGroup(
+                                        ctx.hg_fa().getText()),
+                                fa
+                        );
+                }
+
                 LipidSpeciesInfo.LipidSpeciesInfoBuilder builder = LipidSpeciesInfo.lipidSpeciesInfoBuilder();
                 LipidSpeciesInfo lsi = builder.level(LipidLevel.SPECIES).
                         nCarbon(fa.getNCarbon()).
@@ -73,11 +108,11 @@ public class MolecularSubspeciesFasHandler {
                         nDoubleBonds(fa.getNDoubleBonds()).
                         lipidFaBondType(LipidFaBondType.UNDEFINED).
                         modifications(fa.getModifications()).
-                    build();
+                        build();
                 LipidSpecies ls = new LipidSpecies(
-                        ctx.hg_fa().getText(),
-                        LipidCategory.FA,
-                        LipidClass.forHeadGroup(ctx.hg_fa().getText()),
+                        new HeadGroup(
+                                ctx.hg_fa().getText()
+                        ),
                         Optional.of(lsi)
                 );
                 return ls;
@@ -89,7 +124,7 @@ public class MolecularSubspeciesFasHandler {
         }
     }
 
-    public Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<LipidMapsParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitMolecularSubspeciesFas(HeadGroup headGroup, List<LipidMapsParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         for (int i = 0; i < faContexts.size(); i++) {
             FattyAcid fa = buildMolecularFa(faContexts.get(i), "FA" + (i + 1));
@@ -114,9 +149,9 @@ public class MolecularSubspeciesFasHandler {
             fa.nCarbon(HandlerUtils.asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(HandlerUtils.asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
-                fa.nDoubleBonds(plasmenylEtherDbBondCorrection + HandlerUtils.asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0));
+                fa.nDoubleBonds(plasmenylEtherDbBondCorrection + HandlerUtils.asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0) + (faBondType == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0));
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
-                    throw new RuntimeException("Support for double bond positions is implemented in " + IsomericSubspeciesFasHandler.class.getSimpleName() + "!");
+                    return ssfh.buildStructuralFa(ctx, faName, -1);
                 }
             }
             return fa.name(faName).build();

@@ -19,6 +19,7 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -39,7 +40,7 @@ public class MolecularSubspeciesFasHandler {
         this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<GoslinFragmentsParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitMolecularSubspeciesFas(HeadGroup headGroup, List<GoslinFragmentsParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         for (int i = 0; i < faContexts.size(); i++) {
             FattyAcid fa = buildMolecularFa(headGroup, faContexts.get(i), "FA" + (i + 1));
@@ -50,7 +51,7 @@ public class MolecularSubspeciesFasHandler {
         return Optional.of(new LipidMolecularSubspecies(headGroup, arrs));
     }
 
-    public FattyAcid buildMolecularFa(String headGroup, GoslinFragmentsParser.FaContext ctx, String faName) {
+    public FattyAcid buildMolecularFa(HeadGroup headGroup, GoslinFragmentsParser.FaContext ctx, String faName) {
         if (ctx.fa_pure() != null && ctx.heavy_fa() != null) {
             throw new RuntimeException("Heavy label in fa_pure context not implemented yet!");
         }

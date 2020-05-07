@@ -82,9 +82,9 @@ class LipidMapsVisitorImpl extends LipidMapsBaseVisitor<LipidAdduct> {
             bs.set(LipidCategory.SP.ordinal(), ctx.sl() != null);
             bs.set(LipidCategory.PK.ordinal(), ctx.pk() != null);
             final FattyAcylHelper faHelper = new FattyAcylHelper();
-            final MolecularSubspeciesFasHandler msfh = new MolecularSubspeciesFasHandler(faHelper);
             final IsomericSubspeciesFasHandler isfh = new IsomericSubspeciesFasHandler(faHelper);
             final StructuralSubspeciesFasHandler ssfh = new StructuralSubspeciesFasHandler(isfh, faHelper);
+            final MolecularSubspeciesFasHandler msfh = new MolecularSubspeciesFasHandler(ssfh, faHelper);
             final IsomericSubspeciesLcbHandler islh = new IsomericSubspeciesLcbHandler(isfh, faHelper);
             final StructuralSubspeciesLcbHandler sslh = new StructuralSubspeciesLcbHandler(ssfh, islh, faHelper);
             final FattyAcylHandler faHandler = new FattyAcylHandler(msfh, ssfh, sslh, faHelper);

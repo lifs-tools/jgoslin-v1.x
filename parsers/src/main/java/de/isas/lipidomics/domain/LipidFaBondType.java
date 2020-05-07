@@ -40,9 +40,9 @@ public enum LipidFaBondType {
         }
     }
 
-    public static LipidFaBondType getLipidFaBondType(String headGroup, FattyAcid... fa) {
+    public static LipidFaBondType getLipidFaBondType(HeadGroup headGroup, FattyAcid... fa) {
         LipidFaBondType speciesFaBondType = LipidFaBondType.UNDEFINED;
-        if (headGroup.endsWith(" O") || headGroup.endsWith("-O")) {
+        if (headGroup.getRawName().endsWith(" O") || headGroup.getRawName().endsWith("-O")) {
             speciesFaBondType = LipidFaBondType.ETHER_UNSPECIFIED;
         }
         LipidFaBondType mostSpecificFaBondType = LipidFaBondType.UNDEFINED;

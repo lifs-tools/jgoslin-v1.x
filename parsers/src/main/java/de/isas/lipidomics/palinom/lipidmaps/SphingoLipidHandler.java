@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.LipidMapsParser.Lipid_pureContext;
@@ -54,7 +55,7 @@ public class SphingoLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleDsl(LipidMapsParser.DslContext dsl) {
-        String headGroup = dsl.hg_dslc().getText();
+        HeadGroup headGroup = new HeadGroup(dsl.hg_dslc().getText());
         if (dsl.dsl_species() != null) { //species level
             //process species level
             return fhf.visitSpeciesLcb(headGroup, dsl.dsl_species().lcb());
@@ -71,7 +72,7 @@ public class SphingoLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleLsl(LipidMapsParser.LslContext lsl) {
-        String headGroup = lsl.hg_lslc().getText();
+        HeadGroup headGroup = new HeadGroup(lsl.hg_lslc().getText());
         if (lsl.lcb() != null) { //species / subspecies level
             //process structural sub species level
             return sslh.visitStructuralSubspeciesLcb(headGroup, lsl.lcb());

@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.hmdb;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.HMDBParser.Lipid_pureContext;
@@ -65,7 +66,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     }
 
     private Optional<LipidSpecies> handleGpRegular(HMDBParser.Pl_regularContext dsl) {
-        String headGroup = dsl.pl_hg().getText();
+        HeadGroup headGroup = new HeadGroup(dsl.pl_hg().getText());
         if (dsl.pl_fa().fa_species() != null) { //species level
             //process single fa
             return fhf.visitSpeciesFas(headGroup, dsl.pl_fa().fa_species().fa());
@@ -92,7 +93,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     }
 
     private Optional<LipidSpecies> handleGpThree(HMDBParser.Pl_threeContext lsl) {
-        String headGroup = lsl.pl_three_hg().getText();
+        HeadGroup headGroup = new HeadGroup(lsl.pl_three_hg().getText());
         if (lsl.pl_three_fa() != null) {
             if (lsl.pl_three_fa().fa_species() != null) {
                 return fhf.visitSpeciesFas(headGroup, lsl.pl_three_fa().fa_species().fa());
@@ -121,7 +122,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     }
 
     private Optional<LipidSpecies> handleGpFour(HMDBParser.Pl_fourContext lsl) {
-        String headGroup = lsl.pl_four_hg().getText();
+        HeadGroup headGroup = new HeadGroup(lsl.pl_four_hg().getText());
         if (lsl.pl_four_fa() != null) {
             if (lsl.pl_four_fa().fa_species() != null) {
                 return fhf.visitSpeciesFas(headGroup, lsl.pl_four_fa().fa_species().fa());

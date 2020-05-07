@@ -17,6 +17,7 @@ package de.isas.lipidomics.palinom.goslin;
 
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
@@ -43,7 +44,7 @@ public class IsomericSubspeciesFasHandler {
         this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitIsomericSubspeciesFas(String headGroup, List<GoslinParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitIsomericSubspeciesFas(HeadGroup headGroup, List<GoslinParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         int nIsomericFas = 0;
         for (int i = 0; i < faContexts.size(); i++) {
@@ -66,7 +67,7 @@ public class IsomericSubspeciesFasHandler {
         }
     }
 
-    public FattyAcid buildIsomericFa(String headGroup, GoslinParser.FaContext ctx, String faName, int position) {
+    public FattyAcid buildIsomericFa(HeadGroup headGroup, GoslinParser.FaContext ctx, String faName, int position) {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(headGroup, ctx);
         if (ctx.fa_pure() != null) {

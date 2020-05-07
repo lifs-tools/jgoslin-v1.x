@@ -132,7 +132,7 @@ public class LipidSpeciesInfo extends FattyAcid {
     public ElementTable getElements(int numFa) {
         ElementTable elements = super.getElements();
         elements.incrementBy(Element.ELEMENT_O, numFa - 1);
-        elements.incrementBy(Element.ELEMENT_H, -numFa - 1);
+        elements.decrementBy(Element.ELEMENT_H, numFa - 1);
         return elements;
     }
 }

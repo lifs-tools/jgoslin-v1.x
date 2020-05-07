@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.goslinfragments;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import de.isas.lipidomics.palinom.HandlerUtils;
@@ -30,7 +31,7 @@ import java.util.Optional;
  */
 public class FattyAcylHelper {
 
-    public LipidFaBondType getLipidLcbBondType(String headGroup, GoslinFragmentsParser.LcbContext lcbContext) throws ParseTreeVisitorException {
+    public LipidFaBondType getLipidLcbBondType(HeadGroup headGroup, GoslinFragmentsParser.LcbContext lcbContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         return lfbt;
     }
@@ -44,7 +45,7 @@ public class FattyAcylHelper {
         throw new ParseTreeVisitorException("Uninitialized lcb_core context!");
     }
 
-    public LipidFaBondType getLipidFaBondType(String headGroup, GoslinFragmentsParser.FaContext faContext) throws ParseTreeVisitorException {
+    public LipidFaBondType getLipidFaBondType(HeadGroup headGroup, GoslinFragmentsParser.FaContext faContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         if (faContext.ether() != null) {
             if ("a".equals(faContext.ether().getText())) {

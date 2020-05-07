@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.LipidMapsParser.Lipid_pureContext;
@@ -54,7 +55,7 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleTgl(LipidMapsParser.TglContext tgl) {
-        String headGroup = tgl.hg_glc().getText();
+        HeadGroup headGroup = new HeadGroup(tgl.hg_glc().getText());
         if (tgl.tgl_species() != null) {
             return fhf.visitSpeciesFas(headGroup, tgl.tgl_species().fa());
         } else if (tgl.tgl_subspecies() != null) {
@@ -73,7 +74,7 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleSgl(LipidMapsParser.SglContext sgl) {
-        String headGroup = sgl.hg_sglc().getText();
+        HeadGroup headGroup = new HeadGroup(sgl.hg_sglc().getText());
         if (sgl.sgl_species() != null) { //species level
             //process species level
             return fhf.visitSpeciesFas(headGroup, sgl.sgl_species().fa());

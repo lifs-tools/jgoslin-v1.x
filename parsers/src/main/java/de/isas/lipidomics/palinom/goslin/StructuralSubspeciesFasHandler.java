@@ -21,6 +21,7 @@ import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import static de.isas.lipidomics.domain.FattyAcidType.ISOMERIC;
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.GoslinParser;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -44,7 +45,7 @@ public class StructuralSubspeciesFasHandler {
         this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<GoslinParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitStructuralSubspeciesFas(HeadGroup headGroup, List<GoslinParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         int nIsomericFas = 0;
         for (int i = 0; i < faContexts.size(); i++) {
@@ -67,7 +68,7 @@ public class StructuralSubspeciesFasHandler {
         }
     }
 
-    public FattyAcid buildStructuralFa(String headGroup, GoslinParser.FaContext ctx, String faName, int position) {
+    public FattyAcid buildStructuralFa(HeadGroup headGroup, GoslinParser.FaContext ctx, String faName, int position) {
         if (ctx.fa_pure() != null && ctx.heavy_fa() != null) {
             throw new RuntimeException("Heavy label in fa_pure context not implemented yet!");
         }

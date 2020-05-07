@@ -36,6 +36,5 @@ public class SumFormulaVisitorImplTest {
         assertEquals(2, elementTable.get(Element.ELEMENT_N));
         assertEquals(6, elementTable.get(Element.ELEMENT_O));
         assertEquals(1, elementTable.get(Element.ELEMENT_P));
-        
     }
 }

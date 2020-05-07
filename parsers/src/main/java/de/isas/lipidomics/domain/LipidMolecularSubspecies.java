@@ -43,11 +43,12 @@ public class LipidMolecularSubspecies extends LipidSpecies {
     protected final Map<String, FattyAcid> fa = new LinkedHashMap<>();
 
     @Builder
-    public LipidMolecularSubspecies(String headGroup, FattyAcid... fa) {
+    public LipidMolecularSubspecies(HeadGroup headGroup, FattyAcid... fa) {
         super(headGroup);
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
+        ModificationsList mods = new ModificationsList();
         for (FattyAcid fas : fa) {
 //            if (fas.getPosition() != -1) {
 //                throw new ConstraintViolationException("MolecularFattyAcid " + fas.getName() + " must have position set to -1! Was: " + fas.getPosition());
@@ -60,17 +61,19 @@ public class LipidMolecularSubspecies extends LipidSpecies {
                 nCarbon += fas.getNCarbon();
                 nHydroxyl += fas.getNHydroxy();
                 nDoubleBonds += fas.getNDoubleBonds();
+                mods.addAll(fas.getModifications());
             }
 
         }
         super.info = Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
                 level(LipidLevel.MOLECULAR_SUBSPECIES).
-                name(headGroup).
+                name(headGroup.getName()).
                 position(-1).
                 nCarbon(nCarbon).
                 nHydroxy(nHydroxyl).
                 nDoubleBonds(nDoubleBonds).
                 lipidFaBondType(LipidFaBondType.getLipidFaBondType(headGroup, fa)).
+                modifications(mods).
                 build()
         );
     }
@@ -102,7 +105,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
 
     @Override
     public String getLipidString(LipidLevel level, boolean normalizeHeadGroup) {
-        String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup();
+        String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup().getName();
         switch (level) {
             case MOLECULAR_SUBSPECIES:
                 return buildLipidSubspeciesName(level, "-", headGroup);

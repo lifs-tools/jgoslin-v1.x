@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.LipidMapsParser.Lipid_pureContext;
@@ -54,7 +55,7 @@ public class PolyketideHandler implements ParserRuleContextHandler<Lipid_pureCon
     }
 
     private Optional<LipidSpecies> handlePk(LipidMapsParser.PkContext pk) {
-        String headGroup = pk.pk_hg().getText();
+        HeadGroup headGroup = new HeadGroup(pk.pk_hg().getText());
         if (pk.pk_fa() != null) {
             //process subspecies
             if (pk.pk_fa().fa() != null) {

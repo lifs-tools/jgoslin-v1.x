@@ -63,12 +63,14 @@ public class Adduct {
             return t.length() > 1 ? t.substring(1) : "";
         }).orElse("");
         try {
-            elements.accumulate(new ElementTable(adductName));
+            elements.add(new ElementTable(adductName));
         } catch (ParsingException ex) {
             return elements;
         }
         if (adductString.length() > 0 && adductString.startsWith("-")) {
-            elements.keySet().stream().forEach(elements::decrement);
+            elements.keySet().stream().forEach((t) -> {
+                elements.negate(t);
+            });
         }
         return elements;
     }

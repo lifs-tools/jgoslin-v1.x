@@ -31,7 +31,7 @@ public class LipidSpeciesTest {
     public void testGetLipidSpeciesString() {
 
         LipidSpecies lss = new LipidSpecies(
-                "PG",
+                new HeadGroup("PG"),
                 Optional.of(new LipidSpeciesInfo(LipidLevel.SPECIES, 20, 1, 2, LipidFaBondType.ESTER))
         );
         String expectedSpecies = "PG 20:2;1";
@@ -56,7 +56,7 @@ public class LipidSpeciesTest {
     public void testGetNormalizedLipidString() {
 
         LipidSpecies lss = new LipidSpecies(
-                "TG",
+                new HeadGroup("TG"),
                 Optional.of(new LipidSpeciesInfo(LipidLevel.SPECIES, 20, 1, 2, LipidFaBondType.ESTER))
         );
         String expectedSpecies = "TAG 20:2;1";
@@ -67,7 +67,7 @@ public class LipidSpeciesTest {
         String expectedNormalizedMolSubSpecies = "TAG 8:1-12:1-18:0";
         MolecularFattyAcidBuilder mfab = FattyAcid.molecularFattyAcidBuilder();
         LipidMolecularSubspeciesBuilder lmsb = LipidMolecularSubspecies.builder();
-        LipidMolecularSubspecies lms = lmsb.headGroup("TG").fa(new FattyAcid[]{
+        LipidMolecularSubspecies lms = lmsb.headGroup(new HeadGroup("TG")).fa(new FattyAcid[]{
             mfab.nCarbon(8).nDoubleBonds(1).lipidFaBondType(LipidFaBondType.ESTER).name("FA1").build(),
             mfab.nCarbon(12).nDoubleBonds(1).lipidFaBondType(LipidFaBondType.ESTER).name("FA2").build(),
             mfab.nCarbon(18).nDoubleBonds(0).lipidFaBondType(LipidFaBondType.ESTER).name("FA3").build()}).build();

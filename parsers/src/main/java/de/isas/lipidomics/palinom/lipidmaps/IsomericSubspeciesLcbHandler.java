@@ -21,6 +21,7 @@ import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -45,7 +46,7 @@ public class IsomericSubspeciesLcbHandler {
         this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitIsomericSubspeciesLcb(String headGroup, LipidMapsParser.LcbContext lcbContext, List<LipidMapsParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitIsomericSubspeciesLcb(HeadGroup headGroup, LipidMapsParser.LcbContext lcbContext, List<LipidMapsParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         FattyAcid lcbA = buildIsomericLcb(headGroup, lcbContext, "LCB", 1);
         fas.add(lcbA);
@@ -73,7 +74,7 @@ public class IsomericSubspeciesLcbHandler {
         }
     }
 
-    public FattyAcid buildIsomericLcb(String headGroup, LipidMapsParser.LcbContext ctx, String faName, int position) {
+    public FattyAcid buildIsomericLcb(HeadGroup headGroup, LipidMapsParser.LcbContext ctx, String faName, int position) {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidLcbBondType(ctx);
         if (ctx.lcb_fa() != null) {
@@ -88,7 +89,7 @@ public class IsomericSubspeciesLcbHandler {
                 fa.nHydroxy(faHelper.getHydroxyCount(ctx));
                 if (factx.db() != null) {
                     if (factx.db().db_positions() != null) {
-                        fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(factx.db().db_positions()));
+                        fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, factx.db().db_positions()));
                     } else { // handle cases like (0:0) but with at least one fa with isomeric subspecies level
                         Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
                         if (factx.db().db_count() != null) {
@@ -98,6 +99,7 @@ public class IsomericSubspeciesLcbHandler {
                                         lipidFaBondType(lfbt).
                                         name(faName).
                                         lcb(true).
+                                        nHydroxy(faHelper.getHydroxyCount(ctx)).
                                         nCarbon(HandlerUtils.asInt(factx.carbon(), 0)).
                                         nDoubleBonds(doubleBonds).
                                         build();

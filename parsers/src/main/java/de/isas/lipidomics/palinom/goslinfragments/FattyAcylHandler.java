@@ -16,6 +16,7 @@
 package de.isas.lipidomics.palinom.goslinfragments;
 
 import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
@@ -23,6 +24,7 @@ import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.List;
@@ -47,7 +49,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<GoslinFragment
 //                    if (ctx.fatty_acid().mediator().mediator_single() != null) {
 //                        ctx.fatty_acid().mediator().mediator_single().db_positions();
 //                    }
-                String mediatorsSingleContext = ctx.mediatorc().mediator().getText();
+                HeadGroup mediatorsSingleContext = new HeadGroup(ctx.mediatorc().mediator().getText());
                 return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(mediatorsSingleContext).fa(new FattyAcid[0]).build();
             } else {
                 throw new ParseTreeVisitorException("Context for FA head group was null!");
@@ -58,15 +60,15 @@ public class FattyAcylHandler implements ParserRuleContextHandler<GoslinFragment
         }
     }
 
-    public Optional<LipidSpecies> visitSpeciesLcb(String headGroup, GoslinFragmentsParser.LcbContext lcbContext) {
+    public Optional<LipidSpecies> visitSpeciesLcb(HeadGroup headGroup, GoslinFragmentsParser.LcbContext lcbContext) {
         return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(lcbContext)));
     }
 
-    public Optional<LipidSpecies> visitSpeciesFas(String headGroup, GoslinFragmentsParser.FaContext faContext) {
+    public Optional<LipidSpecies> visitSpeciesFas(HeadGroup headGroup, GoslinFragmentsParser.FaContext faContext) {
         return Optional.of(new LipidSpecies(headGroup, getSpeciesInfo(headGroup, faContext)));
     }
 
-    public Optional<LipidSpeciesInfo> getSpeciesInfo(String headGroup, GoslinFragmentsParser.FaContext faContext) {
+    public Optional<LipidSpeciesInfo> getSpeciesInfo(HeadGroup headGroup, GoslinFragmentsParser.FaContext faContext) {
         //fa_pure, ether, heavy
         if (faContext.fa_pure() != null && faContext.heavy_fa() != null) {
             throw new RuntimeException("Heavy label in FA_pure context not implemented yet!");
@@ -109,11 +111,16 @@ public class FattyAcylHandler implements ParserRuleContextHandler<GoslinFragment
             } else if (pureCtx.hydroxyl() != null) {
                 hydroxyl = asInt(pureCtx.hydroxyl(), 0);
             }
-            return Optional.of(new LipidSpeciesInfo(
-                    LipidLevel.SPECIES,
-                    asInt(pureCtx.carbon(), 0),
-                    hydroxyl,
-                    asInt(pureCtx.db(), 0), LipidFaBondType.ESTER));
+            return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+                    level(LipidLevel.SPECIES).
+                    name("LCB").
+                    lcb(true).
+                    nCarbon(asInt(pureCtx.carbon(), 0)).
+                    nHydroxy(hydroxyl).
+                    nDoubleBonds(asInt(pureCtx.db(), 0)).
+                    lipidFaBondType(LipidFaBondType.ESTER).
+                    build()
+            );
         }
         throw new ParseTreeVisitorException("Uninitialized lcb_pure context!");
     }
@@ -123,9 +130,8 @@ public class FattyAcylHandler implements ParserRuleContextHandler<GoslinFragment
             if (faContext.fa_pure() != null) {
                 GoslinFragmentsParser.Fa_pureContext coreCtx = faContext.fa_pure();
                 if (coreCtx.db() != null) {
-                    if (coreCtx.db().db_positions() != null) {
-                        return true;
-                    }
+                    int dbCount = coreCtx.db().db_count() != null ? HandlerUtils.asInt(coreCtx.db().db_count(), 0) : -1;
+                    return dbCount == 0 || coreCtx.db().db_positions() != null;
                 }
             }
         }
@@ -136,7 +142,8 @@ public class FattyAcylHandler implements ParserRuleContextHandler<GoslinFragment
         if (faContext.fa_pure() != null) {
             GoslinFragmentsParser.Fa_pureContext coreCtx = faContext.fa_pure();
             if (coreCtx.db() != null) {
-                return coreCtx.db().db_positions() != null;
+                int dbCount = coreCtx.db().db_count() != null ? HandlerUtils.asInt(coreCtx.db().db_count(), 0) : -1;
+                return dbCount == 0 || coreCtx.db().db_positions() != null;
             }
         }
         return false;
@@ -146,7 +153,8 @@ public class FattyAcylHandler implements ParserRuleContextHandler<GoslinFragment
         if (lcbContext.lcb_pure() != null) {
             GoslinFragmentsParser.Lcb_pureContext coreCtx = lcbContext.lcb_pure();
             if (coreCtx.db() != null) {
-                return coreCtx.db().db_positions() != null;
+                int dbCount = coreCtx.db().db_count() != null ? HandlerUtils.asInt(coreCtx.db().db_count(), 0) : -1;
+                return dbCount == 0 || coreCtx.db().db_positions() != null;
             }
         }
         return false;

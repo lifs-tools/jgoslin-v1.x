@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
@@ -54,7 +55,7 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
 
     private LipidSpecies handleSt(Lipid_pureContext ctx) {
         if (ctx.sterol() != null && ctx.sterol().chc().ch() != null) {
-            return new LipidIsomericSubspecies(ctx.sterol().chc().ch().getText());
+            return new LipidIsomericSubspecies(new HeadGroup(ctx.sterol().chc().ch().getText()));
         } else {
             throw new ParseTreeVisitorException("Unhandled context state in Sterol!");
         }
@@ -62,9 +63,9 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
 
     private Optional<LipidSpecies> handleSte(LipidMapsParser.ChecContext che) {
         if (che.che_fa().fa() != null) {
-            return ssfh.visitStructuralSubspeciesFas(che.che_fa().hg_che().getText(), Arrays.asList(che.che_fa().fa()));
+            return ssfh.visitStructuralSubspeciesFas(new HeadGroup(che.che_fa().hg_che().getText()), Arrays.asList(che.che_fa().fa()));
         } else if (che.che() != null) {
-            return ssfh.visitStructuralSubspeciesFas(che.che().hg_che().getText(), Arrays.asList(che.che().fa()));
+            return ssfh.visitStructuralSubspeciesFas(new HeadGroup(che.che().hg_che().getText()), Arrays.asList(che.che().fa()));
         } else {
             throw new ParseTreeVisitorException("Unhandled context state in ChE!");
         }

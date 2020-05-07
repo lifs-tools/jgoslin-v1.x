@@ -28,15 +28,15 @@ public class LipidFaBondTypeTest {
 
     @Test
     public void testEtherHeadGroup() {
-        String etherHeadGroup1 = "PE O";
-        String etherHeadGroup2 = "PE-O";
+        HeadGroup etherHeadGroup1 = new HeadGroup("PE O");
+        HeadGroup etherHeadGroup2 = new HeadGroup("PE-O");
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup2));
     }
 
     @Test
     public void testEtherHeadGroupAndFaEtherUnspecifiedOrUndefinedThrowException() {
-        String etherHeadGroup1 = "PE O";
+        HeadGroup etherHeadGroup1 = new HeadGroup("PE O");
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_UNSPECIFIED).build()));
         Assertions.assertThrows(ConstraintViolationException.class, () -> { // should raise exception, fa bond type must not be UNDEFINED!
@@ -46,7 +46,7 @@ public class LipidFaBondTypeTest {
 
     @Test
     public void testEtherHeadGroupOverruledBySpecificFaEther() {
-        String etherHeadGroup1 = "PE O";
+        HeadGroup etherHeadGroup1 = new HeadGroup("PE O");
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build()));
         assertEquals(LipidFaBondType.ETHER_PLASMENYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build()));
@@ -54,14 +54,14 @@ public class LipidFaBondTypeTest {
 
     @Test
     public void testEtherHeadGroupDominatesFaEster() {
-        String etherHeadGroup1 = "PE O";
+        HeadGroup etherHeadGroup1 = new HeadGroup("PE O");
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
         assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build()));
     }
     
     @Test
     public void testNormalHeadGroupOverruledByFaEther() {
-        String etherHeadGroup1 = "PE";
+        HeadGroup etherHeadGroup1 = new HeadGroup("PE");
         assertEquals(LipidFaBondType.UNDEFINED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMANYL).build()));
         assertEquals(LipidFaBondType.ETHER_PLASMENYL, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ETHER_PLASMENYL).build()));
@@ -69,14 +69,14 @@ public class LipidFaBondTypeTest {
     
     @Test
     public void testNormalHeadGroupAndFaEster() {
-        String etherHeadGroup1 = "PE";
+        HeadGroup etherHeadGroup1 = new HeadGroup("PE");
         assertEquals(LipidFaBondType.UNDEFINED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
         assertEquals(LipidFaBondType.ESTER, LipidFaBondType.getLipidFaBondType(etherHeadGroup1, FattyAcid.structuralFattyAcidBuilder().lipidFaBondType(LipidFaBondType.ESTER).build()));
     }
     
     @Test
     public void testNormalHeadGroupAndFaEtherAndEster() {
-        String etherHeadGroup1 = "PE";
+        HeadGroup etherHeadGroup1 = new HeadGroup("PE");
         assertEquals(LipidFaBondType.UNDEFINED, LipidFaBondType.getLipidFaBondType(etherHeadGroup1));
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, 
                 LipidFaBondType.getLipidFaBondType(etherHeadGroup1, 

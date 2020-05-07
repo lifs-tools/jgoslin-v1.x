@@ -28,7 +28,7 @@ public class LipidStructuralSubspeciesTest {
     public void testGetLipidSpeciesString() {
 
         LipidStructuralSubspecies lss = new LipidStructuralSubspecies(
-                "PG",
+                new HeadGroup("PG"),
                 new FattyAcid("FA1", -1, 8, 0, 1, LipidFaBondType.ESTER, false, ModificationsList.NONE),
                 new FattyAcid("FA2", -1, 12, 1, 1, LipidFaBondType.ESTER, false, ModificationsList.NONE)
         );

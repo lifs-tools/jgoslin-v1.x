@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.hmdb;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.HMDBParser.Lipid_pureContext;
@@ -64,7 +65,7 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleGlRegular(HMDBParser.Gl_regularContext dsl) {
-        String headGroup = dsl.gl_hg().getText();
+        HeadGroup headGroup = new HeadGroup(dsl.gl_hg().getText());
         if (dsl.gl_fa().fa_species() != null) { //species level
             //process single fa
             return fhf.visitSpeciesFas(headGroup, dsl.gl_fa().fa_species().fa());
@@ -91,7 +92,7 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleGlMono(HMDBParser.Gl_monoContext lsl) {
-        String headGroup = lsl.gl_mono_hg().getText();
+        HeadGroup headGroup = new HeadGroup(lsl.gl_mono_hg().getText());
         if (lsl.gl_mono_fa() != null) {
             if (lsl.gl_mono_fa().fa_species() != null) {
                 return fhf.visitSpeciesFas(headGroup, lsl.gl_mono_fa().fa_species().fa());
@@ -120,7 +121,7 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleGlMolecular(HMDBParser.Gl_molecularContext lsl) {
-        String headGroup = lsl.gl_molecular_hg().getText();
+        HeadGroup headGroup = new HeadGroup(lsl.gl_molecular_hg().getText());
         if (lsl.gl_molecular_fa() != null) {
             if (lsl.gl_molecular_fa().fa2() != null) {
                 if (lsl.gl_molecular_fa().fa2().fa2_unsorted() != null) {

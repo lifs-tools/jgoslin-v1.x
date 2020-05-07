@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.hmdb;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.HMDBParser.Lipid_pureContext;
@@ -55,7 +56,7 @@ public class SphingoLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleSphingoLcb(HMDBParser.SlContext slc) {
-        String headGroup = slc.sl_hg().getText();
+        HeadGroup headGroup = new HeadGroup(slc.sl_hg().getText());
         if (slc.sl_lcb() != null && slc.sl_lcb().sl_lcb_species() != null) { //species level
             return fhf.visitSpeciesLcb(headGroup, slc.sl_lcb().sl_lcb_species().lcb());
         } else if (slc.sl_lcb() != null && slc.sl_lcb().sl_lcb_subspecies() != null) { // subspecies level

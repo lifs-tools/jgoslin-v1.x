@@ -21,6 +21,7 @@ import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
+import de.isas.lipidomics.domain.HeadGroup;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -38,13 +39,13 @@ public class StructuralSubspeciesFasHandler {
 
     private final IsomericSubspeciesFasHandler isfh;
     private final FattyAcylHelper faHelper;
-    
+
     public StructuralSubspeciesFasHandler(IsomericSubspeciesFasHandler isfh, FattyAcylHelper faHelper) {
         this.isfh = isfh;
         this.faHelper = faHelper;
     }
-    
-    public Optional<LipidSpecies> visitStructuralSubspeciesFas(String headGroup, List<LipidMapsParser.FaContext> faContexts) {
+
+    public Optional<LipidSpecies> visitStructuralSubspeciesFas(HeadGroup headGroup, List<LipidMapsParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         int nIsomericFas = 0;
         for (int i = 0; i < faContexts.size(); i++) {
@@ -80,7 +81,7 @@ public class StructuralSubspeciesFasHandler {
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
-                int nDoubleBonds = asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0);
+                int nDoubleBonds = asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0) + (faBondType == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0);
                 fa.nDoubleBonds(nDoubleBonds);
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null || nDoubleBonds == 0) {
                     return isfh.buildIsomericFa(ctx, faName, position);

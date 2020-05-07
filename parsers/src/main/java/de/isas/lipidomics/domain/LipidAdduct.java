@@ -57,10 +57,21 @@ public class LipidAdduct {
     public ElementTable getElements() {
         ElementTable elements = new ElementTable();
         if (lipid != null) {
-            elements.accumulate(lipid.getElements());
+            elements.add(lipid.getElements());
         }
         if (adduct != null) {
-            elements.accumulate(adduct.getElements());
+            if (lipid != null && lipid.getInfo().isPresent()) {
+                //only add elements on species level or below
+                //higher levels will not return a mass 
+                switch (lipid.getInfo().get().getLevel()) {
+                    case ISOMERIC_SUBSPECIES:
+                    case MOLECULAR_SUBSPECIES:
+                    case STRUCTURAL_SUBSPECIES:
+                    case SPECIES:
+                        elements.add(adduct.getElements());
+                        break;
+                }
+            }
         }
         return elements;
     }

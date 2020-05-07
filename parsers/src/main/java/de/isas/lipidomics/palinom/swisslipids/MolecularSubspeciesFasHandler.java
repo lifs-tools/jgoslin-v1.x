@@ -19,6 +19,7 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -39,7 +40,7 @@ public class MolecularSubspeciesFasHandler {
         this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitMolecularSubspeciesFas(String headGroup, List<SwissLipidsParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitMolecularSubspeciesFas(HeadGroup headGroup, List<SwissLipidsParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         for (int i = 0; i < faContexts.size(); i++) {
             FattyAcid fa = buildMolecularFa(headGroup, faContexts.get(i), "FA" + (i + 1));
@@ -50,13 +51,13 @@ public class MolecularSubspeciesFasHandler {
         return Optional.of(new LipidMolecularSubspecies(headGroup, arrs));
     }
 
-    public FattyAcid buildMolecularFa(String headGroup, SwissLipidsParser.FaContext ctx, String faName) {
+    public FattyAcid buildMolecularFa(HeadGroup headGroup, SwissLipidsParser.FaContext ctx, String faName) {
         FattyAcid.MolecularFattyAcidBuilder fa = FattyAcid.molecularFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(ctx);
         if (ctx.fa_core() != null) {
             fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));
             if (ctx.fa_core().db() != null) {
-                fa.nDoubleBonds(HandlerUtils.asInt(ctx.fa_core().db().db_count(), 0));
+                fa.nDoubleBonds(HandlerUtils.asInt(ctx.fa_core().db().db_count(), 0) + (lfbt == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0));
                 if (ctx.fa_core().db().db_positions() != null) {
                     throw new RuntimeException("Support for double bond positions is implemented in " + IsomericSubspeciesFasHandler.class.getSimpleName() + "!");
                 }

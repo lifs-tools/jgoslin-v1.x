@@ -199,7 +199,7 @@ public class FattyAcid {
 
     public ElementTable getElements() {
         ElementTable table = new ElementTable();
-        if (!lcb) {
+        if (!isLcb()) {
             if (nCarbon > 0 || nDoubleBonds > 0) {
                 table.incrementBy(Element.ELEMENT_C, nCarbon);// C
                 switch (lipidFaBondType) {

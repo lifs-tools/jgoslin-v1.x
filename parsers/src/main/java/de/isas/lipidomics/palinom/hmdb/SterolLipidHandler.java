@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.hmdb;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.HMDBParser.Lipid_pureContext;
@@ -60,7 +61,7 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
     }
 
     private Optional<LipidSpecies> handleStSpecies(HMDBParser.St_speciesContext che) {
-        String headGroup = che.st_species_hg().getText();
+        HeadGroup headGroup = new HeadGroup(che.st_species_hg().getText());
         if (che.st_species_fa() != null) {
             if (che.st_species_fa().fa_species() != null && che.st_species_fa().fa_species().fa() != null) {
                 if (fhf.isIsomericFa(che.st_species_fa().fa_species().fa())) {
@@ -77,7 +78,7 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
     }
 
     private Optional<LipidSpecies> handleStFa1(HMDBParser.St_sub1Context che) {
-        String headGroup = che.st_sub1_hg().getText();
+        HeadGroup headGroup = new HeadGroup(che.st_sub1_hg().getText());
         if (che.st_sub1_fa() != null) {
             if (fhf.isIsomericFa(che.st_sub1_fa().fa())) {
                 return isfh.visitIsomericSubspeciesFas(headGroup, Arrays.asList(che.st_sub1_fa().fa()));
@@ -90,7 +91,7 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
     }
 
     private Optional<LipidSpecies> handleStFa2(HMDBParser.St_sub2Context che) {
-        String headGroup = che.st_sub2_hg().getText();
+        HeadGroup headGroup = new HeadGroup(che.st_sub2_hg().getText());
         if (che.st_sub2_fa() != null) {
             if (che.st_sub2_fa().fa2().fa2_unsorted() != null) {
                 return msfh.visitMolecularSubspeciesFas(headGroup, che.st_sub2_fa().fa2().fa2_unsorted().fa());

@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.goslin;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.domain.LipidCategory;
 import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
@@ -49,7 +50,8 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
     private Optional<LipidSpecies> handleSterol(GoslinParser.Lipid_pureContext ctx) throws RuntimeException {
         if (ctx.sterol().stc() != null) {
             LipidSpeciesInfo lsi = new LipidSpeciesInfo(LipidLevel.SPECIES, 0, 0, 0, LipidFaBondType.UNDEFINED);
-            return Optional.of(new LipidSpecies(ctx.sterol().stc().st().getText(), LipidCategory.ST, Optional.of(LipidClass.ST), Optional.of(lsi)));
+            HeadGroup headGroup = new HeadGroup(ctx.sterol().stc().st().getText());
+            return Optional.of(new LipidSpecies(headGroup, Optional.of(lsi)));
         } else if (ctx.sterol().ste() != null) {
             return Optional.of(handleSte(ctx.sterol().ste()).orElse(LipidSpecies.NONE));
         } else if (ctx.sterol().stes() != null) {
@@ -60,7 +62,7 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
     }
 
     private Optional<LipidSpecies> handleSte(GoslinParser.SteContext che) {
-        String headGroup = che.hg_stc().getText();
+        HeadGroup headGroup = new HeadGroup(che.hg_stc().getText());
         if (che.fa() != null) {
             return ssfh.visitStructuralSubspeciesFas(headGroup, Arrays.asList(che.fa()));
         } else {
@@ -69,7 +71,7 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
     }
 
     private Optional<LipidSpecies> handleStes(GoslinParser.StesContext che) {
-        String headGroup = che.hg_stcs().getText();
+        HeadGroup headGroup = new HeadGroup(che.hg_stcs().getText());
         if (che.fa() != null) {
             return ssfh.visitStructuralSubspeciesFas(headGroup, Arrays.asList(che.fa()));
         } else {

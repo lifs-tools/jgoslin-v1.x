@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.goslinfragments;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
@@ -65,7 +66,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
 
     private Optional<LipidSpecies> handlePlo(GoslinFragmentsParser.Pl_oContext ploc) {
         if (ploc.dpl_o() != null) {
-            String headGroup = ploc.dpl_o().hg_pl_oc().getText();
+            HeadGroup headGroup = new HeadGroup(ploc.dpl_o().hg_pl_oc().getText());
             if (ploc.dpl_o().pl_species() != null) {
                 //process species
                 return fah.visitSpeciesFas(headGroup, ploc.dpl_o().pl_species().fa());
@@ -80,7 +81,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
                 }
             }
         } else if (ploc.lpl_o() != null) {
-            String headGroup = ploc.lpl_o().hg_lpl_oc().getText();
+            HeadGroup headGroup = new HeadGroup(ploc.lpl_o().hg_lpl_oc().getText());
             return ssfh.visitStructuralSubspeciesFas(headGroup, Arrays.asList(ploc.lpl_o().fa()));
         } else {
             throw new ParseTreeVisitorException("Unhandled context state in PL O!");
@@ -89,7 +90,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     }
 
     private Optional<LipidSpecies> handleCl(GoslinFragmentsParser.ClContext cl) {
-        String headGroup = cl.hg_clc().getText();
+        HeadGroup headGroup = new HeadGroup(cl.hg_clc().getText());
         if (cl.pl_species() != null) { //species level
             //process species level
             return fah.visitSpeciesFas(headGroup, cl.pl_species().fa());
@@ -109,7 +110,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     }
 
     private Optional<LipidSpecies> handleMlcl(GoslinFragmentsParser.MlclContext mlcl) {
-        String headGroup = mlcl.hg_mlclc().getText();
+        HeadGroup headGroup = new HeadGroup(mlcl.hg_mlclc().getText());
         if (mlcl.pl_species() != null) { //species level
             //process species level
             return fah.visitSpeciesFas(headGroup, mlcl.pl_species().fa());
@@ -129,7 +130,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     }
 
     private Optional<LipidSpecies> handleDpl(GoslinFragmentsParser.DplContext dpl) {
-        String headGroup = dpl.hg_plc().getText();
+        HeadGroup headGroup = new HeadGroup(dpl.hg_plc().getText());
         if (dpl.pl_species() != null) { //species level
             //process species level
             return fah.visitSpeciesFas(headGroup, dpl.pl_species().fa());
@@ -149,7 +150,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     }
 
     private Optional<LipidSpecies> handleLpl(GoslinFragmentsParser.LplContext lpl) {
-        String headGroup = lpl.hg_lplc().getText();
+        HeadGroup headGroup = new HeadGroup(lpl.hg_lplc().getText());
         //lyso PL has one FA, Species=MolecularSubSpecies=StructuralSubSpecies
         if (lpl.fa() != null) {
             return ssfh.visitStructuralSubspeciesFas(headGroup, Arrays.asList(lpl.fa()));

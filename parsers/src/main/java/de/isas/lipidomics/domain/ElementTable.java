@@ -53,7 +53,7 @@ public final class ElementTable extends EnumMap<Element, Integer> {
         this();
         if (!sumFormula.isEmpty()) {
             SumFormulaVisitorParser parser = new SumFormulaVisitorParser();
-            accumulate(parser.parse(sumFormula));
+            add(parser.parse(sumFormula));
         }
     }
 
@@ -61,13 +61,15 @@ public final class ElementTable extends EnumMap<Element, Integer> {
      * Adds the element counts of the provided table to this one.
      *
      * @param other the table to add to this one.
+     * @return a new element table.
      */
-    public void accumulate(ElementTable other) {
+    public ElementTable add(ElementTable other) {
         other.entrySet().stream().filter((entry) -> {
-            return entry.getValue() != null && entry.getValue() > 0;
+            return entry.getValue() != null;
         }).forEach((entry) -> {
             incrementBy(entry.getKey(), entry.getValue());
         });
+        return this;
     }
 
     /**
@@ -80,7 +82,7 @@ public final class ElementTable extends EnumMap<Element, Integer> {
     }
 
     /**
-     * Increment the count of the provided element by the given amount.
+     * Increment the count of the provided element by the given number.
      *
      * @param element the element.
      * @param increment the increment for the element.
@@ -96,6 +98,43 @@ public final class ElementTable extends EnumMap<Element, Integer> {
      */
     public void decrement(Element element) {
         incrementBy(element, -1);
+    }
+
+    /**
+     * Decrement the count of the provided element by the given number.
+     *
+     * @param element the element.
+     * @param decrement the decrement for the element.
+     */
+    public void decrementBy(Element element, Integer decrement) {
+        merge(element, -decrement, Integer::sum);
+    }
+
+    /**
+     * Negates the count stored in the table. E.g. '5' will become '-5', '-5'
+     * would become '5'.
+     *
+     * @param element the element count to negate.
+     */
+    public void negate(Element element) {
+        Integer count = getOrDefault(element, 0);
+        put(element, -1 * count);
+    }
+
+    /**
+     * Subtracts all element counts in the provided element table from this
+     * table.
+     *
+     * @param elementTable the element table to subtract from this.
+     * @return this element table.
+     */
+    public ElementTable subtract(ElementTable elementTable) {
+        elementTable.entrySet().stream().filter((entry) -> {
+            return entry.getValue() != null;
+        }).forEach((entry) -> {
+            decrementBy(entry.getKey(), entry.getValue());
+        });
+        return this;
     }
 
     /**

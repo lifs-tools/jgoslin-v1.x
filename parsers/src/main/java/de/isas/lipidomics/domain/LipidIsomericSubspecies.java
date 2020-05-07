@@ -42,11 +42,12 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
      * @param fa the FattyAcids attached to this lipid.
      */
     @Builder(builderMethodName = "lipidIsomericSubspeciesBuilder")
-    public LipidIsomericSubspecies(String headGroup, FattyAcid... fa) {
+    public LipidIsomericSubspecies(HeadGroup headGroup, FattyAcid... fa) {
         super(headGroup);
         int nCarbon = 0;
         int nHydroxyl = 0;
         int nDoubleBonds = 0;
+        ModificationsList mods = new ModificationsList();
         for (FattyAcid fas : fa) {
             if (super.fa.containsKey(fas.getName())) {
                 throw new ConstraintViolationException(
@@ -56,17 +57,19 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
                 nCarbon += fas.getNCarbon();
                 nHydroxyl += fas.getNHydroxy();
                 nDoubleBonds += fas.getNDoubleBonds();
+                mods.addAll(fas.getModifications());
             }
         }
         super.info = Optional.of(
                 LipidSpeciesInfo.lipidSpeciesInfoBuilder().
                         level(LipidLevel.ISOMERIC_SUBSPECIES).
-                        name(headGroup).
+                        name(headGroup.getName()).
                         position(-1).
                         nCarbon(nCarbon).
                         nHydroxy(nHydroxyl).
                         nDoubleBonds(nDoubleBonds).
                         lipidFaBondType(LipidFaBondType.getLipidFaBondType(headGroup, fa)).
+                        modifications(mods).
                         build()
         );
     }
@@ -80,7 +83,7 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
 
     @Override
     public String getLipidString(LipidLevel level, boolean normalizeHeadGroup) {
-        String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup();
+        String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup().getName();
         switch (level) {
             case ISOMERIC_SUBSPECIES:
                 return buildLipidIsomericSubstructureName(level, headGroup);

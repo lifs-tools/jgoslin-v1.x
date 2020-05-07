@@ -22,10 +22,10 @@ import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.LipidMapsParser.ModificationContext;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
@@ -95,12 +95,16 @@ public class FattyAcylHelper {
     /**
      * Resolve double bond positions from the given Db_positionsContext.
      *
+     * @param lfbt the bond type between lipid head group and fatty acyl.
      * @param context the double bond context.
      * @return a map of position to double bond configuration mappings.
      */
-    public Map<Integer, String> resolveDoubleBondPositions(LipidMapsParser.Db_positionsContext context) {
-        Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+    public Map<Integer, String> resolveDoubleBondPositions(LipidFaBondType lfbt, LipidMapsParser.Db_positionsContext context) {
+        Map<Integer, String> doubleBondPositions = new TreeMap<>();
         if (context.db_position() != null) {
+            if (lfbt == LipidFaBondType.ETHER_PLASMENYL) {
+                doubleBondPositions.put(1, "Z"); // add implicit double bond for plasmenyls
+            }
             return resolveDoubleBondPosition(context.db_position(), doubleBondPositions);
         } else {
             throw new ParseTreeVisitorException("Unhandled state in IsomericFattyAcid - double bond positions!");

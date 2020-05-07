@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.LipidMapsParser.Lipid_pureContext;
@@ -64,7 +65,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     }
 
     private Optional<LipidSpecies> handleCl(LipidMapsParser.ClContext cl) {
-        String headGroup = cl.hg_clc().getText();
+        HeadGroup headGroup = new HeadGroup(cl.hg_clc().getText());
         if (cl.cl_species() != null) { //species level
             //process species level
             return fhf.visitSpeciesFas(headGroup, cl.cl_species().fa());
@@ -84,10 +85,11 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     private Optional<LipidSpecies> handleDpl(LipidMapsParser.DplContext dpl) {
         LipidMapsParser.Hg_ddplContext hg_ddplcontext = dpl.hg_ddpl();
         if (hg_ddplcontext != null) {
-            String headGroup = hg_ddplcontext.hg_dplc().getText();
+            String headGroupText = hg_ddplcontext.hg_dplc().getText();
             if(hg_ddplcontext.pip_position() != null) {
-                headGroup += hg_ddplcontext.pip_position().getText();
+                headGroupText += hg_ddplcontext.pip_position().getText();
             }
+            HeadGroup headGroup = new HeadGroup(headGroupText);
             if (dpl.dpl_species() != null) { //species level
                 //process species level
                 return fhf.visitSpeciesFas(headGroup, dpl.dpl_species().fa());
@@ -110,7 +112,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     }
 
     private Optional<LipidSpecies> handleLpl(LipidMapsParser.LplContext lpl) {
-        String headGroup = lpl.hg_lplc().getText();
+        HeadGroup headGroup = new HeadGroup(lpl.hg_lplc().getText());
         //lyso PL has one FA, Species=MolecularSubSpecies=StructuralSubSpecies
         if (lpl.fa_lpl() != null) {
             if (lpl.fa_lpl().fa() != null) {
@@ -132,7 +134,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     private Optional<LipidSpecies> handleThreePl(LipidMapsParser.ThreeplContext tpl) {
         LipidMapsParser.Hg_threeplcContext context = tpl.hg_threeplc();
         if (context != null) {
-            String headGroup = context.hg_threepl().getText();
+            HeadGroup headGroup = new HeadGroup(context.hg_threepl().getText());
             if (tpl.species_fa() != null) { //species level
                 //process species level
                 return fhf.visitSpeciesFas(headGroup, tpl.species_fa().fa());
@@ -157,7 +159,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
     private Optional<LipidSpecies> handleFourPl(LipidMapsParser.FourplContext fpl) {
         LipidMapsParser.Hg_fourplcContext context = fpl.hg_fourplc();
         if (context != null) {
-            String headGroup = context.hg_fourpl().getText();
+            HeadGroup headGroup = new HeadGroup(context.hg_fourpl().getText());
             if (fpl.fa4() != null) { //species level
                 //process species level
                 return fhf.visitSpeciesFas(headGroup, fpl.species_fa().fa());

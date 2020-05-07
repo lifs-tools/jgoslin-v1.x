@@ -15,13 +15,14 @@
  */
 package de.isas.lipidomics.palinom.goslin;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.palinom.GoslinParser;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 /**
  * Helper class for FA and LCB handling.
@@ -37,7 +38,7 @@ public class FattyAcylHelper {
      * @param lcbContext the lcb context.
      * @return the lipid fa bond type.
      */
-    public LipidFaBondType getLipidLcbBondType(String headGroup, GoslinParser.LcbContext lcbContext) {
+    public LipidFaBondType getLipidLcbBondType(HeadGroup headGroup, GoslinParser.LcbContext lcbContext) {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         return lfbt;
     }
@@ -65,7 +66,7 @@ public class FattyAcylHelper {
      * @return the lipid fa bond type.
      * @throws ParseTreeVisitorException for unknown ether context values.
      */
-    public LipidFaBondType getLipidFaBondType(String headGroup, GoslinParser.FaContext faContext) throws ParseTreeVisitorException {
+    public LipidFaBondType getLipidFaBondType(HeadGroup headGroup, GoslinParser.FaContext faContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         if (faContext.ether() != null) {
             if ("a".equals(faContext.ether().getText())) {
@@ -109,7 +110,7 @@ public class FattyAcylHelper {
      * @return a map of position to double bond configuration mappings.
      */
     public Map<Integer, String> resolveDoubleBondPositions(GoslinParser.Db_positionsContext context) {
-        Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+        Map<Integer, String> doubleBondPositions = new TreeMap<>();
         if (context.db_position() != null) {
             return resolveDoubleBondPosition(context.db_position(), doubleBondPositions);
         } else {

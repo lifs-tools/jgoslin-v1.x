@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.palinom.goslin;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.GoslinParser.Lipid_pureContext;
@@ -63,7 +64,7 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleTgl(GoslinParser.TglContext tgl) {
-        String headGroup = tgl.hg_tgl_full().getText();
+        HeadGroup headGroup = new HeadGroup(tgl.hg_tgl_full().getText());
         if (tgl.gl_species() != null) { //species level
             //process species level
             return fah.visitSpeciesFas(headGroup, tgl.gl_species().fa());
@@ -85,7 +86,7 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleSgl(GoslinParser.SglContext sgl) {
-        String headGroup = sgl.hg_sgl_full().getText();
+        HeadGroup headGroup = new HeadGroup(sgl.hg_sgl_full().getText());
         if (sgl.gl_species() != null) { //species level
             //process species level
             return fah.visitSpeciesFas(headGroup, sgl.gl_species().fa());
@@ -105,7 +106,7 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleMgl(GoslinParser.MglContext mgl) {
-        String headGroup = mgl.hg_mgl_full().getText();
+        HeadGroup headGroup = new HeadGroup(mgl.hg_mgl_full().getText());
         if (mgl.fa() != null) {
             return ssfh.visitStructuralSubspeciesFas(headGroup, Arrays.asList(mgl.fa()));
         } else {
@@ -114,7 +115,7 @@ public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureC
     }
 
     private Optional<LipidSpecies> handleDgl(GoslinParser.DglContext dgl) {
-        String headGroup = dgl.hg_dgl_full().getText();
+        HeadGroup headGroup = new HeadGroup(dgl.hg_dgl_full().getText());
         if (dgl.gl_species() != null) { //species level
             //process species level
             return fah.visitSpeciesFas(headGroup, dgl.gl_species().fa());

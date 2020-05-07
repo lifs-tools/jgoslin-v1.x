@@ -21,6 +21,7 @@ import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.LipidMapsParser;
@@ -45,7 +46,7 @@ public class IsomericSubspeciesFasHandler {
         this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitIsomericSubspeciesFas(String headGroup, List<LipidMapsParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitIsomericSubspeciesFas(HeadGroup headGroup, List<LipidMapsParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         int nIsomericFas = 0;
         for (int i = 0; i < faContexts.size(); i++) {
@@ -82,11 +83,11 @@ public class IsomericSubspeciesFasHandler {
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
-                    fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(ctx.fa_unmod().fa_pure().db().db_positions()));
+                    fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(faBondType, ctx.fa_unmod().fa_pure().db().db_positions()));
                 } else {
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
                     if (ctx.fa_unmod().fa_pure().db().db_count() != null) {
-                        int doubleBonds = HandlerUtils.asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0);
+                        int doubleBonds = HandlerUtils.asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0) + ((faBondType == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);
                         if (doubleBonds > 0) {
                             return FattyAcid.structuralFattyAcidBuilder().
                                     lipidFaBondType(faBondType).

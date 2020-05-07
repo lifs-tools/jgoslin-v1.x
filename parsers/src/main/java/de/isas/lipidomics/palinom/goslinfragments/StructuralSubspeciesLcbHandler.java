@@ -20,6 +20,7 @@ import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import java.util.Collections;
@@ -43,7 +44,7 @@ public class StructuralSubspeciesLcbHandler {
         this.islh = islh;
     }
 
-    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, GoslinFragmentsParser.LcbContext lcbContext, List<GoslinFragmentsParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(HeadGroup headGroup, GoslinFragmentsParser.LcbContext lcbContext, List<GoslinFragmentsParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         FattyAcid lcbA = buildStructuralLcb(lcbContext, "LCB", 1);
         fas.add(lcbA);
@@ -71,7 +72,7 @@ public class StructuralSubspeciesLcbHandler {
         }
     }
 
-    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, GoslinFragmentsParser.LcbContext lcbContext) {
+    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(HeadGroup headGroup, GoslinFragmentsParser.LcbContext lcbContext) {
         return visitStructuralSubspeciesLcb(headGroup, lcbContext, Collections.emptyList());
     }
 

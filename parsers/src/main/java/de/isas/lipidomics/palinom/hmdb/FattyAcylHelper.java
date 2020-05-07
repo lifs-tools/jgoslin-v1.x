@@ -15,12 +15,13 @@
  */
 package de.isas.lipidomics.palinom.hmdb;
 
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.palinom.HMDBParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 /**
  * Helper class for FA and LCB handling.
@@ -29,7 +30,7 @@ import java.util.Optional;
  */
 public class FattyAcylHelper {
 
-    public LipidFaBondType getLipidLcbBondType(String headGroup, HMDBParser.LcbContext lcbContext) throws ParseTreeVisitorException {
+    public LipidFaBondType getLipidLcbBondType(HeadGroup headGroup, HMDBParser.LcbContext lcbContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         return lfbt;
     }
@@ -94,12 +95,16 @@ public class FattyAcylHelper {
     /**
      * Resolve double bond positions from the given Db_positionsContext.
      *
+     * @param lfbt the bond type between lipid head group and fatty acyl.
      * @param context the double bond context.
      * @return a map of position to double bond configuration mappings.
      */
-    public Map<Integer, String> resolveDoubleBondPositions(HMDBParser.Db_positionsContext context) {
-        Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+    public Map<Integer, String> resolveDoubleBondPositions(LipidFaBondType lfbt, HMDBParser.Db_positionsContext context) {
+        Map<Integer, String> doubleBondPositions = new TreeMap<>();
         if (context.db_position() != null) {
+            if (lfbt == LipidFaBondType.ETHER_PLASMENYL) {
+                doubleBondPositions.put(1, "Z"); // add implicit double bond for plasmenyls
+            }
             return resolveDoubleBondPosition(context.db_position(), doubleBondPositions);
         } else {
             throw new ParseTreeVisitorException("Unhandled state in IsomericFattyAcid - double bond positions!");

@@ -21,9 +21,9 @@ import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
+import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.HMDBParser;
-import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +46,7 @@ public class StructuralSubspeciesLcbHandler {
         this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, HMDBParser.LcbContext lcbContext, List<HMDBParser.FaContext> faContexts) {
+    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(HeadGroup headGroup, HMDBParser.LcbContext lcbContext, List<HMDBParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         FattyAcid lcbA = buildStructuralLcb(headGroup, lcbContext, "LCB", 1);
         fas.add(lcbA);
@@ -74,12 +74,12 @@ public class StructuralSubspeciesLcbHandler {
         }
     }
 
-    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(String headGroup, HMDBParser.LcbContext lcbContext) {
+    public Optional<LipidSpecies> visitStructuralSubspeciesLcb(HeadGroup headGroup, HMDBParser.LcbContext lcbContext) {
         FattyAcid fa = buildStructuralLcb(headGroup, lcbContext, "LCB", 1);
         return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
     }
 
-    public FattyAcid buildStructuralLcb(String headGroup, HMDBParser.LcbContext ctx, String faName, int position) {
+    public FattyAcid buildStructuralLcb(HeadGroup headGroup, HMDBParser.LcbContext ctx, String faName, int position) {
         HMDBParser.Lcb_coreContext pureCtx = ctx.lcb_core();
         FattyAcid.StructuralFattyAcidBuilder fa = FattyAcid.structuralFattyAcidBuilder();
         fa.nCarbon(HandlerUtils.asInt(pureCtx.carbon(), 0));
