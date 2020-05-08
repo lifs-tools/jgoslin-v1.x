@@ -13,6 +13,7 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -523,6 +524,37 @@ public class GoslinVisitorParserTest {
         assertEquals(58, lipidAdduct.getLipid().getInfo().get().getNCarbon());
         assertEquals(6, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+    }
+
+    @Test
+    public void testDgDgAdduct() throws ParsingException {
+        String ref = "DGDG 16:0-16:1";
+        String refWithAdduct = ref + "[M+NH4]1+";
+        double expectedMass = 908.630498;
+        String expectedSumFormula = "C47H90NO15"; // sum formula of precursor without adduct is C47H86O15
+        System.out.println("Testing lipid name " + refWithAdduct);
+        LipidAdduct lipidAdduct = parseLipidName(refWithAdduct);
+        assertEquals("[M+NH4]1+", lipidAdduct.getAdduct().getLipidString());
+        assertEquals(LipidLevel.MOLECULAR_SUBSPECIES, lipidAdduct.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+        assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidClass.DGDG, lipidAdduct.getLipid().getLipidClass().orElse(LipidClass.UNDEFINED));
+        assertEquals(expectedMass, lipidAdduct.getMass(), 1e-6);
+        assertEquals(expectedSumFormula, lipidAdduct.getSumFormula());
+    }
+
+    @Test
+    public void testCholesterolAdduct() throws ParsingException {
+        String ref = "ST 27:1;1[M+NH4]1+";
+        double expectedMass = 404.3886918;
+        String expectedSumFormula = "C27H50NO"; //C27H46O is the original precursor sum formula without adduct
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals("[M+NH4]1+", lipidAdduct.getAdduct().getLipidString());
+        assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+        assertEquals(LipidCategory.ST, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidClass.ST_27_1_1, lipidAdduct.getLipid().getLipidClass().orElse(LipidClass.UNDEFINED));
+        assertEquals(expectedSumFormula, lipidAdduct.getSumFormula());
+        assertEquals(expectedMass, lipidAdduct.getMass(), 1e-6);
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

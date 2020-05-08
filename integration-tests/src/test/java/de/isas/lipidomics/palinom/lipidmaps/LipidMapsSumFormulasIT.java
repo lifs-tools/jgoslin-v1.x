@@ -15,11 +15,11 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
+import de.isas.lipidomics.domain.ElementTable;
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
-import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
 import lombok.extern.slf4j.Slf4j;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,14 +40,26 @@ public class LipidMapsSumFormulasIT {
         LipidAdduct lipidAdduct;
         LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
         try {
+            ElementTable referenceTable = new ElementTable(sumFormula);
+            assertNotNull(referenceTable);
             lipidAdduct = parser.parse(lipidName.replaceAll("\"", ""));
+            assertNotNull(lipidAdduct);
             LipidSpecies ls = lipidAdduct.getLipid();
             assertNotNull(ls);
-            assertEquals(sumFormula.replaceAll("\"", ""), lipidAdduct.getSumFormula(), "for lipid name " + lipidName);
+            String prefix = "";
+            assertNotNull(lipidAdduct.getElements());
+            ElementTable difference = lipidAdduct.getElements().subtract(referenceTable);
+            if (difference.isEmpty()) {
+                prefix = "-";
+                difference = referenceTable.subtract(lipidAdduct.getElements());
+            }
+            assertEquals(sumFormula.replaceAll("\"", ""), lipidAdduct.getSumFormula(), "for lipid name " + lipidName + " with difference " + prefix + difference.getSumFormula());
         } catch (ParseTreeVisitorException pve) {
             fail("Parsing current LipidMAPS identifier: " + lipidName + " failed - incomplete implementation: " + pve.getMessage());
+        } catch (NullPointerException npe) {
+            fail("Parsing current LipidMAPS identifier: " + lipidName + " failed - null pointer: " + npe.getMessage());
         } catch (ParsingException | RuntimeException ex) {
-            fail("Parsing current LipidMAPS identifier: " + lipidName + " failed - name unsupported in grammar!");
+            fail("Parsing current LipidMAPS identifier: " + lipidName + " failed - name unsupported in grammar!" + ex.getMessage());
         }
     }
 

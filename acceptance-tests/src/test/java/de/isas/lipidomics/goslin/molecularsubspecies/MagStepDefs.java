@@ -44,7 +44,7 @@ public class MagStepDefs {
     public void i_should_get_a_mag_lipid_of_category_and_species_MAG_headgroup(String category, String species, String headgroup) {
         Assert.assertEquals(category, this.lipid.getLipidCategory().name());
         Assert.assertEquals(species, this.lipid.getLipidString(LipidLevel.SPECIES));
-        Assert.assertEquals(headgroup, this.lipid.getHeadGroup());
+        Assert.assertEquals(headgroup, this.lipid.getHeadGroup().getName());
     }
 
     @Then("the first mag fatty acid at position {int} with {int} carbon atoms, {int} double bonds and {int} hydroxy groups.")

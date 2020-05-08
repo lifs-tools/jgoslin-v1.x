@@ -15,10 +15,14 @@
  */
 package de.isas.lipidomics.palinom.swisslipids;
 
+import de.isas.lipidomics.domain.Element;
+import de.isas.lipidomics.domain.ElementTable;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -106,5 +110,52 @@ public class FattyAcylHelper {
         } else {
             throw new ParseTreeVisitorException("Unhandled state in IsomericFattyAcid - double bond positions!");
         }
+    }
+
+    /**
+     * Returns the number of double bonds and the number of carbons that need to
+     * be subtracted from the sterol ester head group to calculate the proper
+     * sum formula and mass on species levels.
+     *
+     * @param headGroup the head group
+     * @return a map with slots "doubleBondCorrection" and "carbonCorrection".
+     */
+    public Map<String, Integer> getSterolSpeciesCountCorrection(HeadGroup headGroup) {
+        Integer doubleBondCorrection = 0;
+        Integer carbonCorrection = 0;
+        if (headGroup.getLipidClass().isPresent()) {
+            LipidClass lipidClass = headGroup.getLipidClass().get();
+            switch (lipidClass) {
+                case SE:
+                case SE_27_1:
+                    doubleBondCorrection = 1;
+                    break;
+                case SE_27_2:
+                case SE_28_2:
+                case SE_29_2:
+                case SE_30_2:
+                    doubleBondCorrection = 2;
+                    break;
+                case SE_28_3:
+                    doubleBondCorrection = 3;
+                    break;
+            }
+            switch (lipidClass) {
+                case SE:
+                case SE_27_1:
+                case SE_27_2:
+                case SE_28_2:
+                case SE_29_2:
+                case SE_30_2:
+                case SE_28_3:
+                    ElementTable et = lipidClass.getElements();
+                    carbonCorrection = et.get(Element.ELEMENT_C);
+                    break;
+            }
+        }
+        Map<String, Integer> map = new HashMap<>();
+        map.put("doubleBondCorrection", doubleBondCorrection);
+        map.put("carbonCorrection", carbonCorrection);
+        return map;
     }
 }

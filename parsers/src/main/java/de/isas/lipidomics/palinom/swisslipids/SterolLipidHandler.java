@@ -15,7 +15,10 @@
  */
 package de.isas.lipidomics.palinom.swisslipids;
 
+import de.isas.lipidomics.domain.Element;
+import de.isas.lipidomics.domain.ElementTable;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.palinom.SwissLipidsParser.Lipid_pureContext;
@@ -62,9 +65,20 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
 
     private Optional<LipidSpecies> handleStSpecies(SwissLipidsParser.St_speciesContext che) {
         HeadGroup headGroup = new HeadGroup(che.st_species_hg().getText());
-        //TODO handle this on species level
         if (che.st_species_fa() != null) {
             if (che.st_species_fa().fa_species() != null && che.st_species_fa().fa_species().fa() != null) {
+                LipidClass lipidClass = headGroup.getLipidClass().orElse(LipidClass.UNDEFINED);
+                //special handling for sterol esters on species level
+                switch (lipidClass) {
+                    case SE:
+                    case SE_27_1:
+                    case SE_27_2:
+                    case SE_28_2:
+                    case SE_29_2:
+                    case SE_30_2:
+                    case SE_28_3:
+                        return fhf.visitSpeciesFas(headGroup, che.st_species_fa().fa_species().fa());
+                }
                 if (fhf.isIsomericFa(che.st_species_fa().fa_species().fa())) {
                     return isfh.visitIsomericSubspeciesFas(headGroup, Arrays.asList(che.st_species_fa().fa_species().fa()));
                 } else {

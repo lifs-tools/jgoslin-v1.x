@@ -74,11 +74,14 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
         );
     }
 
-    private String buildLipidIsomericSubstructureName(LipidLevel level, String headGroup) {
+    private String buildLipidIsomericSubstructureName(LipidLevel level, String headGroup, boolean isNormalized) {
+        StringBuilder sb = new StringBuilder();
         String faStrings = getFa().values().stream().map((fa) -> {
             return fa.buildSubstructureName(level);
         }).collect(Collectors.joining("/"));
-        return headGroup + (faStrings.isEmpty() ? "" : getHeadGroupSuffix()) + faStrings;
+        return sb.append(
+                buildSubspeciesHeadGroupString(headGroup, isNormalized)
+        ).append(faStrings).toString();
     }
 
     @Override
@@ -86,7 +89,7 @@ public class LipidIsomericSubspecies extends LipidStructuralSubspecies {
         String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup().getName();
         switch (level) {
             case ISOMERIC_SUBSPECIES:
-                return buildLipidIsomericSubstructureName(level, headGroup);
+                return buildLipidIsomericSubstructureName(level, headGroup, normalizeHeadGroup);
             case STRUCTURAL_SUBSPECIES:
             case MOLECULAR_SUBSPECIES:
             case CATEGORY:

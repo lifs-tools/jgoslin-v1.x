@@ -505,14 +505,11 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(LipidClass.SE, lipidAdduct.getLipid().getLipidClass().get());
         assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
         assertEquals(16, lipidAdduct.getLipid().getInfo().get().getNCarbon());
-        Integer nDoubleBonds = lipidAdduct.getLipid().getFa().values().stream().collect(Collectors.summingInt((t) -> {
-            return t.getNDoubleBonds();
-        }));
-        assertEquals(1, nDoubleBonds);
         assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
         assertEquals("SE 27:1/16:1", lipidAdduct.getNormalizedLipidString(LipidLevel.SPECIES));
         assertEquals(expectedSumFormula, lipidAdduct.getSumFormula());
+        assertEquals(expectedMass, lipidAdduct.getMass(), 1e-3);
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

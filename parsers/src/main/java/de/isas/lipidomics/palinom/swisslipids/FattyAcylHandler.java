@@ -29,6 +29,7 @@ import de.isas.lipidomics.palinom.SwissLipidsParser.FaContext;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -114,6 +115,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
 
     public Optional<LipidSpeciesInfo> getSpeciesInfo(HeadGroup headGroup, SwissLipidsParser.FaContext faContext) {
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(faContext);
+        Map<String, Integer> countCorrection = faHelper.getSterolSpeciesCountCorrection(headGroup);
         int nHydroxyl = 0;
         if (faContext.fa_lcb_prefix() != null) {
             throw new ParseTreeVisitorException("Unsupported lcb prefix on fa: " + faContext.fa_lcb_prefix().getText());
@@ -126,7 +128,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
                     level(LipidLevel.ISOMERIC_SUBSPECIES).
                     name("FA").
                     position(-1).
-                    nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).
+                    nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0) - countCorrection.getOrDefault("carbonCorrection", 0)).
                     nHydroxy(nHydroxyl).
                     doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, faContext.fa_core().db().db_positions())).
                     lipidFaBondType(lfbt).
@@ -137,9 +139,9 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
                     level(LipidLevel.SPECIES).
                     name("FA").
                     position(-1).
-                    nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).
+                    nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0) - countCorrection.getOrDefault("carbonCorrection", 0)).
                     nHydroxy(nHydroxyl).
-                    nDoubleBonds(HandlerUtils.asInt(faContext.fa_core().db(), 0) + (lfbt == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0)).
+                    nDoubleBonds(HandlerUtils.asInt(faContext.fa_core().db(), 0) + (lfbt == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0) - countCorrection.getOrDefault("doubleBondCorrection", 0)).
                     lipidFaBondType(lfbt).
                     build()
             );

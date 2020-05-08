@@ -76,7 +76,7 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
         String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup().getName();
         switch (level) {
             case STRUCTURAL_SUBSPECIES:
-                return super.buildLipidSubspeciesName(level, "/", headGroup);
+                return super.buildLipidSubspeciesName(level, "/", headGroup, normalizeHeadGroup);
             case MOLECULAR_SUBSPECIES:
             case CATEGORY:
             case CLASS:

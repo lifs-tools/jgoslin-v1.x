@@ -35,7 +35,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals("NAPE", lipidAdduct.getLipid().getHeadGroup().getName());
         assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
     }
-    
+
     @Test
     public void testPK_Structural() throws ParsingException {
         String ref = "PHENOL(15:2)";
@@ -341,7 +341,7 @@ public class LipidMapsVisitorParserTest {
                 get("FA2").
                 getNHydroxy());
     }
-    
+
     @Test
     public void testPE_plasmenyl_Species() throws ParsingException {
         String ref = "PE(P-32:0)";
@@ -435,7 +435,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
         assertEquals(4, lipidAdduct.getLipid().getInfo().get().getNCarbon());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
-        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+        assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
     }
 
     @Test
@@ -463,7 +463,7 @@ public class LipidMapsVisitorParserTest {
         assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
         assertEquals("FA 16:4(6,9,12,15)", lipidAdduct.getLipid().getLipidString());
     }
-    
+
     @Test
     public void testModification() throws ParsingException {
         String ref = "FA(6:0(OH,Ke))";
@@ -476,10 +476,10 @@ public class LipidMapsVisitorParserTest {
         assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
         assertEquals(6, lipidAdduct.getLipid().getInfo().get().getNCarbon());
         assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
-        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+        assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
         assertEquals(2, lipidAdduct.getLipid().getFa().get("FA1").getModifications().size());
         assertEquals(2, lipidAdduct.getLipid().getInfo().get().getModifications().size());
-        assertEquals("FA 6:0(OH,Ke)", lipidAdduct.getLipid().getLipidString());
+        assertEquals("FA 6:0;1(OH,Ke)", lipidAdduct.getLipid().getLipidString());
     }
 
     @Test
@@ -497,6 +497,47 @@ public class LipidMapsVisitorParserTest {
         assertEquals(2, lipidAdduct.getLipid().getFa().get("FA2").getDoubleBondPositions().size());
         assertEquals("PIP2[3',5'] 16:0/18:2(9Z,12Z)", lipidAdduct.getLipid().getLipidString());
         assertEquals("PIP2[3',5'] 34:2", lipidAdduct.getLipid().getLipidString(LipidLevel.SPECIES));
+    }
+
+    @Test
+    public void testCardiolipin() throws ParsingException {
+        String ref = "CL(1'-[24:1(15Z)/24:1(15Z)],3'-[24:1(15Z)/14:1(9Z)])[rac]";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("CL", lipidAdduct.getLipid().getHeadGroup().getName());
+        assertEquals(LipidCategory.GP, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+    }
+
+    @Test
+    public void testCE() throws ParsingException {
+        String ref = "CE(16:2)";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("CE", lipidAdduct.getLipid().getHeadGroup().getName());
+        assertEquals("SE 27:1", lipidAdduct.getLipid().getHeadGroup().getNormalizedName());
+        assertEquals(LipidCategory.ST, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals("SE 27:1/16:2", lipidAdduct.getNormalizedLipidString());
+    }
+
+    @Test
+    public void testReverseCE() throws ParsingException {
+        String ref = "16:2 Cholesterol ester";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("Cholesterol ester", lipidAdduct.getLipid().getHeadGroup().getName());
+        assertEquals("SE 27:1", lipidAdduct.getLipid().getHeadGroup().getNormalizedName());
+        assertEquals(LipidCategory.ST, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals("SE 27:1/16:2", lipidAdduct.getNormalizedLipidString());
+        assertNotNull(lipidAdduct.getLipid());
+        assertNotNull(lipidAdduct.getElements());
+        assertNotNull(lipidAdduct.getSumFormula());
+        assertNotNull(lipidAdduct.getMass());
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

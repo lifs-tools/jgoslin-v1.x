@@ -22,6 +22,7 @@ import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.LipidMapsParser;
@@ -71,16 +72,21 @@ public class IsomericSubspeciesFasHandler {
 
     public FattyAcid buildIsomericFa(LipidMapsParser.FaContext ctx, String faName, int position) {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
+        int modificationHydroxyls = 0;
         if (ctx.fa_mod() != null) {
             if (ctx.fa_mod().modification() != null) {
-                fa.modifications(faHelper.resolveModifications(ctx.fa_mod().modification()));
+                ModificationsList ml = faHelper.resolveModifications(ctx.fa_mod().modification());
+                modificationHydroxyls += ml.stream().filter((pair) -> {
+                    return pair.getValue().startsWith("OH");
+                }).count();
+                fa.modifications(ml);
             }
         }
         if (ctx.fa_unmod() != null) {
             LipidFaBondType faBondType = faHelper.getLipidFaBondType(ctx);
             fa.lipidFaBondType(faBondType);
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
-            fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
+            fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0) + modificationHydroxyls);
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
                     fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(faBondType, ctx.fa_unmod().fa_pure().db().db_positions()));

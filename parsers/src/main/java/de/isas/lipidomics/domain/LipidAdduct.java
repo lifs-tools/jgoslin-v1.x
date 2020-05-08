@@ -33,9 +33,13 @@ public class LipidAdduct {
 
     private LipidSpecies lipid;
     private Adduct adduct;
-//    private String sumFormula;
     private Fragment fragment;
 
+    /**
+     * Calculates the mass based on the elements of this lipid adduct.
+     *
+     * @return the mass (in Dalton).
+     */
     public Double getMass() {
         ElementTable elements = getElements();
         int charge = 0;
@@ -54,6 +58,11 @@ public class LipidAdduct {
         return mass;
     }
 
+    /**
+     * Returns the elemental composition table.
+     *
+     * @return the elemental composition table.
+     */
     public ElementTable getElements() {
         ElementTable elements = new ElementTable();
         if (lipid != null) {
@@ -76,10 +85,35 @@ public class LipidAdduct {
         return elements;
     }
 
+    /**
+     * Returns the sum formula.
+     *
+     * @return the sum formula.
+     */
     public String getSumFormula() {
         return getElements().getSumFormula();
     }
 
+    /**
+     * Returns the non-normalized (original head group) lipid name for the
+     * native level of this lipid.
+     *
+     * @return the non-normalized lipid name with adduct.
+     */
+    public String getLipidString() {
+        if (lipid != null) {
+            return getLipidString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+        }
+        return "";
+    }
+
+    /**
+     * Returns the non-normalized (original head group) lipid name for the given
+     * level.
+     *
+     * @param level the lipid level to generate the name on.
+     * @return the non-normalized lipid name with adduct.
+     */
     public String getLipidString(LipidLevel level) {
         StringBuilder sb = new StringBuilder();
         if (lipid != null) {
@@ -88,12 +122,32 @@ public class LipidAdduct {
             return "";
         }
 
-        if (adduct != null) {
+        if (adduct != null && !adduct.getLipidString().isEmpty()) {
             sb.append(adduct.getLipidString());
         }
         return sb.toString();
     }
 
+    /**
+     * Returns the normalized (class name as head group) lipid name for the
+     * native level of this lipid.
+     *
+     * @return the normalized lipid name with adduct.
+     */
+    public String getNormalizedLipidString() {
+        if (lipid != null) {
+            return getNormalizedLipidString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+        }
+        return "";
+    }
+
+    /**
+     * Returns the normalized (class name as head group) lipid name for the
+     * given level.
+     *
+     * @param level the lipid level to generate the name on.
+     * @return the normalized lipid name with adduct.
+     */
     public String getNormalizedLipidString(LipidLevel level) {
         StringBuilder sb = new StringBuilder();
         if (lipid != null) {
@@ -102,12 +156,17 @@ public class LipidAdduct {
             return "";
         }
 
-        if (adduct != null) {
+        if (adduct != null && !adduct.getLipidString().isEmpty()) {
             sb.append(adduct.getLipidString());
         }
         return sb.toString();
     }
 
+    /**
+     * Returns the class name for this lipid adduct.
+     *
+     * @return the class name.
+     */
     public String getClassName() {
         if (lipid != null) {
             return lipid.getLipidClass().orElse(LipidClass.UNDEFINED).getAbbreviation();
@@ -116,6 +175,13 @@ public class LipidAdduct {
         }
     }
 
+    /**
+     * Returns the non-normalized lipid adduct name (original head group) with
+     * fragment, if available, for the given level.
+     *
+     * @param level the lipid level to generate the name on.
+     * @return the non-normalized lipid name with adduct and fragment.
+     */
     public String getLipidFragmentString(LipidLevel level) {
         StringBuilder sb = new StringBuilder();
         if (lipid != null) {
@@ -123,15 +189,22 @@ public class LipidAdduct {
         } else {
             return "";
         }
-        if (adduct != null) {
+        if (adduct != null && !adduct.getLipidString().isEmpty()) {
             sb.append(adduct.getLipidString());
         }
-        if (fragment != null) {
+        if (fragment != null && !fragment.getLipidString().isEmpty()) {
             sb.append(" - ").append(fragment.getLipidString());
         }
         return sb.toString();
     }
 
+    /**
+     * Returns the normalized lipid adduct name (class name as head group) with
+     * fragment for the given level.
+     *
+     * @param level the lipid level to generate the name on.
+     * @return the normalized lipid name with adduct and fragment.
+     */
     public String getNormalizedLipidFragmentString(LipidLevel level) {
         StringBuilder sb = new StringBuilder();
         if (lipid != null) {
@@ -139,10 +212,10 @@ public class LipidAdduct {
         } else {
             return "";
         }
-        if (adduct != null) {
+        if (adduct != null && !adduct.getLipidString().isEmpty()) {
             sb.append(adduct.getLipidString());
         }
-        if (fragment != null) {
+        if (fragment != null && !fragment.getLipidString().isEmpty()) {
             sb.append(" - ").append(fragment.getLipidString());
         }
         return sb.toString();
@@ -151,7 +224,7 @@ public class LipidAdduct {
     @Override
     public String toString() {
         if (lipid != null) {
-            return getLipidString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+            return getLipidFragmentString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
         }
         return "";
     }

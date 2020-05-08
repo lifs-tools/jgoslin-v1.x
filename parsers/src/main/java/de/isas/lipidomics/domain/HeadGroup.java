@@ -72,7 +72,7 @@ public class HeadGroup {
      *
      * @return the normalized lipid head group.
      */
-    public String getNormalizedHeadGroup() {
+    public String getNormalizedName() {
         if (lipidClass.isPresent()) {
             return lipidClass.get().getSynonyms().get(0);
         }

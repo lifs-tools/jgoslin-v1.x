@@ -15,17 +15,16 @@
  */
 package de.isas.lipidomics.palinom.lipidmaps;
 
-import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.FattyAcid;
-import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -100,7 +99,6 @@ public class MolecularSubspeciesFasHandler {
                                 fa
                         );
                 }
-
                 LipidSpeciesInfo.LipidSpeciesInfoBuilder builder = LipidSpeciesInfo.lipidSpeciesInfoBuilder();
                 LipidSpeciesInfo lsi = builder.level(LipidLevel.SPECIES).
                         nCarbon(fa.getNCarbon()).
@@ -137,9 +135,14 @@ public class MolecularSubspeciesFasHandler {
 
     public FattyAcid buildMolecularFa(LipidMapsParser.FaContext ctx, String faName) {
         FattyAcid.MolecularFattyAcidBuilder fa = FattyAcid.molecularFattyAcidBuilder();
+        int modificationHydroxyls = 0;
         if (ctx.fa_mod() != null) {
             if (ctx.fa_mod().modification() != null) {
-                fa.modifications(faHelper.resolveModifications(ctx.fa_mod().modification()));
+                ModificationsList ml = faHelper.resolveModifications(ctx.fa_mod().modification());
+                modificationHydroxyls += ml.stream().filter((pair) -> {
+                    return pair.getValue().startsWith("OH");
+                }).count();
+                fa.modifications(ml);
             }
         }
         if (ctx.fa_unmod() != null) {
@@ -147,7 +150,7 @@ public class MolecularSubspeciesFasHandler {
             int plasmenylEtherDbBondCorrection = 0;
             fa.lipidFaBondType(faBondType);
             fa.nCarbon(HandlerUtils.asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
-            fa.nHydroxy(HandlerUtils.asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0));
+            fa.nHydroxy(HandlerUtils.asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0) + modificationHydroxyls);
             if (ctx.fa_unmod().fa_pure().db() != null) {
                 fa.nDoubleBonds(plasmenylEtherDbBondCorrection + HandlerUtils.asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0) + (faBondType == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0));
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {

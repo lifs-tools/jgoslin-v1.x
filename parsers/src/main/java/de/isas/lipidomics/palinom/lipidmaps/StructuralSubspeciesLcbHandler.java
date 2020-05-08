@@ -22,6 +22,7 @@ import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.ModificationsList;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -82,14 +83,19 @@ public class StructuralSubspeciesLcbHandler {
 
     public FattyAcid buildStructuralLcb(HeadGroup headGroup, LipidMapsParser.LcbContext ctx, String faName, int position) {
         FattyAcid.StructuralFattyAcidBuilder fa = FattyAcid.structuralFattyAcidBuilder();
+        int modificationHydroxyls = 0;
         if (ctx.lcb_fa().lcb_fa_mod() != null) {
             if (ctx.lcb_fa().lcb_fa_mod().modification() != null) {
-                fa.modifications(faHelper.resolveModifications(ctx.lcb_fa().lcb_fa_mod().modification()));
+                ModificationsList ml = faHelper.resolveModifications(ctx.lcb_fa().lcb_fa_mod().modification());
+                modificationHydroxyls += ml.stream().filter((pair) -> {
+                    return pair.getValue().startsWith("OH");
+                }).count();
+                fa.modifications(ml);
             }
         }
         if (ctx.lcb_fa().lcb_fa_unmod() != null) {
             fa.nCarbon(asInt(ctx.lcb_fa().lcb_fa_unmod().carbon(), 0));
-            Integer nHydroxy = faHelper.getHydroxyCount(ctx);
+            Integer nHydroxy = faHelper.getHydroxyCount(ctx) + modificationHydroxyls;
             fa.nHydroxy(nHydroxy);
             if (ctx.lcb_fa().lcb_fa_unmod().db() != null) {
                 int nDoubleBonds = asInt(ctx.lcb_fa().lcb_fa_unmod().db().db_count(), 0);

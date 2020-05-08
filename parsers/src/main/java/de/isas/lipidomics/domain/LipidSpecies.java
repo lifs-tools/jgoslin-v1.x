@@ -127,7 +127,7 @@ public class LipidSpecies {
      * @return the lipid name.
      */
     public String getLipidString(LipidLevel level) {
-        return this.buildLipidString(level, headGroup.getName());
+        return this.buildLipidString(level, headGroup.getName(), false);
     }
 
     /**
@@ -143,10 +143,28 @@ public class LipidSpecies {
      * @return the lipid name.
      */
     public String getLipidString(LipidLevel level, boolean normalizeHeadGroup) {
-        return this.buildLipidString(level, normalizeHeadGroup ? getNormalizedHeadGroup() : headGroup.getName());
+        return this.buildLipidString(level, normalizeHeadGroup ? getNormalizedHeadGroup() : headGroup.getName(), normalizeHeadGroup);
     }
 
-    protected String buildLipidString(LipidLevel level, String headGroup) throws ConstraintViolationException {
+    protected StringBuilder buildSpeciesHeadGroupString(String headGroup, boolean normalizeHeadGroup) {
+        StringBuilder lipidString = new StringBuilder();
+        lipidString.append(this.headGroup.getLipidClass().map((lclass) -> {
+            switch (lclass) {
+                case SE:
+                case SE_27_1:
+                case SE_27_2:
+                case SE_28_2:
+                case SE_28_3:
+                case SE_29_2:
+                case SE_30_2:
+                    return getNormalizedHeadGroup() + "/"; // use this for disambiguation to avoid SE 16:1 to be similar to SE 43:2 because of expansion to SE 27:1/16:1
+            }
+            return headGroup + " ";
+        }).orElse(headGroup + " "));
+        return lipidString;
+    }
+
+    protected String buildLipidString(LipidLevel level, String headGroup, boolean isNormalized) throws ConstraintViolationException {
         switch (level) {
             case CATEGORY:
                 return this.headGroup.getLipidCategory().name();
@@ -154,10 +172,7 @@ public class LipidSpecies {
                 return this.headGroup.getLipidClass().orElse(LipidClass.UNDEFINED).name();
             case SPECIES:
                 StringBuilder lipidString = new StringBuilder();
-                lipidString.append(this.headGroup.getLipidClass().map((lipidClass) -> {
-                    return (lipidClass == LipidClass.SE
-                            ? getNormalizedHeadGroup() + "/" : headGroup + " ");
-                }).orElse(headGroup + " "));
+                lipidString.append(buildSpeciesHeadGroupString(headGroup, isNormalized));
                 if (this.info.isPresent() && this.info.get().getNCarbon() > 0) {
                     int nCarbon = info.get().getNCarbon();
                     String hgToFaSep = "";
@@ -196,7 +211,7 @@ public class LipidSpecies {
      * @return the normalized lipid head group.
      */
     public String getNormalizedHeadGroup() {
-        return headGroup.getNormalizedHeadGroup();
+        return headGroup.getNormalizedName();
     }
 
     /**
@@ -238,11 +253,6 @@ public class LipidSpecies {
      */
     public ElementTable getElements() {
         ElementTable elements = new ElementTable();
-
-        //TODO implement
-//    if (use_head_group || (LipidClasses::get_instance().lipid_classes.find(lipid_class) == LipidClasses::get_instance().lipid_classes.end())){
-//        return elements;
-//    }
         if (info.isPresent()) {
             switch (info.get().getLevel()) {
                 case CATEGORY:
@@ -281,25 +291,6 @@ public class LipidSpecies {
                     if (headGroup.getLipidClass().isPresent()) {
                         LipidClass lclass = headGroup.getLipidClass().get();
                         maxNumFa = lclass.getMaxNumFa();
-//                        elements.add(lclass.getElements());
-                        switch (lclass) {
-                            case SE:
-//                case SE_27_1:
-//                case SE_27_2:
-//                case SE_28_2:
-//                case SE_28_3:
-//                case SE_29_2:
-//                case SE_30_2:
-                                Pattern p = Pattern.compile("SE ([0-9]+):([0-9]+)");
-                                Matcher m = p.matcher(headGroup.getName());
-                                if (m.matches() && m.groupCount() == 2) {
-                                    int nCarbonHeadGroup = Integer.parseInt(m.group(1));
-                                    int nDoubleBondsHeadGroup = Integer.parseInt(m.group(2));
-                                    elements.decrementBy(ELEMENT_C, nCarbonHeadGroup);
-                                    elements.decrementBy(ELEMENT_H, nDoubleBondsHeadGroup);
-                                }
-                                break;
-                        }
                     }
 
                     if (info.isPresent()) {

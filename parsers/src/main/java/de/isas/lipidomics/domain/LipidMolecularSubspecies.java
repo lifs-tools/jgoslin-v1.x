@@ -27,9 +27,9 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * A molecular subspecies. Child of LipidSpecies. Individual FAs are known,
- * but neither their sn positions nor double bond positions.
- * 
+ * A molecular subspecies. Child of LipidSpecies. Individual FAs are known, but
+ * neither their sn positions nor double bond positions.
+ *
  * Example: Phosphatidylinositol (8:0-8:0) or PI(8:0-8:0)
  *
  * @author nils.hoffmann
@@ -91,11 +91,33 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         return hgToFaSep;
     }
 
-    protected String buildLipidSubspeciesName(LipidLevel level, String faSeparator, String headGroup) {
+    protected StringBuilder buildSubspeciesHeadGroupString(String headGroup, boolean normalizeHeadGroup) {
+        StringBuilder lipidString = new StringBuilder();
+        lipidString.append(getHeadGroup().getLipidClass().map((lclass) -> {
+            switch (lclass) {
+                case SE:
+                case SE_27_1:
+                case SE_27_2:
+                case SE_28_2:
+                case SE_28_3:
+                case SE_29_2:
+                case SE_30_2:
+                    if (!getFa().isEmpty()) {
+                        return (normalizeHeadGroup ? headGroup : getNormalizedHeadGroup()) + getHeadGroupSuffix().trim() + "/";
+                    }
+            }
+            return headGroup + (getFa().isEmpty() ? "" : getHeadGroupSuffix());
+        }).orElse(headGroup + (getFa().isEmpty() ? "" : getHeadGroupSuffix())));
+        return lipidString;
+    }
+
+    protected String buildLipidSubspeciesName(LipidLevel level, String faSeparator, String headGroup, boolean isNormalized) {
+        StringBuilder sb = new StringBuilder();
         String faStrings = getFa().values().stream().map((fa) -> {
             return fa.buildSubstructureName(level);
         }).collect(Collectors.joining(faSeparator));
-        return headGroup + (faStrings.isEmpty() ? "" : getHeadGroupSuffix()) + faStrings;
+        return sb.append(buildSubspeciesHeadGroupString(headGroup, isNormalized)
+        ).append(faStrings).toString();
     }
 
     @Override
@@ -108,7 +130,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         String headGroup = normalizeHeadGroup ? getNormalizedHeadGroup() : getHeadGroup().getName();
         switch (level) {
             case MOLECULAR_SUBSPECIES:
-                return buildLipidSubspeciesName(level, "-", headGroup);
+                return buildLipidSubspeciesName(level, "-", headGroup, normalizeHeadGroup);
             case CATEGORY:
             case CLASS:
             case SPECIES:

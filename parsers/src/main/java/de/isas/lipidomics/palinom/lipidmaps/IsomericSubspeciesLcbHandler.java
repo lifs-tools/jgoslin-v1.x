@@ -22,6 +22,7 @@ import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 
 /**
  * Handler for Isomeric LCBs.
+ *
  * @author nilshoffmann
  */
 public class IsomericSubspeciesLcbHandler {
@@ -78,15 +80,20 @@ public class IsomericSubspeciesLcbHandler {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidLcbBondType(ctx);
         if (ctx.lcb_fa() != null) {
+            int modificationHydroxyls = 0;
             if (ctx.lcb_fa().lcb_fa_mod() != null) {
                 if (ctx.lcb_fa().lcb_fa_mod().modification() != null) {
-                    fa.modifications(faHelper.resolveModifications(ctx.lcb_fa().lcb_fa_mod().modification()));
+                    ModificationsList ml = faHelper.resolveModifications(ctx.lcb_fa().lcb_fa_mod().modification());
+                    modificationHydroxyls += ml.stream().filter((pair) -> {
+                        return pair.getValue().startsWith("OH");
+                    }).count();
+                    fa.modifications(ml);
                 }
             }
             if (ctx.lcb_fa().lcb_fa_unmod() != null) {
                 LipidMapsParser.Lcb_fa_unmodContext factx = ctx.lcb_fa().lcb_fa_unmod();
                 fa.nCarbon(HandlerUtils.asInt(factx.carbon(), 0));
-                fa.nHydroxy(faHelper.getHydroxyCount(ctx));
+                fa.nHydroxy(faHelper.getHydroxyCount(ctx) + modificationHydroxyls);
                 if (factx.db() != null) {
                     if (factx.db().db_positions() != null) {
                         fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, factx.db().db_positions()));
@@ -99,7 +106,7 @@ public class IsomericSubspeciesLcbHandler {
                                         lipidFaBondType(lfbt).
                                         name(faName).
                                         lcb(true).
-                                        nHydroxy(faHelper.getHydroxyCount(ctx)).
+                                        nHydroxy(faHelper.getHydroxyCount(ctx) + modificationHydroxyls).
                                         nCarbon(HandlerUtils.asInt(factx.carbon(), 0)).
                                         nDoubleBonds(doubleBonds).
                                         build();

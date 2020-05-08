@@ -61,14 +61,17 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
         }
     }
 
-    private Optional<LipidSpecies> handleSte(LipidMapsParser.ChecContext che) {
-        if (che.che_fa().fa() != null) {
-            return ssfh.visitStructuralSubspeciesFas(new HeadGroup(che.che_fa().hg_che().getText()), Arrays.asList(che.che_fa().fa()));
-        } else if (che.che() != null) {
-            return ssfh.visitStructuralSubspeciesFas(new HeadGroup(che.che().hg_che().getText()), Arrays.asList(che.che().fa()));
-        } else {
-            throw new ParseTreeVisitorException("Unhandled context state in ChE!");
+    private Optional<LipidSpecies> handleSte(LipidMapsParser.ChecContext chec) {
+        if (chec.che_fa() != null) {
+            if (chec.che_fa().fa() != null) {
+                return ssfh.visitStructuralSubspeciesFas(new HeadGroup(chec.che_fa().hg_che().getText()), Arrays.asList(chec.che_fa().fa()));
+            }
+        } else if (chec.che() != null) {
+            if (chec.che().fa() != null) {
+                return ssfh.visitStructuralSubspeciesFas(new HeadGroup(chec.che().hg_che().getText()), Arrays.asList(chec.che().fa()));
+            }
         }
+        throw new ParseTreeVisitorException("Unhandled context state in ChE!");
     }
 
 }

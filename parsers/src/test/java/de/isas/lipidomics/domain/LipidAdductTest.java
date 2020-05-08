@@ -17,9 +17,11 @@ package de.isas.lipidomics.domain;
 
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
+import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
 import de.isas.lipidomics.palinom.sumformula.SumFormulaVisitorParser;
 import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -107,9 +109,17 @@ public class LipidAdductTest {
     @Test
     public void testSumFormulaForSESpecies() throws ParsingException {
         String lipidAdduct = "SE(43:2)";
-        String expectedSumFormula = "C37H64O2";
+        String expectedSumFormula = "C43H74O2";
         LipidAdduct la = new SwissLipidsVisitorParser().parse(lipidAdduct);
         assertEquals(expectedSumFormula, la.getSumFormula());
+        assertEquals("SE 27:1/16:1", la.getNormalizedLipidString(LipidLevel.SPECIES));
+        assertEquals("SE 27:1/16:1", la.getLipidString(LipidLevel.SPECIES));
+        
+        lipidAdduct = "SE(27:1/16:1)";
+        la = new SwissLipidsVisitorParser().parse(lipidAdduct);
+        assertEquals(expectedSumFormula, la.getSumFormula());
+        assertEquals("SE 27:1/16:1", la.getNormalizedLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
+        assertEquals("SE 27:1/16:1", la.getNormalizedLipidString(LipidLevel.SPECIES));
     }
 
     @Test
@@ -158,5 +168,55 @@ public class LipidAdductTest {
         la = gvp.parse("PC 21:0-22:6[M+H]1+");
         assertEquals(expectedSumFormula, la.getSumFormula());
         assertEquals(876.6476822, la.getMass(), 1e-6);
+    }
+    
+    @Test
+    public void testGlcCerModSumFormula() throws ParsingException {
+        String ref = "GlcCer(d18:2(4E,8Z)/16:0(2OH[R]))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = new LipidMapsVisitorParser().parse(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("GlcCer", lipidAdduct.getLipid().getHeadGroup().getName());
+        assertEquals("HexCer 18:2(4E,8Z);2/16:0;1(2OH[R])", lipidAdduct.getNormalizedLipidString());
+        assertEquals(LipidCategory.SP, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+//        assertEquals("HexCer 18:2(4E,8Z);2/16:0;1", lipidAdduct.getNormalizedLipidString());
+        assertNotNull(lipidAdduct.getLipid());
+        assertNotNull(lipidAdduct.getElements());
+        assertNotNull(lipidAdduct.getSumFormula());
+        assertNotNull(lipidAdduct.getMass());
+        assertEquals("C40H75NO9", lipidAdduct.getSumFormula());
+        assertEquals(713.544, lipidAdduct.getMass(), 1e-3);
+    }
+    
+    @Test
+    public void testPip2SumFormula() throws ParsingException {
+        String ref = "PIP3[3',4',5'](17:0/20:4(5Z,8Z,11Z,14Z))";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = new LipidMapsVisitorParser().parse(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals("PIP3[3',4',5']", lipidAdduct.getLipid().getHeadGroup().getName());
+        assertEquals("PIP3[3',4',5'] 17:0/20:4(5Z,8Z,11Z,14Z)", lipidAdduct.getNormalizedLipidString());
+        assertEquals(LipidCategory.GP, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+//        assertNotNull(lipidAdduct.getLipid());
+//        assertNotNull(lipidAdduct.getElements());
+//        assertNotNull(lipidAdduct.getSumFormula());
+//        assertNotNull(lipidAdduct.getMass());
+        assertEquals(1112.44, lipidAdduct.getMass(), 1e-3);
+        assertEquals("C46H84O22P4", lipidAdduct.getSumFormula());
+    }
+    
+    @Test
+    public void testDGDGSumFormula() throws ParsingException {
+        String ref = "MGDG(18:0(9Z)/18:2(9Z,12Z))";
+        String refSumFormula = "C45H82O10";
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = new LipidMapsVisitorParser().parse(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(refSumFormula, lipidAdduct.getSumFormula());
+        assertEquals(782.591, lipidAdduct.getMass(), 1e-3);
     }
 }

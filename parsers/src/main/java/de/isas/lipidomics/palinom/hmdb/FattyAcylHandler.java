@@ -28,6 +28,7 @@ import de.isas.lipidomics.palinom.HMDBParser;
 import de.isas.lipidomics.palinom.HMDBParser.FaContext;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**

@@ -47,7 +47,7 @@ public class SphingolipidsSubspecies2FAStepDefs {
             String headgroup) {
         Assert.assertEquals(category, this.lipid.getLipidCategory().name());
         Assert.assertEquals(species, this.lipid.getLipidString(LipidLevel.SPECIES));
-        Assert.assertEquals(headgroup, this.lipid.getHeadGroup());
+        Assert.assertEquals(headgroup, this.lipid.getHeadGroup().getName());
     }
 
     @Then("the first fatty acid at position {int} with {int} carbon atoms, {int} double bonds and {int} hydroxy groups")
