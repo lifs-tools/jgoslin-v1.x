@@ -82,6 +82,9 @@ public class IsomericSubspeciesLcbHandler {
         fa.nCarbon(asInt(pureCtx.carbon(), 0));
         fa.nHydroxy(asInt(pureCtx.hydroxyl(), 0));
         if (pureCtx.db() != null) {
+            if(pureCtx.db().db_count() != null) {
+                fa.nDoubleBonds(asInt(pureCtx.db().db_count(), 0));
+            }
             if (ctx.lcb_pure().db().db_positions() != null) {
                 fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(ctx.lcb_pure().db().db_positions()));
             } else {

@@ -15,11 +15,13 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.palinom.goslin.GoslinVisitorParser;
 import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
 import de.isas.lipidomics.palinom.sumformula.SumFormulaVisitorParser;
 import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
+import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
@@ -190,7 +192,7 @@ public class LipidAdductTest {
     }
     
     @Test
-    public void testPip2SumFormula() throws ParsingException {
+    public void testPip3SumFormula() throws ParsingException {
         String ref = "PIP3[3',4',5'](17:0/20:4(5Z,8Z,11Z,14Z))";
         System.out.println("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = new LipidMapsVisitorParser().parse(ref);
@@ -212,11 +214,13 @@ public class LipidAdductTest {
         String ref = "MGDG(18:0(9Z)/18:2(9Z,12Z))";
         String refSumFormula = "C45H82O10";
         System.out.println("Testing lipid name " + ref);
-        LipidAdduct lipidAdduct = new LipidMapsVisitorParser().parse(ref);
-        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
-        assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
-        assertEquals(refSumFormula, lipidAdduct.getSumFormula());
-        assertEquals(782.591, lipidAdduct.getMass(), 1e-3);
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+            LipidAdduct lipidAdduct = new LipidMapsVisitorParser().parse(ref);
+        });
+//        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+//        assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
+//        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+//        assertEquals(refSumFormula, lipidAdduct.getSumFormula());
+//        assertEquals(782.591, lipidAdduct.getMass(), 1e-3);
     }
 }

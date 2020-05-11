@@ -50,7 +50,7 @@ public class IsomericSubspeciesFasHandler {
         for (int i = 0; i < faContexts.size(); i++) {
             FattyAcid fa = buildIsomericFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 1);
             fas.add(fa);
-            if (fa.getType()==FattyAcidType.ISOMERIC) {
+            if (fa.getType() == FattyAcidType.ISOMERIC) {
                 nIsomericFas++;
             }
         }
@@ -73,6 +73,9 @@ public class IsomericSubspeciesFasHandler {
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
+            if (ctx.fa_pure().db().db_count() != null) {
+                fa.nDoubleBonds(asInt(ctx.fa_pure().db().db_count(), 0));
+            }
             if (ctx.fa_pure().db().db_positions() != null) {
                 fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(ctx.fa_pure().db().db_positions()));
             } else {

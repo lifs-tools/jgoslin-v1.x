@@ -81,12 +81,16 @@ public class IsomericSubspeciesLcbHandler {
             fa.nCarbon(HandlerUtils.asInt(ctx.lcb_core().carbon(), 0));
             fa.nHydroxy(faHelper.getNHydroxyl(ctx));
             if (ctx.lcb_core().db() != null) {
+                int doubleBonds = 0;
+                if (ctx.lcb_core().db().db_count() != null) {
+                    doubleBonds = HandlerUtils.asInt(ctx.lcb_core().db().db_count(), 0);
+                }
                 if (ctx.lcb_core().db().db_positions() != null) {
+                    fa.nDoubleBonds(doubleBonds);
                     fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, ctx.lcb_core().db().db_positions()));
                 } else { // handle cases like (0:0) but with at least one fa with isomeric subspecies level
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
                     if (ctx.lcb_core().db().db_count() != null) {
-                        int doubleBonds = HandlerUtils.asInt(ctx.lcb_core().db().db_count(), 0);
                         if (doubleBonds > 0) {
                             return FattyAcid.structuralFattyAcidBuilder().
                                     lipidFaBondType(lfbt).

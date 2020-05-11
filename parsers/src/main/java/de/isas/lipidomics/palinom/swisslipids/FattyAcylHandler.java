@@ -24,6 +24,7 @@ import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.palinom.HandlerUtils;
+import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.SwissLipidsParser.FaContext;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -123,6 +124,10 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
         if (faContext.fa_lcb_suffix() != null) {
             throw new ParseTreeVisitorException("Unsupported lcb suffix on fa: " + faContext.fa_lcb_suffix().getText());
         }
+        int nDoubleBonds = 0;
+        if (faContext.fa_core().db() != null) {
+            nDoubleBonds = asInt(faContext.fa_core().db().db_count(), 0);
+        }
         if (faContext.fa_core().db().db_positions() != null) {
             return Optional.of(LipidSpeciesInfo.lipidSubspeciesInfoBuilder().
                     level(LipidLevel.ISOMERIC_SUBSPECIES).
@@ -130,6 +135,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsPar
                     position(-1).
                     nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0) - countCorrection.getOrDefault("carbonCorrection", 0)).
                     nHydroxy(nHydroxyl).
+                    nDoubleBonds(nDoubleBonds + (lfbt == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0) - countCorrection.getOrDefault("doubleBondCorrection", 0)).
                     doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, faContext.fa_core().db().db_positions())).
                     lipidFaBondType(lfbt).
                     build()

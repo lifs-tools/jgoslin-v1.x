@@ -49,6 +49,10 @@ public class LipidMapsComprehensiveIT {
         }
         log.info("Parsing current lipid maps identifier: {}", abbreviation);
 
+        if ("MGDG(18:0(9Z)/18:2(9Z,12Z))".equals(abbreviation)) {
+            log.info("Skipping test for " + abbreviation + ". Illegal entry with double bond positions on FA chain with no double bonds!");
+            return;
+        }
         if ("Isocaldarchaeol(0:0)".equals(abbreviation) || "PC(O-5:0)[R]".equals(abbreviation)) {
             log.info("Skipping test for " + abbreviation + ". Currently unsupported!");
             return;

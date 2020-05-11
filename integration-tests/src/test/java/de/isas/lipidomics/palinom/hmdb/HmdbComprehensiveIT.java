@@ -17,6 +17,7 @@ package de.isas.lipidomics.palinom.hmdb;
 
 import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.domain.LipidSpecies;
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import java.io.IOException;
@@ -49,6 +50,8 @@ public class HmdbComprehensiveIT {
                 lipidAdduct = parser.parse(lipidName);
                 LipidSpecies ls = lipidAdduct.getLipid();
                 assertNotNull(ls);
+            } catch (ConstraintViolationException cex) {
+                fail("Parsing current HMDB identifier: " + hmdbName + " failed - name is illegal!" + cex.getMessage());
             } catch (ParsingException ex) {
                 fail("Parsing current HMDB identifier: " + hmdbName + " failed - name unsupported in grammar!");
             } catch (ParseTreeVisitorException pve) {

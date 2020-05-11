@@ -37,6 +37,10 @@ public class LipidMapsSumFormulasIT {
     @ParameterizedTest(name = "{index} ==> ''{0}'' can be parsed with the lipid maps grammar and sum formulas match")
     @CsvFileSource(resources = "/de/isas/lipidomics/palinom/formulas-lipid-maps.csv", numLinesToSkip = 0, delimiter = ',', encoding = "UTF-8", lineSeparator = "\n")
     public void testSumFormulas(String lipidName, String sumFormula) {
+        if ("MGDG(18:0(9Z)/18:2(9Z,12Z))".equals(lipidName)) {
+            log.info("Skipping test for " + lipidName + ". Illegal entry with double bond positions on FA chain with no double bonds!");
+            return;
+        }
         LipidAdduct lipidAdduct;
         LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
         try {

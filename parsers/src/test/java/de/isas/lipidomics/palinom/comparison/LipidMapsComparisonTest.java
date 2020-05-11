@@ -19,6 +19,7 @@ import de.isas.lipidomics.domain.LipidAdduct;
 import de.isas.lipidomics.palinom.LipidMapsLexer;
 import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.SyntaxErrorListener;
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
 import lombok.extern.slf4j.Slf4j;
@@ -53,9 +54,18 @@ public class LipidMapsComparisonTest {
         if (parser.getNumberOfSyntaxErrors() > 0) {
             throw new ParsingException("Parsing of " + lipidName + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
         }
+        LipidAdduct la = null;
         LipidMapsVisitorParser visitorParser = new LipidMapsVisitorParser();
-        LipidAdduct la = visitorParser.parse(lipidName, listener);
-        Assertions.assertNotNull(la);
+        if ("MGDG(18:0(9Z)/18:2(9Z,12Z))".equals(lipidName)) {
+            try {
+                la = visitorParser.parse(lipidName, listener);
+                Assertions.fail("Lipid " + lipidName + " should cause ConstraintViolationException!");
+            } catch (ConstraintViolationException cve) {
+            }
+        } else {
+            la = visitorParser.parse(lipidName, listener);
+            Assertions.assertNotNull(la);
+        }
     }
 
 }

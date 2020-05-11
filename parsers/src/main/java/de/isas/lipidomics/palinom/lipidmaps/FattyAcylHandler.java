@@ -162,6 +162,7 @@ public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParse
                     position(-1).
                     nCarbon(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().carbon(), 0)).
                     nHydroxy(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().hydroxyl(), 0) + modificationHydroxyls).
+                    nDoubleBonds(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().db(), 0) + (faHelper.getLipidFaBondType(faContext) == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0)).
                     doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, faContext.fa_unmod().fa_pure().db().db_positions())).
                     lipidFaBondType(lfbt).
                     build()

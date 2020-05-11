@@ -50,7 +50,7 @@ public class FattyAcid {
      * @see LipidFaBondType
      */
     @Builder(builderMethodName = "isomericFattyAcidBuilder", builderClassName = "IsomericFattyAcidBuilder")
-    public FattyAcid(String name, int position, int nCarbon, int nHydroxy, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications, Map<Integer, String> doubleBondPositions) {
+    public FattyAcid(String name, int position, int nCarbon, int nHydroxy, LipidFaBondType lipidFaBondType, boolean lcb, ModificationsList modifications, int nDoubleBonds, Map<Integer, String> doubleBondPositions) {
         this.name = name;
         if (nCarbon < 0) {
             throw new ConstraintViolationException("FattyAcid must have at least 0 carbons!");
@@ -69,8 +69,11 @@ public class FattyAcid {
         this.modifications = modifications == null ? ModificationsList.NONE : modifications;
         if (doubleBondPositions == null) {
             this.doubleBondPositions = Collections.emptyMap();
-            this.nDoubleBonds = 0;
+            this.nDoubleBonds = nDoubleBonds;
         } else {
+            if (nDoubleBonds != doubleBondPositions.size()) {
+                throw new ConstraintViolationException("Isomeric FattyAcid must receive double bond positions for all double bonds! Got " + nDoubleBonds + " double bonds and " + doubleBondPositions.size() + " positions: " + doubleBondPositions);
+            }
             this.doubleBondPositions = new TreeMap<>();
             this.doubleBondPositions.putAll(doubleBondPositions);
             this.nDoubleBonds = this.doubleBondPositions.size();

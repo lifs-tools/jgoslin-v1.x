@@ -23,6 +23,7 @@ import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.HandlerUtils;
+import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedHashMap;
@@ -81,20 +82,24 @@ public class IsomericSubspeciesLcbHandler {
             fa.nCarbon(HandlerUtils.asInt(ctx.lcb_core().carbon(), 0));
             fa.nHydroxy(faHelper.getNHydroxyl(ctx));
             if (ctx.lcb_core().db() != null) {
+                int nDoubleBonds = 0;
+                if (ctx.lcb_core().db() != null) {
+                    nDoubleBonds = asInt(ctx.lcb_core().db().db_count(), 0);
+                    fa.nDoubleBonds(nDoubleBonds);
+                }
                 if (ctx.lcb_core().db().db_positions() != null) {
                     fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, ctx.lcb_core().db().db_positions()));
                 } else { // handle cases like (0:0) but with at least one fa with isomeric subspecies level
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
                     if (ctx.lcb_core().db().db_count() != null) {
-                        int doubleBonds = HandlerUtils.asInt(ctx.lcb_core().db().db_count(), 0);
-                        if (doubleBonds > 0) {
+                        if (nDoubleBonds > 0) {
                             return FattyAcid.structuralFattyAcidBuilder().
                                     lipidFaBondType(lfbt).
                                     name(faName).
                                     lcb(true).
                                     nHydroxy(faHelper.getNHydroxyl(ctx)).
                                     nCarbon(HandlerUtils.asInt(ctx.lcb_core().carbon(), 0)).
-                                    nDoubleBonds(doubleBonds).
+                                    nDoubleBonds(nDoubleBonds).
                                     build();
                         }
                     }

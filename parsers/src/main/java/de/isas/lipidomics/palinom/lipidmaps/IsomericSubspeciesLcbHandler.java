@@ -95,12 +95,16 @@ public class IsomericSubspeciesLcbHandler {
                 fa.nCarbon(HandlerUtils.asInt(factx.carbon(), 0));
                 fa.nHydroxy(faHelper.getHydroxyCount(ctx) + modificationHydroxyls);
                 if (factx.db() != null) {
+                    int doubleBonds = 0;
+                    if (factx.db().db_count() != null) {
+                        doubleBonds = HandlerUtils.asInt(factx.db().db_count(), 0);
+                        fa.nDoubleBonds(doubleBonds);
+                    }
                     if (factx.db().db_positions() != null) {
                         fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, factx.db().db_positions()));
                     } else { // handle cases like (0:0) but with at least one fa with isomeric subspecies level
                         Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
                         if (factx.db().db_count() != null) {
-                            int doubleBonds = HandlerUtils.asInt(factx.db().db_count(), 0);
                             if (doubleBonds > 0) {
                                 return FattyAcid.structuralFattyAcidBuilder().
                                         lipidFaBondType(lfbt).

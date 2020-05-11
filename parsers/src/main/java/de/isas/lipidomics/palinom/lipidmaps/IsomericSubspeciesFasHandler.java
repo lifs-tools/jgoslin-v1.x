@@ -88,12 +88,16 @@ public class IsomericSubspeciesFasHandler {
             fa.nCarbon(asInt(ctx.fa_unmod().fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_unmod().fa_pure().hydroxyl(), 0) + modificationHydroxyls);
             if (ctx.fa_unmod().fa_pure().db() != null) {
+                int doubleBonds = 0;
+                if (ctx.fa_unmod().fa_pure().db().db_count() != null) {
+                    doubleBonds = HandlerUtils.asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0) + ((faBondType == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);
+                    fa.nDoubleBonds(doubleBonds);
+                }
                 if (ctx.fa_unmod().fa_pure().db().db_positions() != null) {
                     fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(faBondType, ctx.fa_unmod().fa_pure().db().db_positions()));
                 } else {
                     Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
                     if (ctx.fa_unmod().fa_pure().db().db_count() != null) {
-                        int doubleBonds = HandlerUtils.asInt(ctx.fa_unmod().fa_pure().db().db_count(), 0) + ((faBondType == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);
                         if (doubleBonds > 0) {
                             return FattyAcid.structuralFattyAcidBuilder().
                                     lipidFaBondType(faBondType).
