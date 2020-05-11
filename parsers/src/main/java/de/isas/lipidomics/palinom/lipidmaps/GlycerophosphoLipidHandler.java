@@ -160,7 +160,7 @@ public class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipi
         LipidMapsParser.Hg_fourplcContext context = fpl.hg_fourplc();
         if (context != null) {
             HeadGroup headGroup = new HeadGroup(context.hg_fourpl().getText());
-            if (fpl.fa4() != null) { //species level
+            if (fpl.species_fa() != null) { //species level
                 //process species level
                 return fhf.visitSpeciesFas(headGroup, fpl.species_fa().fa());
             } else if (fpl.fa4() != null) {

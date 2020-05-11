@@ -123,35 +123,33 @@ public class FattyAcylHelper {
     public Map<String, Integer> getSterolSpeciesCountCorrection(HeadGroup headGroup) {
         Integer doubleBondCorrection = 0;
         Integer carbonCorrection = 0;
-        if (headGroup.getLipidClass().isPresent()) {
-            LipidClass lipidClass = headGroup.getLipidClass().get();
-            switch (lipidClass) {
-                case SE:
-                case SE_27_1:
-                    doubleBondCorrection = 1;
-                    break;
-                case SE_27_2:
-                case SE_28_2:
-                case SE_29_2:
-                case SE_30_2:
-                    doubleBondCorrection = 2;
-                    break;
-                case SE_28_3:
-                    doubleBondCorrection = 3;
-                    break;
-            }
-            switch (lipidClass) {
-                case SE:
-                case SE_27_1:
-                case SE_27_2:
-                case SE_28_2:
-                case SE_29_2:
-                case SE_30_2:
-                case SE_28_3:
-                    ElementTable et = lipidClass.getElements();
-                    carbonCorrection = et.get(Element.ELEMENT_C);
-                    break;
-            }
+        LipidClass lipidClass = headGroup.getLipidClass().orElse(LipidClass.UNDEFINED);
+        switch (lipidClass) {
+            case SE:
+            case SE_27_1:
+                doubleBondCorrection = 1;
+                break;
+            case SE_27_2:
+            case SE_28_2:
+            case SE_29_2:
+            case SE_30_2:
+                doubleBondCorrection = 2;
+                break;
+            case SE_28_3:
+                doubleBondCorrection = 3;
+                break;
+        }
+        switch (lipidClass) {
+            case SE:
+            case SE_27_1:
+            case SE_27_2:
+            case SE_28_2:
+            case SE_29_2:
+            case SE_30_2:
+            case SE_28_3:
+                ElementTable et = lipidClass.getElements();
+                carbonCorrection = et.get(Element.ELEMENT_C);
+                break;
         }
         Map<String, Integer> map = new HashMap<>();
         map.put("doubleBondCorrection", doubleBondCorrection);

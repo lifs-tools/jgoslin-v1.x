@@ -15,6 +15,10 @@
  */
 package de.isas.lipidomics.domain;
 
+import static de.isas.lipidomics.domain.LipidLevel.ISOMERIC_SUBSPECIES;
+import static de.isas.lipidomics.domain.LipidLevel.MOLECULAR_SUBSPECIES;
+import static de.isas.lipidomics.domain.LipidLevel.SPECIES;
+import static de.isas.lipidomics.domain.LipidLevel.STRUCTURAL_SUBSPECIES;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -70,9 +74,10 @@ public class LipidAdduct {
         }
         if (adduct != null) {
             if (lipid != null && lipid.getInfo().isPresent()) {
+                LipidSpeciesInfo info = lipid.getInfo().orElse(LipidSpeciesInfo.NONE);
                 //only add elements on species level or below
                 //higher levels will not return a mass 
-                switch (lipid.getInfo().get().getLevel()) {
+                switch (info.getLevel()) {
                     case ISOMERIC_SUBSPECIES:
                     case MOLECULAR_SUBSPECIES:
                     case STRUCTURAL_SUBSPECIES:

@@ -94,7 +94,7 @@ public class LipidSpecies {
      * species, a Plasmanyl or Plasmenyl species.
      */
     public boolean isEtherLipid() {
-        return this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL
+        return this.info.orElse(LipidSpeciesInfo.NONE).getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL
                 || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL
                 || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED
                 || getFa().values().stream().anyMatch((t) -> {
@@ -173,21 +173,22 @@ public class LipidSpecies {
             case SPECIES:
                 StringBuilder lipidString = new StringBuilder();
                 lipidString.append(buildSpeciesHeadGroupString(headGroup, isNormalized));
-                if (this.info.isPresent() && this.info.get().getNCarbon() > 0) {
-                    int nCarbon = info.get().getNCarbon();
+                LipidSpeciesInfo info = this.info.orElse(LipidSpeciesInfo.NONE);
+                if (info.getNCarbon() > 0) {
+                    int nCarbon = info.getNCarbon();
                     String hgToFaSep = "";
                     if (isEtherLipid()) {
                         hgToFaSep = "O-";
                     }
                     lipidString.append(hgToFaSep).append(nCarbon);
-                    int nDB = info.get().getNDoubleBonds();
+                    int nDB = info.getNDoubleBonds();
                     lipidString.append(":").append(nDB);
-                    int nHydroxy = info.get().getNHydroxy();
+                    int nHydroxy = info.getNHydroxy();
                     lipidString.append(nHydroxy > 0 ? ";" + nHydroxy : "");
-                    lipidString.append(info.get().getLipidFaBondType().suffix());
-                    if (!info.get().getModifications().isEmpty()) {
+                    lipidString.append(info.getLipidFaBondType().suffix());
+                    if (!info.getModifications().isEmpty()) {
                         lipidString.append("(");
-                        lipidString.append(info.get().getModifications().stream().map((t) -> {
+                        lipidString.append(info.getModifications().stream().map((t) -> {
                             return (t.getLeft() == -1 ? "" : t.getLeft()) + "" + t.getRight();
                         }).collect(Collectors.joining(",")));
                         lipidString.append(")");
