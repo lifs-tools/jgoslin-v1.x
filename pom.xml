@@ -42,7 +42,8 @@
         <junit.vintage.version>5.5.2</junit.vintage.version>
         <lombok.version>1.18.10</lombok.version>
         <dockerfile.plugin.version>1.4.10</dockerfile.plugin.version>
-        <slf4j.version>1.7.26</slf4j.version>
+	<slf4j.version>1.7.26</slf4j.version>
+	<jacoco.version>0.8.5</jacoco.version>
     </properties>
     <build>
         <pluginManagement>
