@@ -1,13 +1,15 @@
 dist: trusty
 cache:
   directories:
-    - '$HOME/.m2'
-    - '$HOME/.sonar/cache'
-
+  - "$HOME/.m2"
+  - "$HOME/.sonar/cache"
 language: java
-
 jdk:
-  - openjdk11
+- openjdk11
 script:
-  # JaCoCo is used to have code coverage, the agent has to be activated
-  - ./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent verify package sonar:sonar -Dsonar.organization=nilshoffmann-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
+- "./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent verify package sonar:sonar -Dsonar.projectKey=lifs-tools_jgoslin"
+addons:
+  sonarcloud:
+    organization: "lifs-tools"
+    token:
+      secure: WCmE4k6ukPJn4RpTarHuCCPtXGMC0n+n1FNcM7fiO3j9gkJErgHmFIQD88VcC2mCmdgIdfsrccYkZcg0bA8PTn8k1cIQPoDWT2NepHWLZWGqz2oErlWzOBl3JAASILBJN8MEV7rgFY/Mr+1fCxjbSrKsHI9IUgCA9ABRo/HVHksgBhyonYJecltRFq+2sNnU5b6mcy+N3C1hXoPrUb/X/SSy+mxKDElqMrFWAOM23DdaMs602BSIt1M3wNztTvdAZm8FlYXVdv509YLFSDIVANl7vAZ7BonJLZOT1WeDg5SVucnR9s7bX9x2k4RTQsFqBnrUuK4+1V0bqA/7Hh2LDPSy5p6rk+lwRUHFmCzAycqu3oXVw/btUVoptrCtn8d3q8dAIUghwvMtj9tqNfkYYcOqvC4LfPHZT8Gz/cIGUC5a5KvROV7S0bFPkzYHtFtLY/jF+/LYF/aqsVcTrGAfVTjT/bcbv8AFbc1qtJxuM9vP/GBD2/wB8a4IriwYOf9+8kj6oBU12BHzoR56s5paoxrBy2an79Lqkb7YG1WHtmdWdkcc5kqvQWLRtM+zA13QlnvO2k6pz39c60Mxbin5yLMQwwvnzF0G7b6gE9mN/ETYq9/QhteVtgnJFP0rMaik9kGvdQsyuYZ1P6ulqO7s58PRl/chcsLEq7t9qmdCVVw=
