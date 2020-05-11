@@ -94,9 +94,11 @@ public class LipidSpecies {
      * species, a Plasmanyl or Plasmenyl species.
      */
     public boolean isEtherLipid() {
-        return this.info.orElse(LipidSpeciesInfo.NONE).getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL
-                || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_PLASMENYL
-                || this.info.get().getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED
+        LipidSpeciesInfo info = this.info.orElse(LipidSpeciesInfo.NONE);
+        LipidFaBondType bondType = info.getLipidFaBondType();
+        return bondType == LipidFaBondType.ETHER_PLASMANYL
+                || bondType == LipidFaBondType.ETHER_PLASMENYL
+                || bondType == LipidFaBondType.ETHER_UNSPECIFIED
                 || getFa().values().stream().anyMatch((t) -> {
                     return t.getLipidFaBondType() == LipidFaBondType.ETHER_UNSPECIFIED
                             || t.getLipidFaBondType() == LipidFaBondType.ETHER_PLASMANYL

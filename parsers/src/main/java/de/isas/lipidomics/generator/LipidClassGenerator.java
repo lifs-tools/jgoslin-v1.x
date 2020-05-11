@@ -108,8 +108,12 @@ public class LipidClassGenerator {
     }
 
     public String sanitizeToEnumConstant(String lipidName, String lipidCategory) {
-        return lipidName.replaceAll("[/\\-\\s(),.\\[\\]:;]", "_").replaceAll("'", "p")
+        String enumName = lipidName.replaceAll("[/\\-\\s(),.\\[\\]:;]", "_").replaceAll("'", "p")
                 .replaceAll("^([_0-9]+)", lipidCategory + "_$1").replaceAll("[_]+", "_").toUpperCase();
+        if(enumName.endsWith("_")) {
+            return enumName.substring(0, enumName.length()-1);
+        }
+        return enumName;
     }
 
     public String getEnumFromTable(Stream<LipidClassEntry> stream) {
@@ -163,7 +167,7 @@ public class LipidClassGenerator {
                                         + "            } catch (de.isas.lipidomics.palinom.exceptions.ParsingException ex) {\n"
                                         + "                et = new ElementTable();\n"
                                         + "            }\n"
-                                        + "        };\n"
+                                        + "        }\n"
                                         + "        this.elementTable = et;"
                                 )
                         ).
