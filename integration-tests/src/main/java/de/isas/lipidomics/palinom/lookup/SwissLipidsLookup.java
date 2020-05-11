@@ -17,7 +17,6 @@ package de.isas.lipidomics.palinom.lookup;
 
 import de.isas.lipidomics.domain.ExternalDatabaseReference;
 import de.isas.lipidomics.domain.LipidAdduct;
-import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.palinom.swisslipids.SwissLipidsVisitorParser;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
@@ -30,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,16 +44,16 @@ public class SwissLipidsLookup {
         log.info("Parsing ", args[0]);
         URL swissLipidsTable = new File(args[0]).toURI().toURL();
         try (InputStream is = swissLipidsTable.openStream()) {
-            try (InputStreamReader isr = new InputStreamReader(is, "UTF-8")) {
+            try (InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                 try (BufferedReader br = new BufferedReader(isr)) {
                     File outputFile = new File("swiss-lipids-normalized.tsv");
                     try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile))) {
                         // SLID	LEVEL	NAME	ABBREVIATION	SYNONYMS1	SYNONYMS2	SYNONYMS3	SYNONYMS4	SYNONYMS5
                         bw.write("databaseUrl\tdatabaseElementId\tlipidLevel\tnativeAbbreviation\tnativeName\tnormalizedName");
                         bw.newLine();
-                        br.lines().skip(1).map((swissLipidsEntry) -> {
+                        br.lines().skip(1).map(swissLipidsEntry -> {
                             String[] elements = swissLipidsEntry.split("\t", -1);
-                            System.out.println(Arrays.deepToString(elements));
+                            log.info(Arrays.deepToString(elements));
                             return new ExternalDatabaseReference(
                                     "https://www.swisslipids.org/#/entity/",
                                     elements[0],
@@ -62,7 +62,7 @@ public class SwissLipidsLookup {
                                     elements[2],
                                     parseAbbreviation(elements[2])
                             );
-                        }).forEach((edr) -> {
+                        }).forEach(edr -> {
                             StringBuilder sb = new StringBuilder();
                             sb.
                                     append(edr.getDatabaseUrl()).append("\t").

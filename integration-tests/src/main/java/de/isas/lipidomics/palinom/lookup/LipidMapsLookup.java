@@ -17,7 +17,6 @@ package de.isas.lipidomics.palinom.lookup;
 
 import de.isas.lipidomics.domain.ExternalDatabaseReference;
 import de.isas.lipidomics.domain.LipidAdduct;
-import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.palinom.lipidmaps.LipidMapsVisitorParser;
 import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -29,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,12 +38,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class LipidMapsLookup {
-    
+
     public static void main(String[] args) throws IOException {
         log.info("Parsing ", args[0]);
-        URL lipidMapsTable = new File(args[0]).toURI().toURL();//LipidMapsLookup.class.getClassLoader().getResource("lipidmaps-names-Feb-10-2020.tsv");
+        URL lipidMapsTable = new File(args[0]).toURI().toURL();
         try (InputStream is = lipidMapsTable.openStream()) {
-            try (InputStreamReader isr = new InputStreamReader(is, "UTF-8")) {
+            try (InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                 try (BufferedReader br = new BufferedReader(isr)) {
                     File outputFile = new File("lipidmaps-normalized.tsv");
                     try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile))) {
@@ -51,9 +51,9 @@ public class LipidMapsLookup {
                         // LM_ID	NAME	SYSTEMATIC_NAME	ABBREVIATION	CATEGORY	MAIN_CLASS	SUB_CLASS
                         bw.write("databaseUrl\tdatabaseElementId\tlipidLevel\tnativeAbbreviation\tnativeName\tnormalizedName");
                         bw.newLine();
-                        br.lines().skip(1).map((lipidMapsEntry) -> {
+                        br.lines().skip(1).map(lipidMapsEntry -> {
                             String[] elements = lipidMapsEntry.split("\t", -1);
-                            System.out.println(Arrays.deepToString(elements));
+                            log.info(Arrays.deepToString(elements));
                             return new ExternalDatabaseReference(
                                     "https://www.lipidmaps.org/data/LMSDRecord.php?LMID=",
                                     elements[0],
@@ -62,7 +62,7 @@ public class LipidMapsLookup {
                                     elements[1],
                                     parseAbbreviation(elements[1], elements[3])
                             );
-                        }).forEach((edr) -> {
+                        }).forEach(edr -> {
                             StringBuilder sb = new StringBuilder();
                             sb.
                                     append(edr.getDatabaseUrl()).append("\t").
@@ -83,9 +83,9 @@ public class LipidMapsLookup {
             }
         }
     }
-    
+
     public static String parseAbbreviation(String fullName, String abbreviation) {
-        if(abbreviation==null || abbreviation.isEmpty()) {
+        if (abbreviation == null || abbreviation.isEmpty()) {
             log.info("Parsing fullName");
             LipidMapsVisitorParser parser = new LipidMapsVisitorParser();
             String result;
