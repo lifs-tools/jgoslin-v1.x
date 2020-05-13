@@ -89,19 +89,19 @@ public enum LipidFaBondType {
                     throw new ConstraintViolationException("Unhandled case for" + faBondType + " in context of FA: " + fas);
             }
         }
-        switch(speciesFaBondType) {
-            case UNDEFINED:
-                return mostSpecificFaBondType;
-            case ETHER_UNSPECIFIED:
-                switch(mostSpecificFaBondType) {
-                    case ETHER_PLASMANYL:
-                    case ETHER_PLASMENYL:
-                    case ETHER_UNSPECIFIED:
-                        return mostSpecificFaBondType;
-                }
-            default:
-                return speciesFaBondType;
+        if (speciesFaBondType == UNDEFINED) {
+            return mostSpecificFaBondType;
+        } else if (speciesFaBondType == ETHER_UNSPECIFIED) {
+            switch (mostSpecificFaBondType) {
+                case ETHER_PLASMANYL:
+                case ETHER_PLASMENYL:
+                case ETHER_UNSPECIFIED:
+                    return mostSpecificFaBondType;
+                default:
+                    return speciesFaBondType;
+            }
         }
+        return speciesFaBondType;
     }
 
 }

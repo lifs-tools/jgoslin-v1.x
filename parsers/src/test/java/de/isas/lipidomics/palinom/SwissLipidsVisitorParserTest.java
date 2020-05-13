@@ -502,7 +502,7 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("SE", lipidAdduct.getLipid().getHeadGroup().getName());
         assertEquals(LipidCategory.ST, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidClass.SE, lipidAdduct.getLipid().getLipidClass().get());
+        assertEquals(LipidClass.SE_27_1, lipidAdduct.getLipid().getLipidClass().get());
         assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
         assertEquals(16, lipidAdduct.getLipid().getInfo().get().getNCarbon());
         assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());

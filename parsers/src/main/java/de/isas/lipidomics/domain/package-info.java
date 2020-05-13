@@ -13,4 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * This package contains the main common domain models for lipids.
+ */
 package de.isas.lipidomics.domain;

@@ -70,7 +70,7 @@ public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureCo
                 LipidClass lipidClass = headGroup.getLipidClass().orElse(LipidClass.UNDEFINED);
                 //special handling for sterol esters on species level
                 switch (lipidClass) {
-                    case SE:
+//                    case SE:
                     case SE_27_1:
                     case SE_27_2:
                     case SE_28_2:

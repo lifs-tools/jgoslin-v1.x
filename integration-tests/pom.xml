@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.isas.lipidomics</groupId>
         <artifactId>jgoslin</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>jgoslin-integration-tests</artifactId>
@@ -47,7 +47,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M4</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>

@@ -95,7 +95,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
         StringBuilder lipidString = new StringBuilder();
         lipidString.append(getHeadGroup().getLipidClass().map((lclass) -> {
             switch (lclass) {
-                case SE:
+//                case SE:
                 case SE_27_1:
                 case SE_27_2:
                 case SE_28_2:

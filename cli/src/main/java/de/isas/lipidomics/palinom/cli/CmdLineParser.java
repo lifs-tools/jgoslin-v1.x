@@ -237,8 +237,9 @@ public class CmdLineParser {
             m.put("Original Name", t.getLipidName());
             m.put("Grammar", t.getGrammar().name());
             m.put("Message", t.getMessages().stream().collect(Collectors.joining(" | ")));
-//           m.put("Adduct",t.getLipidAdduct().getAdduct().toString());
-//           m.put("Sum Formula", t.getLipidAdduct().getSumFormula());
+            m.put("Adduct", t.getLipidAdduct().getAdduct().toString());
+            m.put("Sum Formula", t.getLipidAdduct().getSumFormula());
+            m.put("Mass", String.format("%.4f", t.getLipidAdduct().getMass()));
             if (t.getLipidAdduct() != null) {
                 m.put("Lipid Maps Category", t.getLipidAdduct().getLipid().getLipidCategory().getFullName() + " [" + t.getLipidAdduct().getLipid().getLipidCategory().name() + "]");
                 LipidClass lclass = t.getLipidAdduct().getLipid().getLipidClass().orElse(LipidClass.UNDEFINED);

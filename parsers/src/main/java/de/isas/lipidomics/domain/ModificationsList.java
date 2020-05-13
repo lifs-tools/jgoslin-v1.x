@@ -38,7 +38,7 @@ import org.apache.commons.lang3.tuple.Pair;
 @EqualsAndHashCode
 public class ModificationsList implements List<Pair<Integer,String>> {
     
-    public static final ModificationsList NONE = new ModificationsList(Collections.emptyList());
+    protected static final ModificationsList NONE = new ModificationsList(Collections.emptyList());
     
     public ModificationsList() {
         this.al = new ArrayList<>();

@@ -152,7 +152,7 @@ public class LipidSpecies {
         StringBuilder lipidString = new StringBuilder();
         lipidString.append(this.headGroup.getLipidClass().map((lclass) -> {
             switch (lclass) {
-                case SE:
+//                case SE:
                 case SE_27_1:
                 case SE_27_2:
                 case SE_28_2:

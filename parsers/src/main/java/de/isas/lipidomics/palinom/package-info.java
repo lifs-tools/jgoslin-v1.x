@@ -13,4 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * This package contains the parser implementations for the lipid grammars.
+ */
 package de.isas.lipidomics.palinom;

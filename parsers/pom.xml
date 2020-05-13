@@ -4,19 +4,16 @@
     <parent>
         <groupId>de.isas.lipidomics</groupId>
         <artifactId>jgoslin</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>jgoslin-parsers</artifactId>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--<maven.compiler.release>11</maven.compiler.release>-->
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cucumber.version>5.1.3</cucumber.version>
-        <java.version>1.8</java.version>
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
         <junit.vintage.version>5.5.2</junit.vintage.version>
         <sonar.tests>src/test/java</sonar.tests>
@@ -26,7 +23,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>add-db-resource</id>
@@ -86,8 +83,7 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <release>${java.version}</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -111,7 +107,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>3.1.0</version>
                 <configuration>
                     <delimiters>
                         <delimiter>@</delimiter>
