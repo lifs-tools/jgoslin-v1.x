@@ -64,9 +64,9 @@
                 <executions>
                     <execution>
                         <id>default-jar</id>
-                        <configuration>
+<!--                        <configuration>
                             <skipIfEmpty>true</skipIfEmpty>
-                        </configuration>
+                        </configuration>-->
                         <goals>
                             <goal>jar</goal>
                         </goals>
