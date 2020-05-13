@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.HMDBParser;
-import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -36,9 +35,9 @@ import java.util.stream.Collectors;
 /**
  * Handler for Isomeric FAs.
  *
- * @author nilshoffmann
+ * @author  nils.hoffmann
  */
-public class IsomericSubspeciesFasHandler {
+class IsomericSubspeciesFasHandler {
 
     private final FattyAcylHelper faHelper;
 

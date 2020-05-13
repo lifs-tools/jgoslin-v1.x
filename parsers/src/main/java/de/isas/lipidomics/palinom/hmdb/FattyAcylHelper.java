@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ import java.util.TreeMap;
 /**
  * Helper class for FA and LCB handling.
  *
- * @author nilshoffmann
+ * @author  nils.hoffmann
  */
-public class FattyAcylHelper {
+class FattyAcylHelper {
 
     public LipidFaBondType getLipidLcbBondType(HeadGroup headGroup, HMDBParser.LcbContext lcbContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;

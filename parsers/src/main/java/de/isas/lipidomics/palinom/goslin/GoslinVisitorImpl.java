@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author nils.hoffmann
  */
 @Slf4j
-class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
+public class GoslinVisitorImpl extends GoslinBaseVisitor<LipidAdduct> {
 
     /**
      * Produces a LipidAdduct given the LipidContext.

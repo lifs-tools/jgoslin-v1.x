@@ -5,7 +5,7 @@
     <artifactId>jgoslin</artifactId>
     <version>1.0.2</version>
     <packaging>pom</packaging>
-    <url>https://gitlab.isas.de/lifs/palinom</url>	
+    <url>https://github.com/lifs-tools/jgoslin</url>	
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
@@ -31,9 +31,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git@gitlab.isas.de:lifs/palinom.git</connection>
-        <developerConnection>scm:git:ssh://git@gitlab.isas.de:lifs/palinom.git</developerConnection>
-        <url>https://gitlab.isas.de/lifs/palinom</url>
+        <connection>scm:git:git@github.com:lifs-tools/jgoslin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:lifs-tools/jgoslin.git</developerConnection>
+        <url>https://github.com/lifs-tools/jgoslin</url>
     </scm>
     <distributionManagement>
         <site>

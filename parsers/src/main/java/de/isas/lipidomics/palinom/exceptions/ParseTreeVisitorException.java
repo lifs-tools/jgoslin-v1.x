@@ -16,6 +16,8 @@
 package de.isas.lipidomics.palinom.exceptions;
 
 /**
+ * Exception for illegal or unhandled cases within the parse tree visitor
+ * handlers.
  *
  * @author nils.hoffmann
  */

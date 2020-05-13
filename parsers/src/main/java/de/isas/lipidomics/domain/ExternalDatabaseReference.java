@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package de.isas.lipidomics.domain;
 
-import lombok.Data;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * An external database reference for a lipid encodes the link to identify the

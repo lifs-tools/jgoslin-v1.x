@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * This package contains the parser implementations for the lipid grammars.
+ * This package contains the code to generate the LipidClass class from lipid-list.csv.
  */
-package de.isas.lipidomics.palinom;
+package de.isas.lipidomics.generator;

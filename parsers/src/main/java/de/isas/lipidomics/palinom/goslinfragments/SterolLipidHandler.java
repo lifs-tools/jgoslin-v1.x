@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 package de.isas.lipidomics.palinom.goslinfragments;
 
 import de.isas.lipidomics.domain.HeadGroup;
-import de.isas.lipidomics.domain.LipidCategory;
-import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.palinom.ParserRuleContextHandler;
@@ -32,9 +30,9 @@ import java.util.Optional;
 /**
  * Handler implementation for Sterollipids.
  *
- * @author nilshoffmann
+ * @author  nils.hoffmann
  */
-public class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
+class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
 
     private final StructuralSubspeciesFasHandler ssfh;
 

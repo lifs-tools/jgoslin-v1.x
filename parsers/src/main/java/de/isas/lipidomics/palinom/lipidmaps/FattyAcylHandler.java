@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,9 @@ import java.util.stream.Collectors;
 /**
  * ParserRuleContextHandler for FattyAcyls.
  *
- * @author nilshoffmann
+ * @author  nils.hoffmann
  */
-public class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParser.Lipid_pureContext, LipidSpecies> {
+class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParser.Lipid_pureContext, LipidSpecies> {
 
     private final MolecularSubspeciesFasHandler msfah;
     private final StructuralSubspeciesFasHandler ssfah;

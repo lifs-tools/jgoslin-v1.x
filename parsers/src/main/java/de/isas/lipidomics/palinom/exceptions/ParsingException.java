@@ -16,6 +16,7 @@
 package de.isas.lipidomics.palinom.exceptions;
 
 /**
+ * Exception which is thrown when syntactic errors are encountered.
  *
  * @author nils.hoffmann
  */

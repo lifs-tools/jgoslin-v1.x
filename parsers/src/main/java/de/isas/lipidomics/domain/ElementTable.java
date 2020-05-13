@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * sum formulas and total masses for a given chemical element distribution, e.g.
  * in a lipid.
  *
- * @author nilshoffmann
+ * @author  nils.hoffmann
  */
 public final class ElementTable extends EnumMap<Element, Integer> {
 

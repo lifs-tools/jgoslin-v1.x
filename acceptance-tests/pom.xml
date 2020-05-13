@@ -9,7 +9,7 @@
     </parent>
     <artifactId>jgoslin-acceptance-tests</artifactId>
     <packaging>jar</packaging>
-
+    <description>Acceptance tests for jgoslin</description>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ import java.util.Optional;
 
 /**
  * Handler implementation for Glycerolipids.
- * @author nilshoffmann
+ * @author  nils.hoffmann
  */
-public class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
+class GlyceroLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
 
     private final MolecularSubspeciesFasHandler msfh;
     private final StructuralSubspeciesFasHandler ssfh;

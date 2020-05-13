@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * This package contains the parser implementations for the lipid grammars.
+* This package contains the parser implementation for the <a href="https://github.com/lifs-tools/goslin/blob/master/SumFormula.g4" target="_blank">SumFormula grammar</a>.
  */
-package de.isas.lipidomics.palinom;
+package de.isas.lipidomics.palinom.sumformula;

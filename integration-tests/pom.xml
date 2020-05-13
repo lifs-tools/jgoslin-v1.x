@@ -9,6 +9,7 @@
     </parent>
     <artifactId>jgoslin-integration-tests</artifactId>
     <packaging>jar</packaging>
+    <description>Integration tests for jgoslin</description>
     <properties>
         <sonar.tests>src/test/java</sonar.tests>
     </properties>

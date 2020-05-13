@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,15 +29,14 @@ import de.isas.lipidomics.palinom.HMDBParser.FaContext;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
  * ParserRuleContextHandler for FattyAcyls.
  *
- * @author nilshoffmann
+ * @author  nils.hoffmann
  */
-public class FattyAcylHandler implements ParserRuleContextHandler<HMDBParser.Lipid_pureContext, LipidSpecies> {
+class FattyAcylHandler implements ParserRuleContextHandler<HMDBParser.Lipid_pureContext, LipidSpecies> {
 
     private final FattyAcylHelper faHelper = new FattyAcylHelper();
 

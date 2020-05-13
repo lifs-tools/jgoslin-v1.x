@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,13 @@ import java.util.Optional;
 
 /**
  *
- * @author nilshoffmann
+ * Base visitor implementation for the SumFormula grammar.
+ *
+ * Overriding implementation of {@link SumFormulaBaseVisitor}. Creates
+ * {@link ElementTable} instances from the provided context.
+ *
+ * @see SumFormulaVisitorParser
+ * @author nils.hoffmann
  */
 public class SumFormulaVisitorImpl extends SumFormulaBaseVisitor<ElementTable> {
 

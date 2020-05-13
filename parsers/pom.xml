@@ -9,6 +9,7 @@
     </parent>
     <artifactId>jgoslin-parsers</artifactId>
     <packaging>jar</packaging>
+    <description>Parsers and domain objects for jgoslin</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>${java.version}</maven.compiler.release>

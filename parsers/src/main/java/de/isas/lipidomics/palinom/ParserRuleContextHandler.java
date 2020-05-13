@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * Generic base class for context handler implementations for the different
  * grammar parsers.
  *
- * @author nilshoffmann
+ * @author  nils.hoffmann
  * @param <T> the generic {@link ParserRuleContext}
  * @param <U> the type to return after handling.
  */

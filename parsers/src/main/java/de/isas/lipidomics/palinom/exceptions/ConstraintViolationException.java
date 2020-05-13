@@ -16,6 +16,8 @@
 package de.isas.lipidomics.palinom.exceptions;
 
 /**
+ * This Exception is used for validation errors, where constraints have not been
+ * met.
  *
  * @author nils.hoffmann
  */

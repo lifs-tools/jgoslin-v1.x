@@ -8,6 +8,7 @@
     </parent>
     <artifactId>jgoslin-cli</artifactId>
     <packaging>jar</packaging>
+    <description>Command line interface for jgoslin</description>
     <properties>
         <assembly.dir>jgoslin-cli</assembly.dir>
     </properties>

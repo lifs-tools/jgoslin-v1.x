@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
- * @author nilshoffmann
+ * @author  nils.hoffmann
  */
 public class ElementTableTest {
 

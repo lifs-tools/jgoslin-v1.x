@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 nilshoffmann.
+ * Copyright 2020  nils.hoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import lombok.Data;
  * This class represents functional head groups of lipids. This is where the
  * association to {@link LipidClass} and {@link LipidCategory} is maintained.
  *
- * @author nilshoffmann
+ * @author  nils.hoffmann
  */
 @Data
 public class HeadGroup {
