@@ -7,7 +7,7 @@ language: java
 jdk:
 - openjdk11
 script:
-        - "./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent compiler:testCompile verify package org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.projectKey=lifs-tools_jgoslin -Dsonar.coverage.jacoco.xmlReportPaths=**/target/jacoco/jacoco.xml,**/target/site/jacoco/jacoco.xml -Dsonar.junit.reportsPath=**/target/surefire-reports/TEST-*.xml,**/target/failsafe-reports/TEST-*.xml"
+        - "./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent verify org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.projectKey=lifs-tools_jgoslin -Dsonar.coverage.jacoco.xmlReportPaths=**/target/jacoco/jacoco.xml,**/target/site/jacoco/jacoco.xml -Dsonar.junit.reportsPath=**/target/surefire-reports/TEST-*.xml,**/target/failsafe-reports/TEST-*.xml"
 addons:
   sonarcloud:
     organization: "lifs-tools"
