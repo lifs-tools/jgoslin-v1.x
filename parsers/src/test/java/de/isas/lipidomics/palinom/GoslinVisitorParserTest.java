@@ -15,6 +15,7 @@ import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
+import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,6 +27,15 @@ import org.junit.jupiter.api.Test;
  * @author nils.hoffmann
  */
 public class GoslinVisitorParserTest {
+
+    @Test
+    public void LPCWithExtraLetters() throws ParsingException {
+        String ref = "LPC 18:1(9Z)/20a1:2(9Z,12E)";
+        System.out.println("Testing lipid name " + ref);
+        Assertions.assertThrows(ParsingException.class, () -> {
+            LipidAdduct lipidAdduct = parseLipidName(ref);
+        });
+    }
 
     @Test
     public void testPE_Structural() throws ParsingException {

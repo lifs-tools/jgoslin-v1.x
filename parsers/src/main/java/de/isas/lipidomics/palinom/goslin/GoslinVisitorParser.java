@@ -33,6 +33,7 @@ public class GoslinVisitorParser implements VisitorParser<LipidAdduct> {
         CharStream charStream = CharStreams.fromString(lipidString);
         GoslinLexer lexer = new GoslinLexer(charStream);
         lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
+        lexer.addErrorListener(listener);
         TokenStream tokens = new CommonTokenStream(lexer);
         log.info("Parsing lipid identifier: {}", lipidString);
         GoslinParser parser = new GoslinParser(tokens);

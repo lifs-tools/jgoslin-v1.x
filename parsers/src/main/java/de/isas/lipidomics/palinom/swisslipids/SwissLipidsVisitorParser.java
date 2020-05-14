@@ -33,6 +33,7 @@ public class SwissLipidsVisitorParser implements VisitorParser<LipidAdduct> {
         CharStream charStream = CharStreams.fromString(lipidString);
         SwissLipidsLexer lexer = new SwissLipidsLexer(charStream);
         lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
+        lexer.addErrorListener(listener);
         TokenStream tokens = new CommonTokenStream(lexer);
         log.info("Parsing swiss lipids identifier: {}", lipidString);
         SwissLipidsParser parser = new SwissLipidsParser(tokens);

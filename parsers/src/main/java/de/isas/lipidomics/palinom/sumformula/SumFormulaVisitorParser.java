@@ -46,6 +46,7 @@ public class SumFormulaVisitorParser implements VisitorParser<ElementTable> {
         CharStream charStream = CharStreams.fromString(sumFormula);
         SumFormulaLexer lexer = new SumFormulaLexer(charStream);
         lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
+        lexer.addErrorListener(listener);
         TokenStream tokens = new CommonTokenStream(lexer);
         log.info("Parsing sum formula: {}", sumFormula);
         SumFormulaParser parser = new SumFormulaParser(tokens);

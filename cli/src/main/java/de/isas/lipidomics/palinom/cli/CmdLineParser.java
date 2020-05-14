@@ -43,6 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -237,10 +238,10 @@ public class CmdLineParser {
             m.put("Original Name", t.getLipidName());
             m.put("Grammar", t.getGrammar().name());
             m.put("Message", t.getMessages().stream().collect(Collectors.joining(" | ")));
-            m.put("Adduct", t.getLipidAdduct().getAdduct().toString());
-            m.put("Sum Formula", t.getLipidAdduct().getSumFormula());
-            m.put("Mass", String.format("%.4f", t.getLipidAdduct().getMass()));
             if (t.getLipidAdduct() != null) {
+                m.put("Adduct", t.getLipidAdduct().getAdduct().getLipidString());
+                m.put("Sum Formula", t.getLipidAdduct().getSumFormula());
+                m.put("Mass", String.format(Locale.US, "%.4f", t.getLipidAdduct().getMass()));
                 m.put("Lipid Maps Category", t.getLipidAdduct().getLipid().getLipidCategory().getFullName() + " [" + t.getLipidAdduct().getLipid().getLipidCategory().name() + "]");
                 LipidClass lclass = t.getLipidAdduct().getLipid().getLipidClass().orElse(LipidClass.UNDEFINED);
                 m.put("Lipid Maps Main Class", lclass.getLipidMapsClassName());
@@ -256,6 +257,10 @@ public class CmdLineParser {
                     m.put(fa.getName() + " #OH", fa.getNHydroxy() + "");
                     m.put(fa.getName() + " #DB", fa.getNDoubleBonds() + "");
                     m.put(fa.getName() + " Bond Type", fa.getLipidFaBondType() + "");
+                    String dbPositions = fa.getDoubleBondPositions().entrySet().stream().map((entry) -> {
+                        return entry.getKey() + "" + entry.getValue();
+                    }).collect(Collectors.joining(","));
+                    m.put(fa.getName() + " DB Positions", dbPositions + "");
                 }
             } else {
                 m.put("Lipid Maps Category", "");
@@ -357,15 +362,25 @@ public class CmdLineParser {
     protected static Pair<String, List<ValidationResult>> parseName(String lipidName) {
         List<ValidationResult> results = new ArrayList<>();
         Pair<String, ValidationResult> goslinResult = parseNameWith(lipidName, ValidationResult.Grammar.GOSLIN);
-        results.add(goslinResult.getValue());
+        if (goslinResult.getValue().getMessages().isEmpty()) {
+            return Pair.of(goslinResult.getKey(), Arrays.asList(goslinResult.getValue()));
+        }
         Pair<String, ValidationResult> goslinFragmentsResult = parseNameWith(lipidName, ValidationResult.Grammar.GOSLIN_FRAGMENTS);
-        results.add(goslinFragmentsResult.getValue());
+        if (goslinFragmentsResult.getValue().getMessages().isEmpty()) {
+            return Pair.of(goslinFragmentsResult.getKey(), Arrays.asList(goslinFragmentsResult.getValue()));
+        }
         Pair<String, ValidationResult> lipidMapsResult = parseNameWith(lipidName, ValidationResult.Grammar.LIPIDMAPS);
-        results.add(lipidMapsResult.getValue());
+        if (lipidMapsResult.getValue().getMessages().isEmpty()) {
+            return Pair.of(lipidMapsResult.getKey(), Arrays.asList(lipidMapsResult.getValue()));
+        }
         Pair<String, ValidationResult> swissLipidsResult = parseNameWith(lipidName, ValidationResult.Grammar.SWISSLIPIDS);
-        results.add(swissLipidsResult.getValue());
+        if (swissLipidsResult.getValue().getMessages().isEmpty()) {
+            return Pair.of(swissLipidsResult.getKey(), Arrays.asList(swissLipidsResult.getValue()));
+        }
         Pair<String, ValidationResult> hmdbResult = parseNameWith(lipidName, ValidationResult.Grammar.HMDB);
-        results.add(hmdbResult.getValue());
+        if (hmdbResult.getValue().getMessages().isEmpty()) {
+            return Pair.of(hmdbResult.getKey(), Arrays.asList(hmdbResult.getValue()));
+        }
         return Pair.of(lipidName, results);
     }
 

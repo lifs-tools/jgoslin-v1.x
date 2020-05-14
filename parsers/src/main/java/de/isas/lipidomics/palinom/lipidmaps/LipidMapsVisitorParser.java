@@ -10,6 +10,7 @@ import de.isas.lipidomics.palinom.LipidMapsParser;
 import de.isas.lipidomics.palinom.SyntaxErrorListener;
 import de.isas.lipidomics.palinom.VisitorParser;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -33,6 +34,7 @@ public class LipidMapsVisitorParser implements VisitorParser<LipidAdduct> {
         CharStream charStream = CharStreams.fromString(lipidString);
         LipidMapsLexer lexer = new LipidMapsLexer(charStream);
         lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
+        lexer.addErrorListener(listener);
         TokenStream tokens = new CommonTokenStream(lexer);
         log.info("Parsing lipid maps identifier: {}", lipidString);
         LipidMapsParser parser = new LipidMapsParser(tokens);

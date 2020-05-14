@@ -33,6 +33,7 @@ public class HmdbVisitorParser implements VisitorParser<LipidAdduct> {
         CharStream charStream = CharStreams.fromString(lipidString);
         HMDBLexer lexer = new HMDBLexer(charStream);
         lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
+        lexer.addErrorListener(listener);
         TokenStream tokens = new CommonTokenStream(lexer);
         log.info("Parsing HMDB lipids identifier: {}", lipidString);
         HMDBParser parser = new HMDBParser(tokens);
