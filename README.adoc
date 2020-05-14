@@ -66,11 +66,11 @@ To parse a single lipid name from the command line, run
 
 To parse multiple lipid names from a file via the commmand line, run
 
-  java -jar jgoslin-cli-<VERSION>.jar -f lipidNames.txt
+  java -jar jgoslin-cli-<VERSION>.jar -f examples/lipidnames.txt
 
 To use a specific grammar, instead of trying all, run
 
-  java -jar jgoslin-cli-<VERSION>.jar -f lipidNames.txt -g GOSLIN
+  java -jar jgoslin-cli-<VERSION>.jar -f examples/lipidNames.txt -g GOSLIN
 
 To write output to the tab-separated output file 'goslin-out.tsv', run
 

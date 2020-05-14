@@ -34,6 +34,14 @@
       <directory>${project.basedir}/conf</directory>
       <outputDirectory>${assembly.dir}/conf</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/</directory>
+      <includes>
+          <include>lipidnames.txt</include>
+      </includes>
+      <outputDirectory>${assembly.dir}/examples</outputDirectory>
+    </fileSet>
+    
 <!--    <fileSet>
       <directory>${project.basedir}/../test-utils/src/main/resources/metabolomics/</directory>
       <outputDirectory>${assembly.dir}/examples</outputDirectory>

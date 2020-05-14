@@ -25,14 +25,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ConsoleErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 /**
  * Parser implementation for the SumFormula grammar.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 @Slf4j
 public class SumFormulaVisitorParser implements VisitorParser<ElementTable> {
@@ -45,19 +45,19 @@ public class SumFormulaVisitorParser implements VisitorParser<ElementTable> {
     private ElementTable parseWithGrammar(String sumFormula, SyntaxErrorListener listener) throws ParsingException, RecognitionException {
         CharStream charStream = CharStreams.fromString(sumFormula);
         SumFormulaLexer lexer = new SumFormulaLexer(charStream);
-        lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
-        lexer.addErrorListener(listener);
         TokenStream tokens = new CommonTokenStream(lexer);
         log.info("Parsing sum formula: {}", sumFormula);
         SumFormulaParser parser = new SumFormulaParser(tokens);
-        parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
-        parser.addErrorListener(listener);
-        parser.setBuildParseTree(true);
-        SumFormulaParser.MoleculeContext context = parser.molecule();
-        if (parser.getNumberOfSyntaxErrors() > 0) {
+        prepare(parser, lexer, listener);
+        try {
+            SumFormulaParser.MoleculeContext context = parser.molecule();
+            if (parser.getNumberOfSyntaxErrors() > 0) {
+                throw new ParsingException("Parsing of " + sumFormula + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
+            }
+            SumFormulaVisitorImpl lipidVisitor = new SumFormulaVisitorImpl();
+            return lipidVisitor.visit(context);
+        } catch (ParseCancellationException pce) {
             throw new ParsingException("Parsing of " + sumFormula + " failed with " + parser.getNumberOfSyntaxErrors() + " syntax errors!\n" + listener.getErrorString());
         }
-        SumFormulaVisitorImpl visitor = new SumFormulaVisitorImpl();
-        return visitor.visit(context);
     }
 }

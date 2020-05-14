@@ -142,7 +142,9 @@ public class CmdLineParser {
             if (line.hasOption(lipidNameOpt)) {
                 lipidNames = Stream.of(line.getOptionValues(lipidNameOpt));
             } else if (line.hasOption(lipidFileOpt)) {
-                lipidNames = Files.lines(new File(lipidFileOpt).toPath());
+                lipidNames = Files.lines(new File(line.getOptionValue(lipidFileOpt)).toPath()).filter((t) -> {
+                    return !t.isEmpty();
+                });
             }
             List<Pair<String, List<ValidationResult>>> results = Collections.emptyList();
             if (line.hasOption(grammarOpt)) {
@@ -174,7 +176,7 @@ public class CmdLineParser {
     private static class ValidationResult {
 
         public static enum Grammar {
-            GOSLIN, GOSLIN_FRAGMENTS, LIPIDMAPS, SWISSLIPIDS, HMDB
+            GOSLIN, GOSLIN_FRAGMENTS, LIPIDMAPS, SWISSLIPIDS, HMDB, NONE
         };
 
         private String lipidName;
@@ -381,6 +383,14 @@ public class CmdLineParser {
         if (hmdbResult.getValue().getMessages().isEmpty()) {
             return Pair.of(hmdbResult.getKey(), Arrays.asList(hmdbResult.getValue()));
         }
+        ValidationResult r = new ValidationResult();
+        r.setGoslinName("");
+        r.setLipidName(lipidName);
+        r.setGrammar(ValidationResult.Grammar.NONE);
+        List<String> messages = new ArrayList<>(hmdbResult.getValue().getMessages());
+        messages.add("Lipid name could not be parsed with any grammar!");
+        r.setMessages(messages);
+        results.add(r);
         return Pair.of(lipidName, results);
     }
 

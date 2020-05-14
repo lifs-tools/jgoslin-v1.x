@@ -14,6 +14,7 @@ import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -30,12 +31,9 @@ public class LipidMapsVisitorParserTest {
     public void LPCWithExtraLetters() throws ParsingException {
         String ref = "LPC 18a1:1(9Z)/20:2(9Z,12E)";
         System.out.println("Testing lipid name " + ref);
-        LipidAdduct lipidAdduct = parseLipidName(ref);
-        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
-        assertEquals("LPC", lipidAdduct.getLipid().getHeadGroup().getName());
-        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
-        assertEquals(18, lipidAdduct.getLipid().getFa().get("FA1").getNCarbon());
-        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
+        Assertions.assertThrows(ParsingException.class, () -> {
+            LipidAdduct lipidAdduct = parseLipidName(ref);
+        });
     }
     
     @Test

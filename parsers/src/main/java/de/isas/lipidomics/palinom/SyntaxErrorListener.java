@@ -16,13 +16,18 @@
 package de.isas.lipidomics.palinom;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 /**
  *
@@ -40,17 +45,27 @@ public class SyntaxErrorListener extends BaseErrorListener {
             int line, int charPositionInLine,
             String msg, RecognitionException e) {
         syntaxErrors.add(new SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e));
+        throw new ParseCancellationException(getErrorString());
     }
 
     public String getErrorString() {
         return syntaxErrors.stream().map((error) -> {
-            return String.format(
-                "Parser %s syntax error on '%s', at line %d, position %d: %s",
-                error.getRecognizer().getGrammarFileName(),
-                error.getOffendingSymbol(),
-                error.getLine(),
-                error.getCharPositionInLine(),
-                error.getMessage());
+            if (error.getOffendingSymbol() == null) {
+                return String.format(
+                        "Parser %s syntax error at line %d, position %d: %s",
+                        error.getRecognizer().getGrammarFileName(),
+                        error.getLine(),
+                        error.getCharPositionInLine(),
+                        error.getMessage());
+            } else {
+                return String.format(
+                        "Parser %s syntax error on '%s', at line %d, position %d: %s",
+                        error.getRecognizer().getGrammarFileName(),
+                        error.getOffendingSymbol(),
+                        error.getLine(),
+                        error.getCharPositionInLine(),
+                        error.getMessage());
+            }
         }).collect(Collectors.joining("\n"));
     }
 
