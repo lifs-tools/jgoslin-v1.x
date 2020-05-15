@@ -105,6 +105,7 @@ class IsomericSubspeciesFasHandler {
                                     lcb(true).
                                     nCarbon(HandlerUtils.asInt(ctx.fa_unmod().fa_pure().carbon(), 0)).
                                     nDoubleBonds(doubleBonds).
+                                    position(position).
                                     build();
                         }
                     }

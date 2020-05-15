@@ -35,7 +35,7 @@ public class LipidMapsVisitorParserTest {
             LipidAdduct lipidAdduct = parseLipidName(ref);
         });
     }
-    
+
     @Test
     public void testNAPE() throws ParsingException {
         String ref = "NAPE(34:2)";
@@ -548,6 +548,16 @@ public class LipidMapsVisitorParserTest {
         assertNotNull(lipidAdduct.getElements());
         assertNotNull(lipidAdduct.getSumFormula());
         assertNotNull(lipidAdduct.getMass());
+    }
+
+    @Test
+    public void testPlasmenylEther() throws ParsingException {
+        String ref = "PE(P-16:0/22:6)";
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals(2, lipidAdduct.getLipid().getFa().size());
+        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA1").getPosition());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA2").getPosition());
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

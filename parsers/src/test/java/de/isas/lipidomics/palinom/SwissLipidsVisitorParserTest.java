@@ -511,6 +511,30 @@ public class SwissLipidsVisitorParserTest {
         assertEquals(expectedSumFormula, lipidAdduct.getSumFormula());
         assertEquals(expectedMass, lipidAdduct.getMass(), 1e-3);
     }
+    
+    @Test
+    public void testNeuGcNeuAcSlashHashGroup() throws ParsingException {
+        String ref = "GD1a(NeuGc/NeuAc) (d20:1(4E)/14:1(9Z))";
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+    }
+    
+    @Test
+    public void testNeuAcNeuGcSlashHashGroup() throws ParsingException {
+        String ref = "GD1a(NeuAc/NeuGc) (d20:1(4E)/14:1)";
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+    }
+    
+    @Test
+    public void testPlasmenylEther() throws ParsingException {
+        String ref = "PE(P-16:0/22:6)";
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals(2, lipidAdduct.getLipid().getFa().size());
+        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA1").getPosition());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA2").getPosition());
+    }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
         SwissLipidsVisitorParser parser = new SwissLipidsVisitorParser();

@@ -125,7 +125,6 @@ class FattyAcylHelper {
         Integer carbonCorrection = 0;
         LipidClass lipidClass = headGroup.getLipidClass().orElse(LipidClass.UNDEFINED);
         switch (lipidClass) {
-//            case SE:
             case SE_27_1:
                 doubleBondCorrection = 1;
                 break;
@@ -140,7 +139,6 @@ class FattyAcylHelper {
                 break;
         }
         switch (lipidClass) {
-//            case SE:
             case SE_27_1:
             case SE_27_2:
             case SE_28_2:

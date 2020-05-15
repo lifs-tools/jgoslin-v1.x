@@ -566,6 +566,18 @@ public class GoslinVisitorParserTest {
         assertEquals(expectedSumFormula, lipidAdduct.getSumFormula());
         assertEquals(expectedMass, lipidAdduct.getMass(), 1e-6);
     }
+    
+    @Test
+    public void testSHexCer() throws ParsingException {
+        String ref = "SHexCer 18:0;3/26:0;1";
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+        assertEquals(LipidCategory.SP, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidClass.SHEXCER, lipidAdduct.getLipid().getLipidClass().orElse(LipidClass.UNDEFINED));
+        assertEquals(2, lipidAdduct.getLipid().getFa().size());
+        assertEquals(1, lipidAdduct.getLipid().getFa().get("LCB").getPosition());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA1").getPosition());
+    }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
         GoslinVisitorParser parser = new GoslinVisitorParser();

@@ -503,6 +503,16 @@ public class HmdbVisitorParserTest {
         assertTrue(m.matches());
     }
 
+    @Test
+    public void testPlasmenylEther() throws ParsingException {
+        String ref = "PE(P-16:0/22:6)";
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
+        assertEquals(2, lipidAdduct.getLipid().getFa().size());
+        assertEquals(1, lipidAdduct.getLipid().getFa().get("FA1").getPosition());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA2").getPosition());
+    }
+
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
         HmdbVisitorParser parser = new HmdbVisitorParser();
         LipidAdduct lipid = parser.parse(ref);

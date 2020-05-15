@@ -100,6 +100,7 @@ class IsomericSubspeciesLcbHandler {
                                     nHydroxy(faHelper.getNHydroxyl(ctx)).
                                     nCarbon(HandlerUtils.asInt(ctx.lcb_core().carbon(), 0)).
                                     nDoubleBonds(nDoubleBonds).
+                                    position(position).
                                     build();
                         }
                     }

@@ -113,6 +113,7 @@ class IsomericSubspeciesLcbHandler {
                                         nHydroxy(faHelper.getHydroxyCount(ctx) + modificationHydroxyls).
                                         nCarbon(HandlerUtils.asInt(factx.carbon(), 0)).
                                         nDoubleBonds(doubleBonds).
+                                        position(position).
                                         build();
                             }
                         }
