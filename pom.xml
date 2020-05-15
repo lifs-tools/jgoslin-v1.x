@@ -195,7 +195,6 @@
                                 <redirectTestOutputToFile>true</redirectTestOutputToFile>
                                 <trimStackTrace>true</trimStackTrace>
                                 <workingDirectory>${project.build.directory}/failsafe-files</workingDirectory>
-                                <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                             </configuration>
                             <goals>
                                 <goal>integration-test</goal>
