@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.isas.lipidomics</groupId>
         <artifactId>jgoslin</artifactId>
-        <version>1.1.1</version>
+        <version>1.1.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>jgoslin-parsers</artifactId>
