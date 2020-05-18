@@ -976,3 +976,9 @@ the class `LipidSpecies` is storing all its associated fatty acyl chains
 which are defined within the class `FattyAcid`. For storing the
 cummulated information on species level for the carbon length, double
 bonds, etc, the class `LipidSpeciesInfo` is utilized.
+
+[[supportedLipidClasses]]
+Supported Lipid Classes
+-----------------------
+
+Please check the most recent version of our https://github.com/lifs-tools/goslin/blob/master/lipid-list.csv[lipid classes table here].
