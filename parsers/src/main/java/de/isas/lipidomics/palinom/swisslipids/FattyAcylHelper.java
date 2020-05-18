@@ -20,17 +20,22 @@ import de.isas.lipidomics.domain.ElementTable;
 import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.domain.LipidClass;
 import de.isas.lipidomics.domain.LipidFaBondType;
+import de.isas.lipidomics.domain.ModificationsList;
+import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Helper class for FA and LCB handling.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class FattyAcylHelper {
 
@@ -123,7 +128,7 @@ class FattyAcylHelper {
     public Map<String, Integer> getSterolSpeciesCountCorrection(HeadGroup headGroup) {
         Integer doubleBondCorrection = 0;
         Integer carbonCorrection = 0;
-        LipidClass lipidClass = headGroup.getLipidClass().orElse(LipidClass.UNDEFINED);
+        LipidClass lipidClass = headGroup.getLipidClass();
         switch (lipidClass) {
             case SE_27_1:
                 doubleBondCorrection = 1;
@@ -153,5 +158,35 @@ class FattyAcylHelper {
         map.put("doubleBondCorrection", doubleBondCorrection);
         map.put("carbonCorrection", carbonCorrection);
         return map;
+    }
+
+    public ModificationsList resolveModification(SwissLipidsParser.Fa_lcb_suffixContext context, ModificationsList mods) {
+        Integer contextNumber = -1;
+        if (context.fa_lcb_suffix_core() != null) {
+            if (context.fa_lcb_suffix_core().fa_lcb_suffix_number() != null) {
+                contextNumber = HandlerUtils.asInt(context.fa_lcb_suffix_core().fa_lcb_suffix_number(), 1);
+            }
+            if (context.fa_lcb_suffix_core().fa_lcb_suffix_type() != null) {
+                String modText = context.fa_lcb_suffix_core().fa_lcb_suffix_type().getText();
+                mods.add(Pair.of(contextNumber, modText));
+            } // insert recursive handling here, if required, see LipidMAPS FattyAcylHandler
+        }
+        return mods;
+    }
+
+    public ModificationsList resolveModificationList(List<SwissLipidsParser.Fa_lcb_suffixContext> modifications, ModificationsList mods) {
+        for (SwissLipidsParser.Fa_lcb_suffixContext context : modifications) {
+            resolveModification(context, mods);
+        }
+        return mods;
+    }
+
+    public ModificationsList resolveModifications(SwissLipidsParser.Fa_lcb_suffixContext modifications) {
+        if (modifications != null) {
+            ModificationsList mods = new ModificationsList();
+            return resolveModificationList(Arrays.asList(modifications), mods);
+        } else {
+            throw new ParseTreeVisitorException("Unhandled state in FattyAcid Modifications!");
+        }
     }
 }

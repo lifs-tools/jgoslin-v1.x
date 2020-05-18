@@ -27,27 +27,28 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 @EqualsAndHashCode
-public class ModificationsList implements List<Pair<Integer,String>> {
-    
+public class ModificationsList implements List<Pair<Integer, String>> {
+
     protected static final ModificationsList NONE = new ModificationsList(Collections.emptyList());
-    
+
     public ModificationsList() {
         this.al = new ArrayList<>();
     }
-    
+
     public ModificationsList(List<Pair<Integer, String>> list) {
         this.al = list;
     }
-    
+
     private final List<Pair<Integer, String>> al;
 
     @Override
@@ -209,5 +210,40 @@ public class ModificationsList implements List<Pair<Integer,String>> {
     public Stream<Pair<Integer, String>> parallelStream() {
         return al.parallelStream();
     }
-    
+
+    /**
+     * Returns the total count (number of elements in this list) with that
+     * particular key.
+     *
+     * @param modification the modification to count, e.g. "OH".
+     * @return the number of times this modification occurs, or zero.
+     */
+    public Integer countFor(String modification) {
+        return this.stream().filter((pair) -> {
+            return pair.getValue().startsWith(modification);
+        }).collect(Collectors.counting()).intValue();
+    }
+
+    /**
+     * Returns the sum of the occurrence count for modifications with name "OH"
+     * in the provided modifications list.
+     *
+     * @param modificationsList the modifications list.
+     * @return the sum of the occurrences of OH.
+     */
+    public Integer countForHydroxy() {
+        return countFor("OH");
+    }
+
+    /**
+     * Returns the modification names stored in this modifications list.
+     *
+     * @return the modification names.
+     */
+    public List<String> keys() {
+        return this.stream().map((t) -> {
+            return t.getValue();
+        }).collect(Collectors.toList());
+    }
+
 }

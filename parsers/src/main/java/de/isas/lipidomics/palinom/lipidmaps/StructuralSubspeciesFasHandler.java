@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 /**
  * Handler for Structural FAs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class StructuralSubspeciesFasHandler {
 
@@ -72,14 +72,11 @@ class StructuralSubspeciesFasHandler {
     public FattyAcid buildStructuralFa(LipidMapsParser.FaContext ctx, String faName, int position) {
         FattyAcid.StructuralFattyAcidBuilder fa = FattyAcid.structuralFattyAcidBuilder();
         int modificationHydroxyls = 0;
+        ModificationsList modifications = new ModificationsList();
         if (ctx.fa_mod() != null) {
-            if (ctx.fa_mod().modification() != null) {
-                ModificationsList ml = faHelper.resolveModifications(ctx.fa_mod().modification());
-                modificationHydroxyls += ml.stream().filter((pair) -> {
-                    return pair.getValue().startsWith("OH");
-                }).count();
-                fa.modifications(ml);
-            }
+            modifications = faHelper.resolveModifications(ctx.fa_mod().modification());
+            modificationHydroxyls += modifications.countFor("OH");
+            fa.modifications(modifications);
         }
         if (ctx.fa_unmod() != null) {
             LipidFaBondType faBondType = faHelper.getLipidFaBondType(ctx);

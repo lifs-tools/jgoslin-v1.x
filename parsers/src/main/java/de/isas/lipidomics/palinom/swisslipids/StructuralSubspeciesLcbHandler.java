@@ -22,27 +22,31 @@ import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
-import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Handler for Structural LCBs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
+@Slf4j
 class StructuralSubspeciesLcbHandler {
 
     private final StructuralSubspeciesFasHandler ssfh;
     private final IsomericSubspeciesLcbHandler islh;
+    private final FattyAcylHelper faHelper;
 
-    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh, IsomericSubspeciesLcbHandler islh) {
+    public StructuralSubspeciesLcbHandler(StructuralSubspeciesFasHandler ssfh, IsomericSubspeciesLcbHandler islh, FattyAcylHelper faHelper) {
         this.ssfh = ssfh;
         this.islh = islh;
+        this.faHelper = faHelper;
     }
 
     public Optional<LipidSpecies> visitStructuralSubspeciesLcb(HeadGroup headGroup, SwissLipidsParser.LcbContext lcbContext, List<SwissLipidsParser.FaContext> faContexts) {
@@ -82,25 +86,16 @@ class StructuralSubspeciesLcbHandler {
         SwissLipidsParser.Lcb_coreContext pureCtx = ctx.lcb_core();
         FattyAcid.StructuralFattyAcidBuilder fa = FattyAcid.structuralFattyAcidBuilder();
         fa.nCarbon(HandlerUtils.asInt(pureCtx.carbon(), 0));
-        Integer hydroxyl = 0;
-        if (pureCtx != null) {
-            if (pureCtx.hydroxyl() != null) {
-                switch (pureCtx.hydroxyl().getText()) {
-                    case "t":
-                        hydroxyl = 3;
-                        break;
-                    case "d":
-                        hydroxyl = 2;
-                        break;
-                    case "m":
-                        hydroxyl = 1;
-                        break;
-                    default:
-                        throw new ParseTreeVisitorException("Unsupported old hydroxyl prefix: " + pureCtx.hydroxyl().getText());
-                }
-            }
+        Integer nHydroxyl = 0;
+        ModificationsList modifications = new ModificationsList();
+        if (ctx.fa_lcb_prefix() != null) {
+            log.warn("Unsupported prefix: " + ctx.fa_lcb_prefix().getText() + " on fa: " + ctx.toString());
         }
-        fa.nHydroxy(hydroxyl);
+        if (ctx.fa_lcb_suffix() != null) {
+            modifications = faHelper.resolveModifications(ctx.fa_lcb_suffix());
+            nHydroxyl += modifications.countForHydroxy();
+        }
+        fa.nHydroxy(nHydroxyl + faHelper.getNHydroxyl(ctx));
         if (pureCtx.db() != null) {
             int nDoubleBonds = HandlerUtils.asInt(pureCtx.db().db_count(), 0);
             fa.nDoubleBonds(nDoubleBonds);
@@ -109,7 +104,7 @@ class StructuralSubspeciesLcbHandler {
             }
         }
         fa.lipidFaBondType(LipidFaBondType.ESTER);
-        return fa.name(faName).position(position).lcb(true).build();
+        return fa.name(faName).position(position).modifications(modifications).lcb(true).build();
     }
 
 }

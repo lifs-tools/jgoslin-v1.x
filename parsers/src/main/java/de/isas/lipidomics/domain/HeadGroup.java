@@ -22,14 +22,14 @@ import lombok.Data;
  * This class represents functional head groups of lipids. This is where the
  * association to {@link LipidClass} and {@link LipidCategory} is maintained.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 @Data
 public class HeadGroup {
 
     private final String name;
     private final String rawName;
-    private final Optional<LipidClass> lipidClass;
+    private final LipidClass lipidClass;
     private final LipidCategory lipidCategory;
 
     /**
@@ -43,9 +43,7 @@ public class HeadGroup {
         this.rawName = rawName;
         this.name = rawName.trim().replaceAll(" O", "");
         this.lipidClass = LipidClass.forHeadGroup(this.name);
-        this.lipidCategory = this.lipidClass.map((lipidClass) -> {
-            return lipidClass.getCategory();
-        }).orElse(LipidCategory.UNDEFINED);
+        this.lipidCategory = this.lipidClass.getCategory();
     }
 
     /**
@@ -58,10 +56,8 @@ public class HeadGroup {
     public HeadGroup(String rawName, Optional<LipidClass> lipidClass) {
         this.rawName = rawName;
         this.name = rawName.trim().replaceAll(" O", "");
-        this.lipidClass = lipidClass;
-        this.lipidCategory = this.lipidClass.map((myLipidClass) -> {
-            return myLipidClass.getCategory();
-        }).orElse(LipidCategory.UNDEFINED);
+        this.lipidClass = lipidClass.orElse(LipidClass.UNDEFINED);
+        this.lipidCategory = this.lipidClass.getCategory();
     }
 
     /**
@@ -73,10 +69,10 @@ public class HeadGroup {
      * @return the normalized lipid head group.
      */
     public String getNormalizedName() {
-        if (lipidClass.isPresent()) {
-            return lipidClass.get().getSynonyms().get(0);
+        if (lipidClass == LipidClass.UNDEFINED) {
+            return name;
         }
-        return name;
+        return lipidClass.getSynonyms().get(0);
     }
 
     @Override

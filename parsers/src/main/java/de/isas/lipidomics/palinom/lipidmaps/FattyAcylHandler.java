@@ -147,12 +147,11 @@ class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParser.Lipid
     public Optional<LipidSpeciesInfo> getSpeciesInfo(HeadGroup headGroup, LipidMapsParser.FaContext faContext) {
         LipidSpeciesInfo.LipidSpeciesInfoBuilder lsi = LipidSpeciesInfo.lipidSpeciesInfoBuilder();
         int modificationHydroxyls = 0;
+        ModificationsList modifications = new ModificationsList();
         if (faContext.fa_mod() != null) {
-            ModificationsList ml = faHelper.resolveModifications(faContext.fa_mod().modification());
-            modificationHydroxyls += ml.stream().filter((pair) -> {
-                return pair.getValue().startsWith("OH");
-            }).count();
-            lsi.modifications(ml);
+            modifications = faHelper.resolveModifications(faContext.fa_mod().modification());
+            modificationHydroxyls += modifications.countFor("OH");
+            lsi.modifications(modifications);
         }
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(faContext);
         if (faContext.fa_unmod().fa_pure().db().db_positions() != null) {
@@ -165,19 +164,19 @@ class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParser.Lipid
                     nDoubleBonds(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().db(), 0) + (faHelper.getLipidFaBondType(faContext) == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0)).
                     doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, faContext.fa_unmod().fa_pure().db().db_positions())).
                     lipidFaBondType(lfbt).
+                    modifications(modifications).
                     build()
             );
         } else {
             if (faContext.fa_unmod() != null) {
-                return Optional.of(
-                        lsi.
-                                position(-1).
-                                name(LipidLevel.SPECIES.name()).
-                                level(LipidLevel.SPECIES).
-                                lipidFaBondType(faHelper.getLipidFaBondType(faContext)).
-                                nCarbon(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().carbon(), 0)).
-                                nDoubleBonds(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().db(), 0) + (faHelper.getLipidFaBondType(faContext) == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0)).
-                                nHydroxy(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().hydroxyl(), 0) + modificationHydroxyls).build()
+                return Optional.of(lsi.
+                        position(-1).
+                        name(LipidLevel.SPECIES.name()).
+                        level(LipidLevel.SPECIES).
+                        lipidFaBondType(faHelper.getLipidFaBondType(faContext)).
+                        nCarbon(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().carbon(), 0)).
+                        nDoubleBonds(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().db(), 0) + (faHelper.getLipidFaBondType(faContext) == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0)).
+                        nHydroxy(HandlerUtils.asInt(faContext.fa_unmod().fa_pure().hydroxyl(), 0) + modificationHydroxyls).build()
                 );
             }
         }
@@ -186,13 +185,15 @@ class FattyAcylHandler implements ParserRuleContextHandler<LipidMapsParser.Lipid
 
     public Optional<LipidSpeciesInfo> getSpeciesInfo(LipidMapsParser.LcbContext lcbContext) {
         LipidSpeciesInfo.LipidSpeciesInfoBuilder lsi = LipidSpeciesInfo.lipidSpeciesInfoBuilder();
-        Integer hydroxyl = 0;
-        if (lcbContext.hydroxyl_lcb() != null) {
-            hydroxyl = faHelper.getHydroxyCount(lcbContext);
-            lsi.nHydroxy(hydroxyl);
-        }
+        ModificationsList modifications = new ModificationsList();
         if (lcbContext.lcb_fa().lcb_fa_mod() != null) {
-            lsi.modifications(faHelper.resolveModification(lcbContext.lcb_fa().lcb_fa_mod().modification(), new ModificationsList()));
+            modifications = faHelper.resolveModifications(lcbContext.lcb_fa().lcb_fa_mod().modification());
+            lsi.modifications(modifications);
+        }
+        Integer hydroxyl = modifications.countFor("OH");
+        if (lcbContext.hydroxyl_lcb() != null) {
+            hydroxyl += faHelper.getHydroxyCount(lcbContext);
+            lsi.nHydroxy(hydroxyl);
         }
         if (lcbContext.lcb_fa().lcb_fa_unmod() != null) {
             return Optional.of(lsi.

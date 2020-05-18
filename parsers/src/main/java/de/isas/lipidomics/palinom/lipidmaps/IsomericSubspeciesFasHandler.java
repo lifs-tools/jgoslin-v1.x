@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 /**
  * Handler for Isomeric FAs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class IsomericSubspeciesFasHandler {
 
@@ -73,14 +73,11 @@ class IsomericSubspeciesFasHandler {
     public FattyAcid buildIsomericFa(LipidMapsParser.FaContext ctx, String faName, int position) {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         int modificationHydroxyls = 0;
+        ModificationsList modifications = new ModificationsList();
         if (ctx.fa_mod() != null) {
-            if (ctx.fa_mod().modification() != null) {
-                ModificationsList ml = faHelper.resolveModifications(ctx.fa_mod().modification());
-                modificationHydroxyls += ml.stream().filter((pair) -> {
-                    return pair.getValue().startsWith("OH");
-                }).count();
-                fa.modifications(ml);
-            }
+            modifications = faHelper.resolveModifications(ctx.fa_mod().modification());
+            modificationHydroxyls += modifications.countFor("OH");
+            fa.modifications(modifications);
         }
         if (ctx.fa_unmod() != null) {
             LipidFaBondType faBondType = faHelper.getLipidFaBondType(ctx);
@@ -106,6 +103,7 @@ class IsomericSubspeciesFasHandler {
                                     nCarbon(HandlerUtils.asInt(ctx.fa_unmod().fa_pure().carbon(), 0)).
                                     nDoubleBonds(doubleBonds).
                                     position(position).
+                                    modifications(modifications).
                                     build();
                         }
                     }

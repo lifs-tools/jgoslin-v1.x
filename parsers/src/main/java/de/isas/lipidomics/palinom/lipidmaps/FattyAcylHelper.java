@@ -31,7 +31,7 @@ import org.apache.commons.lang3.tuple.Pair;
 /**
  * Helper class for FA and LCB handling.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class FattyAcylHelper {
 
@@ -139,7 +139,8 @@ class FattyAcylHelper {
             ModificationsList mods = new ModificationsList();
             return resolveModificationList(Arrays.asList(modifications), mods);
         } else {
-            throw new ParseTreeVisitorException("Unhandled state in FattyAcid Modifications!");
+            return new ModificationsList();
         }
     }
+
 }

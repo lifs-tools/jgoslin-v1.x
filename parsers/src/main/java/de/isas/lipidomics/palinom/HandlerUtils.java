@@ -22,7 +22,7 @@ import org.antlr.v4.runtime.tree.RuleNode;
 /**
  * Common functions for ANTLRv4's RuleNode handling.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 public class HandlerUtils {
 
@@ -65,4 +65,5 @@ public class HandlerUtils {
     public static <T, R> R maybeMapOr(T t, Function<? super T, R> mapper, R r) {
         return maybe(t).map(mapper).orElse(r);
     }
+
 }

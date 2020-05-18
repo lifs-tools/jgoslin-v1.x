@@ -418,9 +418,16 @@ public enum LipidClass {
         throw new ConstraintViolationException("Lipid category must be " + LipidCategory.GP + " for lyso-classes!");
     }
 
-    public static Optional<LipidClass> forHeadGroup(String headGroup) {
+    /**
+     * Returns the lipid class for this head group.
+     *
+     * @param headGroup the head group to check.
+     * @return the lipid class, or undefined if not matching class for the head
+     * group is defined.
+     */
+    public static LipidClass forHeadGroup(String headGroup) {
         return Arrays.asList(values()).stream().filter((lipidClass) -> {
             return lipidClass.matchesAbbreviation(headGroup.trim());
-        }).findFirst();
+        }).findFirst().orElse(LipidClass.UNDEFINED);
     }
 }

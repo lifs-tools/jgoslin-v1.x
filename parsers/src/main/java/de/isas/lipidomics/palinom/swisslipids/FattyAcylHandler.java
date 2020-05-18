@@ -23,6 +23,7 @@ import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
@@ -32,12 +33,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ParserRuleContextHandler for FattyAcyls.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
+@Slf4j
 class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsParser.Lipid_pureContext, LipidSpecies> {
 
     private final FattyAcylHelper faHelper = new FattyAcylHelper();
@@ -117,12 +120,14 @@ class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsParser.Lip
     public Optional<LipidSpeciesInfo> getSpeciesInfo(HeadGroup headGroup, SwissLipidsParser.FaContext faContext) {
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(faContext);
         Map<String, Integer> countCorrection = faHelper.getSterolSpeciesCountCorrection(headGroup);
-        int nHydroxyl = 0;
+        Integer nHydroxyl = 0;
+        ModificationsList modifications = new ModificationsList();
         if (faContext.fa_lcb_prefix() != null) {
-            throw new ParseTreeVisitorException("Unsupported lcb prefix on fa: " + faContext.fa_lcb_prefix().getText());
+            log.warn("Unsupported prefix: " + faContext.getText() + " on fa: " + faContext.toString());
         }
         if (faContext.fa_lcb_suffix() != null) {
-            throw new ParseTreeVisitorException("Unsupported lcb suffix on fa: " + faContext.fa_lcb_suffix().getText());
+            modifications = faHelper.resolveModifications(faContext.fa_lcb_suffix());
+            nHydroxyl += modifications.countForHydroxy();
         }
         int nDoubleBonds = 0;
         if (faContext.fa_core().db() != null) {
@@ -156,8 +161,16 @@ class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsParser.Lip
 
     public Optional<LipidSpeciesInfo> getSpeciesInfo(HeadGroup headGroup, SwissLipidsParser.LcbContext lcbContext) {
         Integer nHydroxyl = 0;
+        ModificationsList modifications = new ModificationsList();
+        if (lcbContext.fa_lcb_prefix() != null) {
+            throw new ParseTreeVisitorException("Unsupported lcb prefix on fa: " + lcbContext.fa_lcb_prefix().getText());
+        }
+        if (lcbContext.fa_lcb_suffix() != null) {
+            modifications = faHelper.resolveModifications(lcbContext.fa_lcb_suffix());
+            nHydroxyl += modifications.countForHydroxy();
+        }
         if (lcbContext.lcb_core() != null) {
-            nHydroxyl = faHelper.getNHydroxyl(lcbContext);
+            nHydroxyl += faHelper.getNHydroxyl(lcbContext);
             return Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
                     level(LipidLevel.SPECIES).
                     name("LCB").

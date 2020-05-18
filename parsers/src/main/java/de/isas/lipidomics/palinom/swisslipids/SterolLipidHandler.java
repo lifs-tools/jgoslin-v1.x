@@ -30,7 +30,7 @@ import java.util.Optional;
 /**
  * Handler implementation for Sterollipids.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
 
@@ -67,7 +67,7 @@ class SterolLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, 
         HeadGroup headGroup = new HeadGroup(che.st_species_hg().getText());
         if (che.st_species_fa() != null) {
             if (che.st_species_fa().fa_species() != null && che.st_species_fa().fa_species().fa() != null) {
-                LipidClass lipidClass = headGroup.getLipidClass().orElse(LipidClass.UNDEFINED);
+                LipidClass lipidClass = headGroup.getLipidClass();
                 //special handling for sterol esters on species level
                 switch (lipidClass) {
 //                    case SE:

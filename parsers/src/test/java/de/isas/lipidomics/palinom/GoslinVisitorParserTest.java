@@ -44,7 +44,7 @@ public class GoslinVisitorParserTest {
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("PE", lipidAdduct.getLipid().getHeadGroup().getName());
-        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
         assertEquals(2, lipidAdduct.getLipid().getFa().size());
         assertEquals(1, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
         assertEquals(1, lipidAdduct.getLipid().getFa().get("FA2").getNDoubleBonds());
@@ -58,7 +58,7 @@ public class GoslinVisitorParserTest {
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("PE", lipidAdduct.getLipid().getHeadGroup().getName());
-        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
         assertEquals(2, lipidAdduct.getLipid().getFa().size());
         assertEquals(0, lipidAdduct.getLipid().getFa().get("FA1").getNDoubleBonds());
         assertEquals(1, lipidAdduct.getLipid().getFa().get("FA2").getNDoubleBonds());
@@ -73,7 +73,7 @@ public class GoslinVisitorParserTest {
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("PE", lipidAdduct.getLipid().getHeadGroup().getName());
         assertEquals(LipidCategory.GP, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
         assertEquals("PE O-34:2;1a", lipidAdduct.getLipid().getLipidString(LipidLevel.SPECIES));
         assertEquals("PE O-18:0a/16:2;1", lipidAdduct.getLipid().toString());
     }
@@ -96,10 +96,10 @@ public class GoslinVisitorParserTest {
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("ChE", lipidAdduct.getLipid().getHeadGroup().getName());
         assertEquals(LipidCategory.ST, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
-        assertEquals(12, lipidAdduct.getLipid().getInfo().get().getNCarbon());
-        assertEquals(1, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
-        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
+        assertEquals(12, lipidAdduct.getLipid().getInfo().getNCarbon());
+        assertEquals(1, lipidAdduct.getLipid().getInfo().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().getNHydroxy());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class GoslinVisitorParserTest {
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals(ref1, lipidAdduct.getLipid().getHeadGroup().getName());
         assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class GoslinVisitorParserTest {
         assertNotNull(lipidAdduct2);
         System.out.println(lipidAdduct2);
         assertEquals(new Adduct("", "+H", 1, 1), lipidAdduct2.getAdduct());
-        assertEquals(LipidLevel.MOLECULAR_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.MOLECULAR_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
     }
 
     @Test
@@ -168,7 +168,7 @@ public class GoslinVisitorParserTest {
         assertEquals(0, lipid.getFa().
                 get("FA2").
                 getNHydroxy());
-        assertEquals(LipidLevel.MOLECULAR_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.MOLECULAR_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
     }
 
     @Test
@@ -193,7 +193,7 @@ public class GoslinVisitorParserTest {
         assertEquals(0, lipid1.getFa().
                 get("FA1").
                 getNHydroxy());
-        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
     }
 
     @Test
@@ -231,7 +231,7 @@ public class GoslinVisitorParserTest {
         assertEquals(0, lipid2.getFa().
                 get("FA2").
                 getNHydroxy());
-        assertEquals(LipidLevel.MOLECULAR_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.MOLECULAR_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
     }
 
     @Test
@@ -268,7 +268,7 @@ public class GoslinVisitorParserTest {
         assertEquals(0, lipid.getFa().
                 get("FA2").
                 getNHydroxy());
-        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
     }
 
     @Test
@@ -314,7 +314,7 @@ public class GoslinVisitorParserTest {
         assertEquals("[M+H]1+", lipidAdduct.
                 getAdduct().
                 getLipidString());
-        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
     }
 
     @Test
@@ -357,7 +357,7 @@ public class GoslinVisitorParserTest {
         assertEquals(0, lipid.getFa().
                 get("FA2").
                 getNHydroxy());
-        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
     }
 
     @Test
@@ -371,8 +371,8 @@ public class GoslinVisitorParserTest {
         System.out.println(lipid);
         assertEquals("PC", lipid.getHeadGroup().getName());
         assertTrue(lipid.isEtherLipid());
-        assertEquals(LipidLevel.SPECIES, lipid.getInfo().get().getLevel());
-        assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, lipid.getInfo().get().getLipidFaBondType());
+        assertEquals(LipidLevel.SPECIES, lipid.getInfo().getLevel());
+        assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, lipid.getInfo().getLipidFaBondType());
         assertEquals(ref, lipid.toString());
     }
 
@@ -387,8 +387,8 @@ public class GoslinVisitorParserTest {
         System.out.println(lipid);
         assertEquals("LPC", lipid.getHeadGroup().getName());
         assertTrue(lipid.isEtherLipid());
-        assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, lipid.getInfo().get().getLipidFaBondType());
-        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipid.getInfo().get().getLevel());
+        assertEquals(LipidFaBondType.ETHER_UNSPECIFIED, lipid.getInfo().getLipidFaBondType());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipid.getInfo().getLevel());
         assertEquals(ref, lipid.toString());
         assertEquals(ref, lipid.getLipidString(LipidLevel.SPECIES));
         assertEquals(ref, lipid.getLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
@@ -405,10 +405,10 @@ public class GoslinVisitorParserTest {
         assertNotNull(lipidAdduct);
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
-        assertEquals(LipidFaBondType.ETHER_PLASMENYL, lipid.getInfo().get().getLipidFaBondType());
+        assertEquals(LipidFaBondType.ETHER_PLASMENYL, lipid.getInfo().getLipidFaBondType());
         System.out.println(lipid);
         assertEquals(LipidCategory.GP, lipid.getLipidCategory());
-        assertEquals(LipidClass.PE, lipid.getLipidClass().get());
+        assertEquals(LipidClass.PE, lipid.getLipidClass());
         assertEquals("PE", lipid.getHeadGroup().getName());
         assertEquals("FA1", lipid.getFa().
                 get("FA1").
@@ -453,10 +453,10 @@ public class GoslinVisitorParserTest {
         assertNotNull(lipidAdduct);
         LipidStructuralSubspecies lipid = (LipidStructuralSubspecies) lipidAdduct.getLipid();
         assertNotNull(lipid);
-        assertEquals(LipidFaBondType.ETHER_PLASMENYL, lipid.getInfo().get().getLipidFaBondType());
+        assertEquals(LipidFaBondType.ETHER_PLASMENYL, lipid.getInfo().getLipidFaBondType());
         System.out.println(lipid);
         assertEquals(LipidCategory.GP, lipid.getLipidCategory());
-        assertEquals(LipidClass.PE, lipid.getLipidClass().get());
+        assertEquals(LipidClass.PE, lipid.getLipidClass());
         assertEquals("PE", lipid.getHeadGroup().getName());
         assertEquals("FA1", lipid.getFa().
                 get("FA1").
@@ -488,7 +488,7 @@ public class GoslinVisitorParserTest {
         assertEquals(1, lipid.getFa().
                 get("FA2").
                 getNHydroxy());
-        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.STRUCTURAL_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
     }
 
     @Test
@@ -513,7 +513,7 @@ public class GoslinVisitorParserTest {
 
         assertEquals("TAG 14:0-16:0-18:1", lipid.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
         assertEquals(LipidCategory.GL, lipid.getLipidCategory());
-        assertEquals(LipidClass.TAG, lipid.getLipidClass().get());
+        assertEquals(LipidClass.TAG, lipid.getLipidClass());
     }
 
     @Test
@@ -530,10 +530,10 @@ public class GoslinVisitorParserTest {
         assertEquals("TAG 16:0/20:2(11Z,14Z)/22:4(7Z,10Z,13Z,16Z)", lipidAdduct.getLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
         assertEquals("TAG 16:0/20:2(11Z,14Z)/22:4(7Z,10Z,13Z,16Z)", lipidAdduct.getLipidString(LipidLevel.ISOMERIC_SUBSPECIES));
         assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
-        assertEquals(58, lipidAdduct.getLipid().getInfo().get().getNCarbon());
-        assertEquals(6, lipidAdduct.getLipid().getInfo().get().getNDoubleBonds());
-        assertEquals(0, lipidAdduct.getLipid().getInfo().get().getNHydroxy());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
+        assertEquals(58, lipidAdduct.getLipid().getInfo().getNCarbon());
+        assertEquals(6, lipidAdduct.getLipid().getInfo().getNDoubleBonds());
+        assertEquals(0, lipidAdduct.getLipid().getInfo().getNHydroxy());
     }
 
     @Test
@@ -545,9 +545,9 @@ public class GoslinVisitorParserTest {
         System.out.println("Testing lipid name " + refWithAdduct);
         LipidAdduct lipidAdduct = parseLipidName(refWithAdduct);
         assertEquals("[M+NH4]1+", lipidAdduct.getAdduct().getLipidString());
-        assertEquals(LipidLevel.MOLECULAR_SUBSPECIES, lipidAdduct.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+        assertEquals(LipidLevel.MOLECULAR_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
         assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidClass.DGDG, lipidAdduct.getLipid().getLipidClass().orElse(LipidClass.UNDEFINED));
+        assertEquals(LipidClass.DGDG, lipidAdduct.getLipid().getLipidClass());
         assertEquals(expectedMass, lipidAdduct.getMass(), 1e-6);
         assertEquals(expectedSumFormula, lipidAdduct.getSumFormula());
     }
@@ -560,9 +560,9 @@ public class GoslinVisitorParserTest {
         System.out.println("Testing lipid name " + ref);
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals("[M+NH4]1+", lipidAdduct.getAdduct().getLipidString());
-        assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+        assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().getLevel());
         assertEquals(LipidCategory.ST, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidClass.ST_27_1_1, lipidAdduct.getLipid().getLipidClass().orElse(LipidClass.UNDEFINED));
+        assertEquals(LipidClass.ST_27_1_1, lipidAdduct.getLipid().getLipidClass());
         assertEquals(expectedSumFormula, lipidAdduct.getSumFormula());
         assertEquals(expectedMass, lipidAdduct.getMass(), 1e-6);
     }
@@ -571,9 +571,9 @@ public class GoslinVisitorParserTest {
     public void testSHexCer() throws ParsingException {
         String ref = "SHexCer 18:0;3/26:0;1";
         LipidAdduct lipidAdduct = parseLipidName(ref);
-        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
         assertEquals(LipidCategory.SP, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidClass.SHEXCER, lipidAdduct.getLipid().getLipidClass().orElse(LipidClass.UNDEFINED));
+        assertEquals(LipidClass.SHEXCER, lipidAdduct.getLipid().getLipidClass());
         assertEquals(2, lipidAdduct.getLipid().getFa().size());
         assertEquals(1, lipidAdduct.getLipid().getFa().get("LCB").getPosition());
         assertEquals(2, lipidAdduct.getLipid().getFa().get("FA1").getPosition());

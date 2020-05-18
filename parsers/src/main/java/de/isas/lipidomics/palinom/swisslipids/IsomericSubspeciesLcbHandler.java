@@ -22,6 +22,7 @@ import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
@@ -32,11 +33,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Handler for Isomeric LCBs.
  * @author  nils.hoffmann
  */
+@Slf4j
 class IsomericSubspeciesLcbHandler {
 
     private final IsomericSubspeciesFasHandler isfh;
@@ -78,9 +81,18 @@ class IsomericSubspeciesLcbHandler {
     public FattyAcid buildIsomericLcb(HeadGroup headGroup, SwissLipidsParser.LcbContext ctx, String faName, int position) {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidLcbBondType(headGroup, ctx);
+        Integer nHydroxyl = 0;
+        ModificationsList modifications = new ModificationsList();
+        if (ctx.fa_lcb_prefix() != null) {
+            log.warn("Unsupported prefix: " + ctx.fa_lcb_prefix().getText() + " on fa: " + ctx.toString());
+        }
+        if (ctx.fa_lcb_suffix() != null) {
+            modifications = faHelper.resolveModifications(ctx.fa_lcb_suffix());
+            nHydroxyl += modifications.countForHydroxy();
+        }
         if (ctx.lcb_core() != null) {
             fa.nCarbon(HandlerUtils.asInt(ctx.lcb_core().carbon(), 0));
-            fa.nHydroxy(faHelper.getNHydroxyl(ctx));
+            fa.nHydroxy(nHydroxyl + faHelper.getNHydroxyl(ctx));
             if (ctx.lcb_core().db() != null) {
                 int nDoubleBonds = 0;
                 if (ctx.lcb_core().db() != null) {
@@ -97,9 +109,10 @@ class IsomericSubspeciesLcbHandler {
                                     lipidFaBondType(lfbt).
                                     name(faName).
                                     lcb(true).
-                                    nHydroxy(faHelper.getNHydroxyl(ctx)).
+                                    nHydroxy(nHydroxyl + faHelper.getNHydroxyl(ctx)).
                                     nCarbon(HandlerUtils.asInt(ctx.lcb_core().carbon(), 0)).
                                     nDoubleBonds(nDoubleBonds).
+                                    modifications(modifications).
                                     position(position).
                                     build();
                         }
@@ -108,7 +121,7 @@ class IsomericSubspeciesLcbHandler {
                 }
             }
             fa.lipidFaBondType(lfbt);
-            return fa.name(faName).lcb(true).position(position).build();
+            return fa.name(faName).lcb(true).position(position).modifications(modifications).build();
         } else {
             throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }

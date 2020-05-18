@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 /**
  * Handler for Isomeric LCBs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class IsomericSubspeciesLcbHandler {
 
@@ -81,14 +81,11 @@ class IsomericSubspeciesLcbHandler {
         LipidFaBondType lfbt = faHelper.getLipidLcbBondType(ctx);
         if (ctx.lcb_fa() != null) {
             int modificationHydroxyls = 0;
+            ModificationsList modifications = new ModificationsList();
             if (ctx.lcb_fa().lcb_fa_mod() != null) {
-                if (ctx.lcb_fa().lcb_fa_mod().modification() != null) {
-                    ModificationsList ml = faHelper.resolveModifications(ctx.lcb_fa().lcb_fa_mod().modification());
-                    modificationHydroxyls += ml.stream().filter((pair) -> {
-                        return pair.getValue().startsWith("OH");
-                    }).count();
-                    fa.modifications(ml);
-                }
+                modifications = faHelper.resolveModifications(ctx.lcb_fa().lcb_fa_mod().modification());
+                modificationHydroxyls += modifications.countFor("OH");
+                fa.modifications(modifications);
             }
             if (ctx.lcb_fa().lcb_fa_unmod() != null) {
                 LipidMapsParser.Lcb_fa_unmodContext factx = ctx.lcb_fa().lcb_fa_unmod();
@@ -114,6 +111,7 @@ class IsomericSubspeciesLcbHandler {
                                         nCarbon(HandlerUtils.asInt(factx.carbon(), 0)).
                                         nDoubleBonds(doubleBonds).
                                         position(position).
+                                        modifications(modifications).
                                         build();
                             }
                         }

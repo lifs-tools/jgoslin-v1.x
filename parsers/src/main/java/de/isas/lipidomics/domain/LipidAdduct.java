@@ -73,8 +73,8 @@ public class LipidAdduct {
             elements.add(lipid.getElements());
         }
         if (adduct != null) {
-            if (lipid != null && lipid.getInfo().isPresent()) {
-                LipidSpeciesInfo info = lipid.getInfo().orElse(LipidSpeciesInfo.NONE);
+            if (lipid != null) {
+                LipidSpeciesInfo info = lipid.getInfo();
                 //only add elements on species level or below
                 //higher levels will not return a mass 
                 switch (info.getLevel()) {
@@ -107,7 +107,7 @@ public class LipidAdduct {
      */
     public String getLipidString() {
         if (lipid != null) {
-            return getLipidString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+            return getLipidString(lipid.getInfo().getLevel());
         }
         return "";
     }
@@ -141,7 +141,7 @@ public class LipidAdduct {
      */
     public String getNormalizedLipidString() {
         if (lipid != null) {
-            return getNormalizedLipidString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+            return getNormalizedLipidString(lipid.getInfo().getLevel());
         }
         return "";
     }
@@ -174,7 +174,7 @@ public class LipidAdduct {
      */
     public String getClassName() {
         if (lipid != null) {
-            return lipid.getLipidClass().orElse(LipidClass.UNDEFINED).getAbbreviation();
+            return lipid.getLipidClass().getAbbreviation();
         } else {
             return "";
         }
@@ -229,7 +229,7 @@ public class LipidAdduct {
     @Override
     public String toString() {
         if (lipid != null) {
-            return getLipidFragmentString(lipid.getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+            return getLipidFragmentString(lipid.getInfo().getLevel());
         }
         return "";
     }

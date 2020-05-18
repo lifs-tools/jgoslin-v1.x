@@ -16,7 +16,6 @@
 package de.isas.lipidomics.domain;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -114,13 +113,14 @@ public class LipidSpeciesInfo extends FattyAcid {
         if (getNHydroxy() > 0) {
             sb.append(";").append(getNHydroxy());
         }
-        if (!getModifications().isEmpty()) {
-            sb.append("(");
-            sb.append(getModifications().stream().map((t) -> {
-                return (t.getLeft() == -1 ? "" : t.getLeft()) + "" + t.getRight();
-            }).collect(Collectors.joining(",")));
-            sb.append(")");
-        }
+        //TODO reenable once LSI has finished modification specification
+//        if (!getModifications().isEmpty()) {
+//            sb.append("(");
+//            sb.append(getModifications().stream().map((t) -> {
+//                return (t.getLeft() == -1 ? "" : t.getLeft()) + "" + t.getRight();
+//            }).collect(Collectors.joining(",")));
+//            sb.append(")");
+//        }
         return sb.toString();
     }
 

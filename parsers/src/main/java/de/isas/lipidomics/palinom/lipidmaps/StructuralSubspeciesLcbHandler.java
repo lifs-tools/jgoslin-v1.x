@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 /**
  * Handler for Structural LCBs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class StructuralSubspeciesLcbHandler {
 
@@ -52,7 +52,7 @@ class StructuralSubspeciesLcbHandler {
         FattyAcid fa = buildStructuralLcb(headGroup, lcbContext, "FA" + 1, 1);
         return Optional.of(new LipidStructuralSubspecies(headGroup, fa));
     }
-    
+
     public Optional<LipidSpecies> visitStructuralSubspeciesLcb(HeadGroup headGroup, LipidMapsParser.LcbContext lcbContext, List<LipidMapsParser.FaContext> faContexts) {
         List<FattyAcid> fas = new LinkedList<>();
         FattyAcid lcbA = buildStructuralLcb(headGroup, lcbContext, "LCB", 1);
@@ -84,14 +84,11 @@ class StructuralSubspeciesLcbHandler {
     public FattyAcid buildStructuralLcb(HeadGroup headGroup, LipidMapsParser.LcbContext ctx, String faName, int position) {
         FattyAcid.StructuralFattyAcidBuilder fa = FattyAcid.structuralFattyAcidBuilder();
         int modificationHydroxyls = 0;
+        ModificationsList modificationsList = new ModificationsList();
         if (ctx.lcb_fa().lcb_fa_mod() != null) {
-            if (ctx.lcb_fa().lcb_fa_mod().modification() != null) {
-                ModificationsList ml = faHelper.resolveModifications(ctx.lcb_fa().lcb_fa_mod().modification());
-                modificationHydroxyls += ml.stream().filter((pair) -> {
-                    return pair.getValue().startsWith("OH");
-                }).count();
-                fa.modifications(ml);
-            }
+            modificationsList = faHelper.resolveModifications(ctx.lcb_fa().lcb_fa_mod().modification());
+            modificationHydroxyls += modificationsList.countFor("OH");
+            fa.modifications(modificationsList);
         }
         if (ctx.lcb_fa().lcb_fa_unmod() != null) {
             fa.nCarbon(asInt(ctx.lcb_fa().lcb_fa_unmod().carbon(), 0));

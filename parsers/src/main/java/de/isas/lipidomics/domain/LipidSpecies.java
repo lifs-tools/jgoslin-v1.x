@@ -3,15 +3,11 @@
  */
 package de.isas.lipidomics.domain;
 
-import static de.isas.lipidomics.domain.Element.ELEMENT_C;
 import static de.isas.lipidomics.domain.Element.ELEMENT_H;
 import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -46,7 +42,7 @@ public class LipidSpecies {
     public static final LipidSpecies NONE = new None();
     private final HeadGroup headGroup;
     @Setter(AccessLevel.NONE)
-    protected Optional<LipidSpeciesInfo> info;
+    protected LipidSpeciesInfo info;
 
     /**
      * Create a lipid species using the provided head group and a lipid species
@@ -72,7 +68,7 @@ public class LipidSpecies {
      */
     public LipidSpecies(HeadGroup headGroup, Optional<LipidSpeciesInfo> lipidSpeciesInfo) {
         this.headGroup = headGroup;
-        this.info = lipidSpeciesInfo;
+        this.info = lipidSpeciesInfo.orElse(LipidSpeciesInfo.NONE);
     }
 
     /**
@@ -80,7 +76,7 @@ public class LipidSpecies {
      *
      * @return the lipid species info.
      */
-    public Optional<LipidSpeciesInfo> getInfo() {
+    public LipidSpeciesInfo getInfo() {
         return this.info;
     }
 
@@ -94,7 +90,7 @@ public class LipidSpecies {
      * species, a Plasmanyl or Plasmenyl species.
      */
     public boolean isEtherLipid() {
-        LipidSpeciesInfo info = this.info.orElse(LipidSpeciesInfo.NONE);
+        LipidSpeciesInfo info = this.info;
         LipidFaBondType bondType = info.getLipidFaBondType();
         return bondType == LipidFaBondType.ETHER_PLASMANYL
                 || bondType == LipidFaBondType.ETHER_PLASMENYL
@@ -116,7 +112,7 @@ public class LipidSpecies {
      * @return the lipid name for the native level.
      */
     public String getLipidString() {
-        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel());
+        return getLipidString(getInfo().getLevel());
     }
 
     /**
@@ -150,7 +146,7 @@ public class LipidSpecies {
 
     protected StringBuilder buildSpeciesHeadGroupString(String headGroup, boolean normalizeHeadGroup) {
         StringBuilder lipidString = new StringBuilder();
-        lipidString.append(this.headGroup.getLipidClass().map((lclass) -> {
+        lipidString.append(Optional.ofNullable(this.headGroup.getLipidClass()).map((lclass) -> {
             switch (lclass) {
 //                case SE:
                 case SE_27_1:
@@ -171,11 +167,11 @@ public class LipidSpecies {
             case CATEGORY:
                 return this.headGroup.getLipidCategory().name();
             case CLASS:
-                return this.headGroup.getLipidClass().orElse(LipidClass.UNDEFINED).name();
+                return this.headGroup.getLipidClass().name();
             case SPECIES:
                 StringBuilder lipidString = new StringBuilder();
                 lipidString.append(buildSpeciesHeadGroupString(headGroup, isNormalized));
-                LipidSpeciesInfo info = this.info.orElse(LipidSpeciesInfo.NONE);
+                LipidSpeciesInfo info = this.info;
                 if (info.getNCarbon() > 0) {
                     int nCarbon = info.getNCarbon();
                     String hgToFaSep = "";
@@ -188,19 +184,20 @@ public class LipidSpecies {
                     int nHydroxy = info.getNHydroxy();
                     lipidString.append(nHydroxy > 0 ? ";" + nHydroxy : "");
                     lipidString.append(info.getLipidFaBondType().suffix());
-                    if (!info.getModifications().isEmpty()) {
-                        lipidString.append("(");
-                        lipidString.append(info.getModifications().stream().map((t) -> {
-                            return (t.getLeft() == -1 ? "" : t.getLeft()) + "" + t.getRight();
-                        }).collect(Collectors.joining(",")));
-                        lipidString.append(")");
-                    }
+                    //TODO reenable once LSI has finished modification specification
+//                    if (!info.getModifications().isEmpty()) {
+//                        lipidString.append("(");
+//                        lipidString.append(info.getModifications().stream().map((t) -> {
+//                            return (t.getLeft() == -1 ? "" : t.getLeft()) + "" + t.getRight();
+//                        }).collect(Collectors.joining(",")));
+//                        lipidString.append(")");
+//                    }
                 }
                 return lipidString.toString().trim();
             case UNDEFINED:
                 return this.headGroup.getName();
             default:
-                LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();
+                LipidLevel thisLevel = getInfo().getLevel();
                 throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
         }
     }
@@ -226,7 +223,7 @@ public class LipidSpecies {
      * @return the normalized lipid name.
      */
     public String getNormalizedLipidString() {
-        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel(), true);
+        return getLipidString(getInfo().getLevel(), true);
     }
 
     /**
@@ -256,62 +253,52 @@ public class LipidSpecies {
      */
     public ElementTable getElements() {
         ElementTable elements = new ElementTable();
-        if (info.isPresent()) {
-            switch (info.get().getLevel()) {
-                case CATEGORY:
-                case CLASS:
-                case UNDEFINED:
-                    return elements;
-            }
+        switch (info.getLevel()) {
+            case CATEGORY:
+            case CLASS:
+            case UNDEFINED:
+                return elements;
         }
 
-        headGroup.getLipidClass().ifPresent((lclass) -> {
+        Optional.ofNullable(headGroup.getLipidClass()).ifPresent((lclass) -> {
             elements.add(lclass.getElements());
         });
 
-        info.ifPresent((t) -> {
-            switch (t.getLevel()) {
-                case MOLECULAR_SUBSPECIES:
-                case STRUCTURAL_SUBSPECIES:
-                case ISOMERIC_SUBSPECIES:
-                    int nTrueFa = 0;
-                    for (FattyAcid fa : getFa().values()) {
-                        ElementTable faElements = fa.getElements();
-                        if (fa.getNCarbon() != 0 || fa.getNDoubleBonds() != 0) {
-                            nTrueFa += 1;
-                        }
-                        elements.add(faElements);
+        switch (info.getLevel()) {
+            case MOLECULAR_SUBSPECIES:
+            case STRUCTURAL_SUBSPECIES:
+            case ISOMERIC_SUBSPECIES:
+                int nTrueFa = 0;
+                for (FattyAcid fa : getFa().values()) {
+                    ElementTable faElements = fa.getElements();
+                    if (fa.getNCarbon() != 0 || fa.getNDoubleBonds() != 0) {
+                        nTrueFa += 1;
                     }
-                    if (headGroup.getLipidClass().isPresent()) {
-                        if (headGroup.getLipidClass().get().getMaxNumFa() < nTrueFa) {
-                            throw new ConstraintViolationException("Inconsistency in number of fatty acyl chains for lipid '" + headGroup.getName() + "'. Expected at most: " + headGroup.getLipidClass().get().getMaxNumFa() + "; received: " + nTrueFa);
-                        }
-                        elements.incrementBy(Element.ELEMENT_H, headGroup.getLipidClass().get().getMaxNumFa() - nTrueFa); // adding hydrogens for absent fatty acyl chains
-                    }
-                    break;
-                case SPECIES:
-                    int maxNumFa = 0;
-                    if (headGroup.getLipidClass().isPresent()) {
-                        LipidClass lclass = headGroup.getLipidClass().get();
-                        maxNumFa = lclass.getMaxNumFa();
-                    }
+                    elements.add(faElements);
+                }
+                if (headGroup.getLipidClass().getMaxNumFa() < nTrueFa) {
+                    throw new ConstraintViolationException("Inconsistency in number of fatty acyl chains for lipid '" + headGroup.getName() + "'. Expected at most: " + headGroup.getLipidClass().getMaxNumFa() + "; received: " + nTrueFa);
+                }
+                elements.incrementBy(Element.ELEMENT_H, headGroup.getLipidClass().getMaxNumFa() - nTrueFa); // adding hydrogens for absent fatty acyl chains
+                break;
+            case SPECIES:
+                int maxNumFa = 0;
+                LipidClass lclass = headGroup.getLipidClass();
+                maxNumFa = lclass.getMaxNumFa();
 
-                    if (info.isPresent()) {
-                        int maxPossNumFa = headGroup.getLipidClass().get().getAllowedNumFa().stream().max(Integer::compareTo).orElse(0);
-                        ElementTable faElements = info.get().getElements(maxPossNumFa);
-                        elements.add(faElements);
-                        elements.incrementBy(ELEMENT_H, maxNumFa - maxPossNumFa); // adding hydrogens for absent fatty acyl chains
-                    }
-                    break;
-                default:
-                    break;
-            }
-        });
+                int maxPossNumFa = headGroup.getLipidClass().getAllowedNumFa().stream().max(Integer::compareTo).orElse(0);
+                ElementTable faElements = info.getElements(maxPossNumFa);
+                elements.add(faElements);
+                elements.incrementBy(ELEMENT_H, maxNumFa - maxPossNumFa); // adding hydrogens for absent fatty acyl chains
+                break;
+            default:
+                break;
+        }
 
         return elements;
     }
 
-    public Optional<LipidClass> getLipidClass() {
+    public LipidClass getLipidClass() {
         return headGroup.getLipidClass();
     }
 
@@ -321,7 +308,7 @@ public class LipidSpecies {
 
     @Override
     public String toString() {
-        return getLipidString(info.orElse(LipidSpeciesInfo.NONE).getLevel());
+        return getLipidString(info.getLevel());
     }
 
 }

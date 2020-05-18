@@ -65,7 +65,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
             }
 
         }
-        super.info = Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+        super.info = LipidSpeciesInfo.lipidSpeciesInfoBuilder().
                 level(LipidLevel.MOLECULAR_SUBSPECIES).
                 name(headGroup.getName()).
                 position(-1).
@@ -74,8 +74,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
                 nDoubleBonds(nDoubleBonds).
                 lipidFaBondType(LipidFaBondType.getLipidFaBondType(headGroup, fa)).
                 modifications(mods).
-                build()
-        );
+                build();
     }
 
     @Override
@@ -93,7 +92,7 @@ public class LipidMolecularSubspecies extends LipidSpecies {
 
     protected StringBuilder buildSubspeciesHeadGroupString(String headGroup, boolean normalizeHeadGroup) {
         StringBuilder lipidString = new StringBuilder();
-        lipidString.append(getHeadGroup().getLipidClass().map((lclass) -> {
+        lipidString.append(Optional.ofNullable(getHeadGroup().getLipidClass()).map((lclass) -> {
             switch (lclass) {
 //                case SE:
                 case SE_27_1:
@@ -136,14 +135,14 @@ public class LipidMolecularSubspecies extends LipidSpecies {
             case SPECIES:
                 return super.getLipidString(level, normalizeHeadGroup);
             default:
-                LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();
+                LipidLevel thisLevel = getInfo().getLevel();
                 throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
         }
     }
 
     @Override
     public String getNormalizedLipidString() {
-        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel(), true);
+        return getLipidString(getInfo().getLevel(), true);
     }
 
     @Override

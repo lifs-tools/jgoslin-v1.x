@@ -138,8 +138,8 @@ public class LipidAdductTest {
         String expectedSumFormula = "C32H65NO3"; // 2H
         double expectedMass = 511.496;
         LipidAdduct la = new SwissLipidsVisitorParser().parse(lipidAdduct);
-        assertEquals(LipidLevel.SPECIES, la.getLipid().getInfo().get().getLevel());
-        assertEquals(true, la.getLipid().getInfo().get().isLcb());
+        assertEquals(LipidLevel.SPECIES, la.getLipid().getInfo().getLevel());
+        assertEquals(true, la.getLipid().getInfo().isLcb());
         assertEquals(expectedSumFormula, la.getSumFormula());
         assertEquals(expectedMass, la.getMass(), 1e-3);
 
@@ -179,9 +179,10 @@ public class LipidAdductTest {
         LipidAdduct lipidAdduct = new LipidMapsVisitorParser().parse(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("GlcCer", lipidAdduct.getLipid().getHeadGroup().getName());
-        assertEquals("HexCer 18:2(4E,8Z);2/16:0;1(2OH[R])", lipidAdduct.getNormalizedLipidString());
+        assertEquals("HexCer 18:2(4E,8Z);2/16:0;1", lipidAdduct.getNormalizedLipidString());
+        assertEquals(1, lipidAdduct.getLipid().getInfo().getModifications().countFor("OH"));
         assertEquals(LipidCategory.SP, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
 //        assertEquals("HexCer 18:2(4E,8Z);2/16:0;1", lipidAdduct.getNormalizedLipidString());
         assertNotNull(lipidAdduct.getLipid());
         assertNotNull(lipidAdduct.getElements());
@@ -200,7 +201,7 @@ public class LipidAdductTest {
         assertEquals("PIP3[3',4',5']", lipidAdduct.getLipid().getHeadGroup().getName());
         assertEquals("PIP3[3',4',5'] 17:0/20:4(5Z,8Z,11Z,14Z)", lipidAdduct.getNormalizedLipidString());
         assertEquals(LipidCategory.GP, lipidAdduct.getLipid().getLipidCategory());
-        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().get().getLevel());
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
 //        assertNotNull(lipidAdduct.getLipid());
 //        assertNotNull(lipidAdduct.getElements());
 //        assertNotNull(lipidAdduct.getSumFormula());

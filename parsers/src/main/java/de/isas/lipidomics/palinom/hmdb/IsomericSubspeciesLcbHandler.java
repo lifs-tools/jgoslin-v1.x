@@ -22,6 +22,7 @@ import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.HMDBParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -34,7 +35,8 @@ import java.util.stream.Collectors;
 
 /**
  * Handler for Isomeric LCBs.
- * @author  nils.hoffmann
+ *
+ * @author nils.hoffmann
  */
 class IsomericSubspeciesLcbHandler {
 
@@ -77,9 +79,16 @@ class IsomericSubspeciesLcbHandler {
     public FattyAcid buildIsomericLcb(HeadGroup headGroup, HMDBParser.LcbContext ctx, String faName, int position) {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidLcbBondType(headGroup, ctx);
+        int modificationHydroxyls = 0;
+        ModificationsList modifications = new ModificationsList();
+        if (ctx.fa_lcb_suffix() != null) {
+            modifications = faHelper.resolveModifications(ctx.fa_lcb_suffix());
+            modificationHydroxyls += modifications.countFor("OH");
+            fa.modifications(modifications);
+        }
         if (ctx.lcb_core() != null) {
             fa.nCarbon(HandlerUtils.asInt(ctx.lcb_core().carbon(), 0));
-            fa.nHydroxy(faHelper.getNHydroxyl(ctx));
+            fa.nHydroxy(modificationHydroxyls + faHelper.getNHydroxyl(ctx));
             if (ctx.lcb_core().db() != null) {
                 int doubleBonds = 0;
                 if (ctx.lcb_core().db().db_count() != null) {
@@ -100,6 +109,7 @@ class IsomericSubspeciesLcbHandler {
                                     nCarbon(HandlerUtils.asInt(ctx.lcb_core().carbon(), 0)).
                                     nDoubleBonds(doubleBonds).
                                     position(position).
+                                    modifications(modifications).
                                     build();
                         }
                     }

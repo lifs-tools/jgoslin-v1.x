@@ -23,6 +23,7 @@ import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.HMDBParser;
 import de.isas.lipidomics.palinom.HMDBParser.FaContext;
@@ -89,8 +90,10 @@ class FattyAcylHandler implements ParserRuleContextHandler<HMDBParser.Lipid_pure
         if (faContext.fa_lcb_prefix() != null) {
             throw new ParseTreeVisitorException("Unsupported lcb prefix on fa: " + faContext.fa_lcb_prefix().getText());
         }
+        ModificationsList modifications = new ModificationsList();
         if (faContext.fa_lcb_suffix() != null) {
-            throw new ParseTreeVisitorException("Unsupported lcb suffix on fa: " + faContext.fa_lcb_suffix().getText());
+            modifications = faHelper.resolveModifications(faContext.fa_lcb_suffix());
+            nHydroxyl+=modifications.countForHydroxy();
         }
         int nDoubleBonds = 0;
         if (faContext.fa_core().db() != null) {
@@ -105,6 +108,7 @@ class FattyAcylHandler implements ParserRuleContextHandler<HMDBParser.Lipid_pure
                     nHydroxy(nHydroxyl).
                     nDoubleBonds(nDoubleBonds + (lfbt == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0)).
                     doubleBondPositions(faHelper.resolveDoubleBondPositions(lfbt, faContext.fa_core().db().db_positions())).
+                    modifications(modifications).
                     lipidFaBondType(lfbt).
                     build()
             );
@@ -116,6 +120,7 @@ class FattyAcylHandler implements ParserRuleContextHandler<HMDBParser.Lipid_pure
                     nCarbon(HandlerUtils.asInt(faContext.fa_core().carbon(), 0)).
                     nHydroxy(nHydroxyl).
                     nDoubleBonds(HandlerUtils.asInt(faContext.fa_core().db().db_count(), 0) + (lfbt == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0)).
+                    modifications(modifications).
                     lipidFaBondType(lfbt).
                     build()
             );

@@ -139,9 +139,7 @@ class MolecularSubspeciesFasHandler {
         if (ctx.fa_mod() != null) {
             if (ctx.fa_mod().modification() != null) {
                 ModificationsList ml = faHelper.resolveModifications(ctx.fa_mod().modification());
-                modificationHydroxyls += ml.stream().filter((pair) -> {
-                    return pair.getValue().startsWith("OH");
-                }).count();
+                modificationHydroxyls += ml.countForHydroxy();
                 fa.modifications(ml);
             }
         }

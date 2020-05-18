@@ -20,6 +20,7 @@ import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.HMDBParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -30,7 +31,7 @@ import java.util.Optional;
 /**
  * Handler for Molecular FAs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class MolecularSubspeciesFasHandler {
 
@@ -54,16 +55,23 @@ class MolecularSubspeciesFasHandler {
     public FattyAcid buildMolecularFa(HeadGroup headGroup, HMDBParser.FaContext ctx, String faName) {
         FattyAcid.MolecularFattyAcidBuilder fa = FattyAcid.molecularFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(ctx);
+        int modificationHydroxyls = 0;
+        ModificationsList modificationsList = new ModificationsList();
+        if (ctx.fa_lcb_suffix() != null) {
+            modificationsList = faHelper.resolveModifications(ctx.fa_lcb_suffix());
+            modificationHydroxyls += modificationsList.countFor("OH");
+            fa.modifications(modificationsList);
+        }
         if (ctx.fa_core() != null) {
             fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));
             if (ctx.fa_core().db() != null) {
-                fa.nDoubleBonds(HandlerUtils.asInt(ctx.fa_core().db().db_count(), 0) + (lfbt==LipidFaBondType.ETHER_PLASMENYL?1:0));
+                fa.nDoubleBonds(HandlerUtils.asInt(ctx.fa_core().db().db_count(), 0) + (lfbt == LipidFaBondType.ETHER_PLASMENYL ? 1 : 0));
                 if (ctx.fa_core().db().db_positions() != null) {
                     throw new RuntimeException("Support for double bond positions is implemented in " + IsomericSubspeciesFasHandler.class.getSimpleName() + "!");
                 }
             }
             fa.lipidFaBondType(lfbt);
-            return fa.name(faName).build();
+            return fa.name(faName).nHydroxy(modificationHydroxyls).build();
         } else if (ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() != null) { //handling of lcbs
             throw new RuntimeException("Support for lcbs is implemented in " + StructuralSubspeciesLcbHandler.class.getSimpleName() + "!");
         } else if (ctx.furan_fa() != null) {

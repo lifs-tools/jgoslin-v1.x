@@ -22,6 +22,7 @@ import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
 import de.isas.lipidomics.palinom.SwissLipidsParser;
@@ -32,12 +33,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Handler for Isomeric FAs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
+@Slf4j
 class IsomericSubspeciesFasHandler {
 
     private final FattyAcylHelper faHelper;
@@ -72,12 +75,21 @@ class IsomericSubspeciesFasHandler {
     public FattyAcid buildIsomericFa(HeadGroup headGroup, SwissLipidsParser.FaContext ctx, String faName, int position) {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(ctx);
+        Integer nHydroxyl = 0;
+        ModificationsList modifications = new ModificationsList();
+        if (ctx.fa_lcb_prefix() != null) {
+            log.warn("Unsupported prefix: " + ctx.fa_lcb_prefix().getText() + " on fa: " + ctx.toString());
+        }
+        if (ctx.fa_lcb_suffix() != null) {
+            modifications = faHelper.resolveModifications(ctx.fa_lcb_suffix());
+            nHydroxyl += modifications.countForHydroxy();
+        }
         if (ctx.fa_core() != null) {
             fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));
             if (ctx.fa_core().db() != null) {
                 int nDoubleBonds = 0;
                 if (ctx.fa_core().db() != null) {
-                    nDoubleBonds = asInt(ctx.fa_core().db().db_count(), 0)  + ((lfbt == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);
+                    nDoubleBonds = asInt(ctx.fa_core().db().db_count(), 0) + ((lfbt == LipidFaBondType.ETHER_PLASMENYL) ? 1 : 0);
                     fa.nDoubleBonds(nDoubleBonds);
                 }
                 if (ctx.fa_core().db().db_positions() != null) {
@@ -91,7 +103,9 @@ class IsomericSubspeciesFasHandler {
                                     name(faName).
                                     nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0)).
                                     nDoubleBonds(nDoubleBonds).
+                                    nHydroxy(nHydroxyl).
                                     position(position).
+                                    modifications(modifications).
                                     build();
                         }
                     }
@@ -99,7 +113,7 @@ class IsomericSubspeciesFasHandler {
                 }
             }
             fa.lipidFaBondType(lfbt);
-            return fa.name(faName).position(position).build();
+            return fa.name(faName).position(position).modifications(modifications).nHydroxy(nHydroxyl).build();
         } else if (ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() != null) { //handling of lcbs
             throw new ParseTreeVisitorException("LCBs are handled by " + IsomericSubspeciesLcbHandler.class.getSimpleName() + "!");
         } else {

@@ -22,6 +22,7 @@ import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.HMDBParser;
 import java.util.LinkedList;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 /**
  * Handler for Structural LCBs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class StructuralSubspeciesLcbHandler {
 
@@ -83,7 +84,14 @@ class StructuralSubspeciesLcbHandler {
         HMDBParser.Lcb_coreContext pureCtx = ctx.lcb_core();
         FattyAcid.StructuralFattyAcidBuilder fa = FattyAcid.structuralFattyAcidBuilder();
         fa.nCarbon(HandlerUtils.asInt(pureCtx.carbon(), 0));
-        fa.nHydroxy(faHelper.getNHydroxyl(ctx));
+        int modificationHydroxyls = 0;
+        ModificationsList modifications = new ModificationsList();
+        if (ctx.fa_lcb_suffix() != null) {
+            modifications = faHelper.resolveModifications(ctx.fa_lcb_suffix());
+            modificationHydroxyls += modifications.countFor("OH");
+            fa.modifications(modifications);
+        }
+        fa.nHydroxy(modificationHydroxyls + faHelper.getNHydroxyl(ctx));
         if (pureCtx.db() != null) {
             int nDoubleBonds = HandlerUtils.asInt(pureCtx.db().db_count(), 0);
             fa.nDoubleBonds(nDoubleBonds);

@@ -22,6 +22,7 @@ import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
 import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
+import de.isas.lipidomics.domain.ModificationsList;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.HMDBParser;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 /**
  * Handler for Isomeric FAs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class IsomericSubspeciesFasHandler {
 
@@ -71,6 +72,13 @@ class IsomericSubspeciesFasHandler {
     public FattyAcid buildIsomericFa(HeadGroup headGroup, HMDBParser.FaContext ctx, String faName, int position) {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(ctx);
+        int modificationHydroxyls = 0;
+        ModificationsList modifications = new ModificationsList();
+        if (ctx.fa_lcb_suffix() != null) {
+            modifications = faHelper.resolveModifications(ctx.fa_lcb_suffix());
+            modificationHydroxyls += modifications.countFor("OH");
+            fa.modifications(modifications);
+        }
         if (ctx.fa_core() != null) {
             fa.nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0));
             if (ctx.fa_core().db() != null) {
@@ -89,8 +97,10 @@ class IsomericSubspeciesFasHandler {
                                     lipidFaBondType(lfbt).
                                     name(faName).
                                     nCarbon(HandlerUtils.asInt(ctx.fa_core().carbon(), 0)).
+                                    nHydroxy(modificationHydroxyls).
                                     nDoubleBonds(doubleBonds).
                                     position(position).
+                                    modifications(modifications).
                                     build();
                         }
                     }
@@ -98,7 +108,7 @@ class IsomericSubspeciesFasHandler {
                 }
             }
             fa.lipidFaBondType(lfbt);
-            return fa.name(faName).position(position).build();
+            return fa.name(faName).position(position).nHydroxy(modificationHydroxyls).build();
         } else if (ctx.fa_lcb_prefix() != null || ctx.fa_lcb_suffix() != null) { //handling of lcbs
             throw new ParseTreeVisitorException("LCBs are handled by " + IsomericSubspeciesLcbHandler.class.getSimpleName() + "!");
         } else if (ctx.furan_fa() != null) {

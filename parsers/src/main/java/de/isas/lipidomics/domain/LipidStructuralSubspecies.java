@@ -16,7 +16,6 @@
 package de.isas.lipidomics.domain;
 
 import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
-import java.util.Optional;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -53,7 +52,7 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
                 mods.addAll(fas.getModifications());
             }
         }
-        super.info = Optional.of(LipidSpeciesInfo.lipidSpeciesInfoBuilder().
+        super.info = LipidSpeciesInfo.lipidSpeciesInfoBuilder().
                 level(LipidLevel.STRUCTURAL_SUBSPECIES).
                 name(headGroup.getName()).
                 position(-1).
@@ -62,8 +61,7 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
                 nDoubleBonds(nDoubleBonds).
                 lipidFaBondType(LipidFaBondType.getLipidFaBondType(headGroup, fa)).
                 modifications(mods).
-                build()
-        );
+                build();
     }
 
     @Override
@@ -83,14 +81,14 @@ public class LipidStructuralSubspecies extends LipidMolecularSubspecies {
             case SPECIES:
                 return super.getLipidString(level, normalizeHeadGroup);
             default:
-                LipidLevel thisLevel = getInfo().orElse(LipidSpeciesInfo.NONE).getLevel();
+                LipidLevel thisLevel = getInfo().getLevel();
                 throw new ConstraintViolationException(getClass().getSimpleName() + " can not create a normalized string for lipid with level " + thisLevel + " for level " + level + ": target level is more specific than this lipid's level!");
         }
     }
 
     @Override
     public String getNormalizedLipidString() {
-        return getLipidString(getInfo().orElse(LipidSpeciesInfo.NONE).getLevel(), true);
+        return getLipidString(getInfo().getLevel(), true);
     }
 
     @Override
