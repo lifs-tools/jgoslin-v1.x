@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
@@ -41,6 +42,55 @@ public class FattyAcidTest {
 
     @Test
     public void testGetElements() {
+        //LCB test
+        FattyAcid fa = new FattyAcid("LCB", 18, 3, 1, LipidFaBondType.ESTER, true, ModificationsList.NONE);
+        assertEquals(LipidFaBondType.ESTER, fa.getLipidFaBondType());
+        assertTrue(fa.isLcb());
+        ElementTable et = fa.getElements();
+        assertEquals(18, et.get(Element.ELEMENT_C));
+        assertEquals(2 * (18 - 1) + 1, et.get(Element.ELEMENT_H));
+        assertEquals(3, et.get(Element.ELEMENT_O));
+        assertEquals(1, et.get(Element.ELEMENT_N));
+
+        //PLASMANYL test
+        fa = new FattyAcid("FA1", 18, 3, 1, LipidFaBondType.ETHER_PLASMANYL, false, ModificationsList.NONE);
+        assertEquals(LipidFaBondType.ETHER_PLASMANYL, fa.getLipidFaBondType());
+        assertFalse(fa.isLcb());
+        et = fa.getElements();
+        assertEquals(18, et.get(Element.ELEMENT_C));
+        assertEquals((18 + 1) * 2 - 1 - 2 * 1, et.get(Element.ELEMENT_H));
+        assertEquals(3, et.get(Element.ELEMENT_O));
+        assertNull(et.get(Element.ELEMENT_N));
+
+        //PLASMENYL test
+        fa = new FattyAcid("FA1", 18, 3, 1, LipidFaBondType.ETHER_PLASMENYL, false, ModificationsList.NONE);
+        assertEquals(LipidFaBondType.ETHER_PLASMENYL, fa.getLipidFaBondType());
+        assertFalse(fa.isLcb());
+        et = fa.getElements();
+        assertEquals(18, et.get(Element.ELEMENT_C));
+        assertEquals(2 * 18 - 1 - 2 * 1 + 2, et.get(Element.ELEMENT_H));
+        assertEquals(3, et.get(Element.ELEMENT_O));
+        assertNull(et.get(Element.ELEMENT_N));
+
+        //ESTER test
+        fa = new FattyAcid("FA1", 18, 3, 1, LipidFaBondType.ESTER, false, ModificationsList.NONE);
+        assertEquals(LipidFaBondType.ESTER, fa.getLipidFaBondType());
+        assertFalse(fa.isLcb());
+        et = fa.getElements();
+        assertEquals(18, et.get(Element.ELEMENT_C));
+        assertEquals(2 * 18 - 1 - 2 * 1, et.get(Element.ELEMENT_H));
+        assertEquals(3 + 1, et.get(Element.ELEMENT_O));
+        assertNull(et.get(Element.ELEMENT_N));
+
+        assertThrows(ConstraintViolationException.class, () -> {
+            FattyAcid fa1 = new FattyAcid("FA1", 18, 3, 1, LipidFaBondType.ETHER_UNSPECIFIED, false, ModificationsList.NONE);
+            fa1.getElements();
+        });
+
+        assertThrows(ConstraintViolationException.class, () -> {
+            FattyAcid fa1 = new FattyAcid("FA1", 18, 3, 1, LipidFaBondType.UNDEFINED, false, ModificationsList.NONE);
+            fa1.getElements();
+        });
     }
 
     @Test
@@ -124,7 +174,7 @@ public class FattyAcidTest {
         assertEquals(0, fa.getNHydroxy());
         assertEquals(1, fa.getNDoubleBonds());
         assertFalse(fa.isLcb());
-        assertEquals(LipidFaBondType.ESTER, fa.getLipidFaBondType());
+        assertEquals(LipidFaBondType.ETHER_PLASMENYL, fa.getLipidFaBondType());
         assertEquals("FA1", fa.getName());
         assertEquals(ModificationsList.NONE, fa.getModifications());
         assertEquals(1, fa.getDoubleBondPositions().size());
