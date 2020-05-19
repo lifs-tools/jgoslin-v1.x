@@ -123,7 +123,7 @@ class FattyAcylHandler implements ParserRuleContextHandler<SwissLipidsParser.Lip
         Integer nHydroxyl = 0;
         ModificationsList modifications = new ModificationsList();
         if (faContext.fa_lcb_prefix() != null) {
-            log.warn("Unsupported prefix: " + faContext.getText() + " on fa: " + faContext.toString());
+            log.warn("Unsupported prefix: " + faContext.getText() + " on fa: " + faContext.getText());
         }
         if (faContext.fa_lcb_suffix() != null) {
             modifications = faHelper.resolveModifications(faContext.fa_lcb_suffix());

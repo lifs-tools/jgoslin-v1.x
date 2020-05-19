@@ -60,7 +60,7 @@ class MolecularSubspeciesFasHandler {
         Integer nHydroxyl = 0;
         ModificationsList modifications = new ModificationsList();
         if (ctx.fa_lcb_prefix() != null) {
-            log.warn("Unsupported prefix: " + ctx.fa_lcb_prefix().getText() + " on fa: " + ctx.toString());
+            log.warn("Unsupported prefix: " + ctx.fa_lcb_prefix().getText() + " on fa: " + ctx.getText());
         }
         if (ctx.fa_lcb_suffix() != null) {
             modifications = faHelper.resolveModifications(ctx.fa_lcb_suffix());
