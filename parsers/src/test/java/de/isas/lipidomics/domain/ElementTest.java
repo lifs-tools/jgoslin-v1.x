@@ -78,6 +78,84 @@ public class ElementTest {
     @Test
     public void testForNameEmpty() {
         assertEquals(Optional.empty(), Element.forName("85P"));
+        assertTrue(Element.forName("85P").isEmpty());
+    }
+
+    @Test
+    public void testValues() {
+        assertEquals(14, Element.values().length);
+    }
+
+    @Test
+    public void testValueOf() {
+        assertSame(Element.ELEMENT_C, Element.valueOf("ELEMENT_C"));
+        assertSame(Element.ELEMENT_H, Element.valueOf("ELEMENT_H"));
+        assertSame(Element.ELEMENT_N, Element.valueOf("ELEMENT_N"));
+        assertSame(Element.ELEMENT_O, Element.valueOf("ELEMENT_O"));
+        assertSame(Element.ELEMENT_P, Element.valueOf("ELEMENT_P"));
+        assertSame(Element.ELEMENT_S, Element.valueOf("ELEMENT_S"));
+        assertSame(Element.ELEMENT_H2, Element.valueOf("ELEMENT_H2"));
+        assertSame(Element.ELEMENT_C13, Element.valueOf("ELEMENT_C13"));
+        assertSame(Element.ELEMENT_N15, Element.valueOf("ELEMENT_N15"));
+        assertSame(Element.ELEMENT_O17, Element.valueOf("ELEMENT_O17"));
+        assertSame(Element.ELEMENT_O18, Element.valueOf("ELEMENT_O18"));
+        assertSame(Element.ELEMENT_P32, Element.valueOf("ELEMENT_P32"));
+        assertSame(Element.ELEMENT_S33, Element.valueOf("ELEMENT_S33"));
+        assertSame(Element.ELEMENT_S34, Element.valueOf("ELEMENT_S34"));
+    }
+
+    @Test
+    public void testGetName() {
+        assertEquals("C", Element.valueOf("ELEMENT_C").getName());
+        assertEquals("H", Element.valueOf("ELEMENT_H").getName());
+        assertEquals("N", Element.valueOf("ELEMENT_N").getName());
+        assertEquals("O", Element.valueOf("ELEMENT_O").getName());
+        assertEquals("P", Element.valueOf("ELEMENT_P").getName());
+        assertEquals("S", Element.valueOf("ELEMENT_S").getName());
+        assertEquals("2H", Element.valueOf("ELEMENT_H2").getName());
+        assertEquals("13C", Element.valueOf("ELEMENT_C13").getName());
+        assertEquals("15N", Element.valueOf("ELEMENT_N15").getName());
+        assertEquals("17O", Element.valueOf("ELEMENT_O17").getName());
+        assertEquals("18O", Element.valueOf("ELEMENT_O18").getName());
+        assertEquals("32P", Element.valueOf("ELEMENT_P32").getName());
+        assertEquals("33S", Element.valueOf("ELEMENT_S33").getName());
+        assertEquals("34S", Element.valueOf("ELEMENT_S34").getName());
+    }
+
+    @Test
+    public void testGetAlias() {
+        assertEquals("12C", Element.valueOf("ELEMENT_C").getAlias());
+        assertEquals("1H", Element.valueOf("ELEMENT_H").getAlias());
+        assertEquals("14N", Element.valueOf("ELEMENT_N").getAlias());
+        assertEquals("15O", Element.valueOf("ELEMENT_O").getAlias());
+        assertEquals("30P", Element.valueOf("ELEMENT_P").getAlias());
+        assertEquals("31S", Element.valueOf("ELEMENT_S").getAlias());
+        assertEquals("H'", Element.valueOf("ELEMENT_H2").getAlias());
+        assertEquals("C'", Element.valueOf("ELEMENT_C13").getAlias());
+        assertEquals("N'", Element.valueOf("ELEMENT_N15").getAlias());
+        assertEquals("O'", Element.valueOf("ELEMENT_O17").getAlias());
+        assertEquals("O''", Element.valueOf("ELEMENT_O18").getAlias());
+        assertEquals("P'", Element.valueOf("ELEMENT_P32").getAlias());
+        assertEquals("S'", Element.valueOf("ELEMENT_S33").getAlias());
+        assertEquals("S''", Element.valueOf("ELEMENT_S34").getAlias());
+    }
+
+    @Test
+    public void testGetOrder() {
+        assertEquals(10, Element.valueOf("ELEMENT_C").getOrder());
+        assertEquals(20, Element.valueOf("ELEMENT_H").getOrder());
+        assertEquals(30, Element.valueOf("ELEMENT_N").getOrder());
+        assertEquals(40, Element.valueOf("ELEMENT_O").getOrder());
+        assertEquals(50, Element.valueOf("ELEMENT_P").getOrder());
+        assertEquals(60, Element.valueOf("ELEMENT_S").getOrder());
+        assertEquals(70, Element.valueOf("ELEMENT_H2").getOrder());
+        assertEquals(80, Element.valueOf("ELEMENT_C13").getOrder());
+        assertEquals(90, Element.valueOf("ELEMENT_N15").getOrder());
+        assertEquals(100, Element.valueOf("ELEMENT_O17").getOrder());
+        assertEquals(110, Element.valueOf("ELEMENT_O18").getOrder());
+        assertEquals(120, Element.valueOf("ELEMENT_P32").getOrder());
+        assertEquals(130, Element.valueOf("ELEMENT_S33").getOrder());
+        assertEquals(140, Element.valueOf("ELEMENT_S34").getOrder());
     }
 }
 

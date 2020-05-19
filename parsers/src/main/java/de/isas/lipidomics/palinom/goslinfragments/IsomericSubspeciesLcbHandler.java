@@ -63,7 +63,7 @@ class IsomericSubspeciesLcbHandler {
         if (nIsomericFas == fas.size()) {
             FattyAcid[] arrs = new FattyAcid[fas.size()];
             fas.stream().map((t) -> {
-                return (FattyAcid) t;
+                return t;
             }).collect(Collectors.toList()).toArray(arrs);
             return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
         } else {
@@ -82,8 +82,8 @@ class IsomericSubspeciesLcbHandler {
         fa.nCarbon(asInt(pureCtx.carbon(), 0));
         fa.nHydroxy(asInt(pureCtx.hydroxyl(), 0));
         if (pureCtx.db() != null) {
-            if (ctx.lcb_pure().db() != null) {
-                fa.nDoubleBonds(asInt(ctx.lcb_pure().db().db_count(), 0));
+            if(pureCtx.db().db_count() != null) {
+                fa.nDoubleBonds(asInt(pureCtx.db().db_count(), 0));
             }
             if (ctx.lcb_pure().db().db_positions() != null) {
                 fa.doubleBondPositions(faHelper.resolveDoubleBondPositions(ctx.lcb_pure().db().db_positions()));

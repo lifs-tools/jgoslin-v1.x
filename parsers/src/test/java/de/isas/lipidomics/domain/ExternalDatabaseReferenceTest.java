@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  nils.hoffmann.
+ * Copyright 2020 nilshoffmann.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,40 @@
  */
 package de.isas.lipidomics.domain;
 
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
- * The type of a fatty acid, reflecting the structural properties following the
- * Liebisch hierarchy.
  *
- * @author nils.hoffmann
+ * @author nilshoffmann
  */
-public enum FattyAcidType {
-    MOLECULAR, STRUCTURAL, ISOMERIC;
+public class ExternalDatabaseReferenceTest {
+
+    public ExternalDatabaseReferenceTest() {
+    }
+
+    @Test
+    public void testGetDatabaseUrl() {
+    }
+
+    @Test
+    public void testGetDatabaseElementId() {
+    }
+
+    @Test
+    public void testGetLipidLevel() {
+    }
+
+    @Test
+    public void testGetNativeAbbreviation() {
+    }
+
+    @Test
+    public void testGetNativeName() {
+    }
+
+    @Test
+    public void testGetNormalizedName() {
+    }
+
 }

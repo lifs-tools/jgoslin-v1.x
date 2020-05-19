@@ -46,6 +46,7 @@ public class FattyAcid {
      * @param lipidFaBondType the bond type, e.g. ESTER.
      * @param lcb true if this is a long-chain base, e.g. in a Ceramide.
      * @param modifications optional modifications for this FA.
+     * @param nDoubleBonds the number of double bonds in this FA.
      * @param doubleBondPositions double bond positions in this FA.
      * @see LipidFaBondType
      */
@@ -88,6 +89,7 @@ public class FattyAcid {
      * @param position the sn position. -1 if undefined or unknown.
      * @param nCarbon the number of carbons in this FA.
      * @param nHydroxy the number of hydroxyls on this FA.
+     * @param nDoubleBonds the number of double bonds in this FA.
      * @param lipidFaBondType the bond type, e.g. ESTER.
      * @param lcb true if this is a long-chain base, e.g. in a Ceramide.
      * @param modifications optional modifications for this FA.
@@ -125,6 +127,7 @@ public class FattyAcid {
      * @param name the name, e.g. FA1 for the first FA.
      * @param nCarbon the number of carbons in this FA.
      * @param nHydroxy the number of hydroxyls on this FA.
+     * @param nDoubleBonds the number of double bonds in this FA.
      * @param lipidFaBondType the bond type, e.g. ESTER.
      * @param lcb true if this is a long-chain base, e.g. in a Ceramide.
      * @param modifications optional modifications for this FA.

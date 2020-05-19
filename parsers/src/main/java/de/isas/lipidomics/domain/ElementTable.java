@@ -144,7 +144,7 @@ public final class ElementTable extends EnumMap<Element, Integer> {
      */
     public String getSumFormula() {
         return entrySet().stream().filter((entry) -> {
-            return entry.getValue() != null && entry.getValue() > 0;
+            return entry.getValue() != null;
         }).map((entry) -> {
             return entry.getKey().getName() + ((entry.getValue() > 1) ? entry.getValue() : "");
         }).collect(Collectors.joining());
@@ -158,10 +158,7 @@ public final class ElementTable extends EnumMap<Element, Integer> {
      */
     public Double getMass(Element element) {
         Integer count = getOrDefault(element, 0);
-        if (count > 0) {
-            return count.doubleValue() * element.getMass();
-        }
-        return 0.0d;
+        return count.doubleValue() * element.getMass();
     }
 
     /**

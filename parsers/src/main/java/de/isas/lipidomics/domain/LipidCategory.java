@@ -26,13 +26,13 @@ public enum LipidCategory {
 
     UNDEFINED("Undefined lipid category"),
     /* SLM:000117142 Glycerolipids */
-    GL("Glycerolipid"),
+    GL("Glycerolipids"),
     /* SLM:000001193 Glycerophospholipids */
-    GP("Glycerophospholipid"),
+    GP("Glycerophospholipids"),
     /* SLM:000000525 Sphingolipids */
-    SP("Sphingolipid"),
+    SP("Sphingolipids"),
     /* SLM:000500463 Steroids and derivatives */
-    ST("Sterollipid"),
+    ST("Sterollipids"),
     /* SLM:000390054 Fatty acyls and derivatives */
     FA("Fattyacyls"),
     /* LipidMAPS [SL]*/

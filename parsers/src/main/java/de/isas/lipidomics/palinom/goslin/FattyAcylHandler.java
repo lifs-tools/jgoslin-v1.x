@@ -49,8 +49,8 @@ class FattyAcylHandler implements ParserRuleContextHandler<GoslinParser.Lipid_pu
 //                    if (ctx.fatty_acid().mediator().mediator_single() != null) {
 //                        ctx.fatty_acid().mediator().mediator_single().db_positions();
 //                    }
-                String mediatorsSingleContext = ctx.mediatorc().mediator().getText();
-                return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(new HeadGroup(mediatorsSingleContext)).fa(new FattyAcid[0]).build();
+                HeadGroup mediatorsSingleContext = new HeadGroup(ctx.mediatorc().mediator().getText());
+                return LipidIsomericSubspecies.lipidIsomericSubspeciesBuilder().headGroup(mediatorsSingleContext).fa(new FattyAcid[0]).build();
             } else {
                 throw new ParseTreeVisitorException("Context for FA head group was null!");
             }

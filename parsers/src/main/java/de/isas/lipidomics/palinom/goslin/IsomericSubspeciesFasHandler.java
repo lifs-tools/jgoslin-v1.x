@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 /**
  * Handler for Isomeric FAs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class IsomericSubspeciesFasHandler {
 

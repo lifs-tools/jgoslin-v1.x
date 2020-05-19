@@ -29,14 +29,11 @@ import lombok.Data;
 @AllArgsConstructor
 public class ExternalDatabaseReference {
 
-    private String databaseUrl;
-    private String databaseElementId;
-    private String lipidLevel;
-    private String nativeAbbreviation;
-    private String nativeName;
-    private String normalizedName;
+    private final String databaseUrl;
+    private final String databaseElementId;
+    private final String lipidLevel;
+    private final String nativeAbbreviation;
+    private final String nativeName;
+    private final String normalizedName;
 
-    public ExternalDatabaseReference() {
-    }
-;
 }

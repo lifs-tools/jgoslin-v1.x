@@ -20,9 +20,9 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import de.isas.lipidomics.palinom.HandlerUtils;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 /**
  * Helper class for FA and LCB handling.
@@ -31,11 +31,24 @@ import java.util.Optional;
  */
 class FattyAcylHelper {
 
-    public LipidFaBondType getLipidLcbBondType(HeadGroup headGroup, GoslinFragmentsParser.LcbContext lcbContext) throws ParseTreeVisitorException {
+    /**
+     * Returns the lipid fa bond type for an LcbContext.
+     *
+     * @param headGroup the head group.
+     * @param lcbContext the lcb context.
+     * @return the lipid fa bond type.
+     */
+    public LipidFaBondType getLipidLcbBondType(HeadGroup headGroup, GoslinFragmentsParser.LcbContext lcbContext) {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         return lfbt;
     }
 
+    /**
+     * Returns the number of hydroxyls for an LcbContext.
+     *
+     * @param lcbContext the lcb context.
+     * @return the number of hydroxyls.
+     */
     public Integer getNHydroxyl(GoslinFragmentsParser.LcbContext lcbContext) {
         Integer hydroxyl = 0;
         if (lcbContext.lcb_pure() != null) {
@@ -45,6 +58,14 @@ class FattyAcylHelper {
         throw new ParseTreeVisitorException("Uninitialized lcb_core context!");
     }
 
+    /**
+     * Returns the lipid fa bond type for an FaContext.
+     *
+     * @param headGroup the head group.
+     * @param faContext the fa context.
+     * @return the lipid fa bond type.
+     * @throws ParseTreeVisitorException for unknown ether context values.
+     */
     public LipidFaBondType getLipidFaBondType(HeadGroup headGroup, GoslinFragmentsParser.FaContext faContext) throws ParseTreeVisitorException {
         LipidFaBondType lfbt = LipidFaBondType.ESTER;
         if (faContext.ether() != null) {
@@ -59,6 +80,14 @@ class FattyAcylHelper {
         return lfbt;
     }
 
+    /**
+     * Resolve double bond positions from the given Db_positionContext.
+     *
+     * @param dbContext the double bond context.
+     * @param doubleBondPositions a map of position to double bond configuration
+     * mappings.
+     * @return a map of position to double bond configuration mappings.
+     */
     public Map<Integer, String> resolveDoubleBondPosition(GoslinFragmentsParser.Db_positionContext dbContext, Map<Integer, String> doubleBondPositions) {
         if (dbContext.db_single_position() != null) {
             doubleBondPositions.put(
@@ -81,7 +110,7 @@ class FattyAcylHelper {
      * @return a map of position to double bond configuration mappings.
      */
     public Map<Integer, String> resolveDoubleBondPositions(GoslinFragmentsParser.Db_positionsContext context) {
-        Map<Integer, String> doubleBondPositions = new LinkedHashMap<>();
+        Map<Integer, String> doubleBondPositions = new TreeMap<>();
         if (context.db_position() != null) {
             return resolveDoubleBondPosition(context.db_position(), doubleBondPositions);
         } else {

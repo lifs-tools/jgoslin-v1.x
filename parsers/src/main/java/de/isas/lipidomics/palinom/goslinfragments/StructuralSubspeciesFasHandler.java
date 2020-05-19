@@ -20,7 +20,7 @@ import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
-import de.isas.lipidomics.domain.FattyAcidType;
+import static de.isas.lipidomics.domain.FattyAcidType.ISOMERIC;
 import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
@@ -51,14 +51,14 @@ class StructuralSubspeciesFasHandler {
         for (int i = 0; i < faContexts.size(); i++) {
             FattyAcid fa = buildStructuralFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 1);
             fas.add(fa);
-            if (fa.getType() == FattyAcidType.ISOMERIC) {
+            if (fa.getType() == ISOMERIC) {
                 nIsomericFas++;
             }
         }
         if (nIsomericFas == fas.size()) {
             FattyAcid[] arrs = new FattyAcid[fas.size()];
             fas.stream().map((t) -> {
-                return (FattyAcid) t;
+                return t;
             }).collect(Collectors.toList()).toArray(arrs);
             return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
         } else {

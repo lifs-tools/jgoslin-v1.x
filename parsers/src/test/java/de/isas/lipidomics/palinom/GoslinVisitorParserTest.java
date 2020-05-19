@@ -13,7 +13,6 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
-import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -105,6 +104,7 @@ public class GoslinVisitorParserTest {
     @Test
     public void testMediators() throws ParsingException {
         String ref1 = "11,12-DHET";
+        String ref2 = "5(6)-EET";
         System.out.println("Testing lipid name " + ref1);
         LipidAdduct lipidAdduct = parseLipidName(ref1);
         assertNotNull(lipidAdduct);
@@ -113,6 +113,9 @@ public class GoslinVisitorParserTest {
         assertEquals(ref1, lipidAdduct.getLipid().getHeadGroup().getName());
         assertEquals(LipidCategory.FA, lipidAdduct.getLipid().getLipidCategory());
         assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
+//        assertEquals("",lipidAdduct.getAdduct().getAdductString());
+//        assertEquals(Integer.valueOf(1),lipidAdduct.getAdduct().getCharge());
+//        assertEquals(Integer.valueOf(1),lipidAdduct.getAdduct().getChargeSign());
     }
 
     @Test
@@ -198,6 +201,7 @@ public class GoslinVisitorParserTest {
 
     @Test
     public void testImplicitLyso() throws ParsingException {
+//        assertThrows(ConstraintViolationException.class, () -> {
         String ref2 = "PE 18:0-0:0";
         System.out.println("Testing implicit lysolipid name " + ref2);
         LipidAdduct lipidAdduct = parseLipidName(ref2);
@@ -566,7 +570,7 @@ public class GoslinVisitorParserTest {
         assertEquals(expectedSumFormula, lipidAdduct.getSumFormula());
         assertEquals(expectedMass, lipidAdduct.getMass(), 1e-6);
     }
-    
+
     @Test
     public void testSHexCer() throws ParsingException {
         String ref = "SHexCer 18:0;3/26:0;1";

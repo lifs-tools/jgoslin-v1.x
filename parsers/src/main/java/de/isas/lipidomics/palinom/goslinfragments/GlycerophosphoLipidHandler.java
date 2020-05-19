@@ -59,6 +59,10 @@ class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipid_pureC
             return handleMlcl(ctx.pl().mlcl());
         } else if (ctx.pl().pl_o() != null) {
             return handlePlo(ctx.pl().pl_o());
+        } else if (ctx.pl().dlcl() != null) {
+            return handleDlcl(ctx.pl().dlcl());
+        } else if (ctx.pl().tpl() != null) {
+            return handleTpl(ctx.pl().tpl());
         } else {
             throw new ParseTreeVisitorException("Unhandled context state in PL!");
         }
@@ -157,6 +161,46 @@ class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipid_pureC
         } else {
             throw new ParseTreeVisitorException("Unhandled context state in PL!");
         }
+    }
+
+    private Optional<LipidSpecies> handleDlcl(GoslinFragmentsParser.DlclContext dlcl) {
+        HeadGroup headGroup = new HeadGroup(dlcl.hg_dlclc().getText());
+        if (dlcl.pl_species() != null) { //species level
+            //process species level
+            return fah.visitSpeciesFas(headGroup, dlcl.pl_species().fa());
+        } else if (dlcl.dlcl_subspecies() != null) {
+            //process subspecies
+            if (dlcl.dlcl_subspecies().fa2().fa2_sorted() != null) {
+                //sorted => StructuralSubspecies
+                return ssfh.visitStructuralSubspeciesFas(headGroup, dlcl.dlcl_subspecies().fa2().fa2_sorted().fa());
+            } else if (dlcl.dlcl_subspecies().fa2().fa2_unsorted() != null) {
+                //unsorted => MolecularSubspecies
+                return msfh.visitMolecularSubspeciesFas(headGroup, dlcl.dlcl_subspecies().fa2().fa2_unsorted().fa());
+}
+        } else {
+            throw new ParseTreeVisitorException("Unhandled context state in DLCL!");
+        }
+        return Optional.empty();
+    }
+
+    private Optional<LipidSpecies> handleTpl(GoslinFragmentsParser.TplContext tpl) {
+        HeadGroup headGroup = new HeadGroup(tpl.hg_tplc().getText());
+        if (tpl.pl_species() != null) { //species level
+            //process species level
+            return fah.visitSpeciesFas(headGroup, tpl.pl_species().fa());
+        } else if (tpl.tpl_subspecies() != null) {
+            //process subspecies
+            if (tpl.tpl_subspecies().fa3().fa3_sorted() != null) {
+                //sorted => StructuralSubspecies
+                return ssfh.visitStructuralSubspeciesFas(headGroup, tpl.tpl_subspecies().fa3().fa3_sorted().fa());
+            } else if (tpl.tpl_subspecies().fa3().fa3_unsorted() != null) {
+                //unsorted => MolecularSubspecies
+                return msfh.visitMolecularSubspeciesFas(headGroup, tpl.tpl_subspecies().fa3().fa3_unsorted().fa());
+            }
+        } else {
+            throw new ParseTreeVisitorException("Unhandled context state in TPL!");
+        }
+        return Optional.empty();
     }
 
 }

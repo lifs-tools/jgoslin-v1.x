@@ -89,12 +89,13 @@ public class LipidSpeciesInfo extends FattyAcid {
     }
 
     /**
-     * Create a new LipidSpeciesInfo on the provided level. The name is inferred
+     * Create a new LipidSpeciesInfo on the provided level.The name is inferred
      * from the level.
      *
      * @param level the level of the species info.
      * @param nCarbon the number of carbons in this FA.
      * @param nHydroxy the number of hydroxyls on this FA.
+     * @param nDoubleBonds the number of double bonds in this FA.
      * @param lipidFaBondType the bond type, e.g. ESTER.
      */
     public LipidSpeciesInfo(LipidLevel level, int nCarbon, int nHydroxy, int nDoubleBonds, LipidFaBondType lipidFaBondType) {

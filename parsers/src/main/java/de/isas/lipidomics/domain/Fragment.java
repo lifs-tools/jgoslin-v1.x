@@ -29,6 +29,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class Fragment {
+
     private static final class None extends Fragment {
 
         private None() {
@@ -38,8 +39,13 @@ public class Fragment {
 
     public static final Fragment NONE = new None();
 
-    private String name;
-    
+    private final String name;
+
+    /**
+     * Returns the string representation of this fragment.
+     *
+     * @return the fragment string.
+     */
     public String getLipidString() {
         return name;
     }

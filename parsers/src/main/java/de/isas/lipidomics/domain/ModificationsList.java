@@ -228,7 +228,6 @@ public class ModificationsList implements List<Pair<Integer, String>> {
      * Returns the sum of the occurrence count for modifications with name "OH"
      * in the provided modifications list.
      *
-     * @param modificationsList the modifications list.
      * @return the sum of the occurrences of OH.
      */
     public Integer countForHydroxy() {

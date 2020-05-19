@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 /**
  * Handler for Isomeric FAs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class IsomericSubspeciesFasHandler {
 
@@ -57,7 +57,7 @@ class IsomericSubspeciesFasHandler {
         if (nIsomericFas == fas.size()) {
             FattyAcid[] arrs = new FattyAcid[fas.size()];
             fas.stream().map((t) -> {
-                return (FattyAcid) t;
+                return t;
             }).collect(Collectors.toList()).toArray(arrs);
             return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
         } else {
@@ -73,7 +73,7 @@ class IsomericSubspeciesFasHandler {
         if (ctx.fa_pure() != null) {
             fa.nCarbon(asInt(ctx.fa_pure().carbon(), 0));
             fa.nHydroxy(asInt(ctx.fa_pure().hydroxyl(), 0));
-            if (ctx.fa_pure().db() != null) {
+            if (ctx.fa_pure().db().db_count() != null) {
                 fa.nDoubleBonds(asInt(ctx.fa_pure().db().db_count(), 0));
             }
             if (ctx.fa_pure().db().db_positions() != null) {

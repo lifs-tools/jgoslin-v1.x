@@ -26,7 +26,8 @@ import java.util.Optional;
 
 /**
  * Handler implementation for Glycero-phospholipids.
- * @author  nils.hoffmann
+ *
+ * @author nils.hoffmann
  */
 class GlycerophosphoLipidHandler implements ParserRuleContextHandler<Lipid_pureContext, LipidSpecies> {
 

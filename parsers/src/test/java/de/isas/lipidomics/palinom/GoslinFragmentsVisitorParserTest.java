@@ -15,6 +15,7 @@ import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.palinom.goslinfragments.GoslinFragmentsVisitorParser;
+import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,6 +27,15 @@ import org.junit.jupiter.api.Test;
  * @author nils.hoffmann
  */
 public class GoslinFragmentsVisitorParserTest {
+
+    @Test
+    public void LPCWithExtraLetters() throws ParsingException {
+        String ref = "LPC 18:1(9Z)/20a1:2(9Z,12E)";
+        System.out.println("Testing lipid name " + ref);
+        Assertions.assertThrows(ParsingException.class, () -> {
+            LipidAdduct lipidAdduct = parseLipidName(ref);
+        });
+    }
 
     @Test
     public void testPE_Structural() throws ParsingException {
@@ -533,11 +543,60 @@ public class GoslinFragmentsVisitorParserTest {
         LipidAdduct lipidAdduct = parseLipidName(ref);
         assertEquals(Adduct.NONE, lipidAdduct.getAdduct());
         assertEquals("TAG", lipidAdduct.getLipid().getHeadGroup().getName());
+        assertEquals("GL", lipidAdduct.getLipidString(LipidLevel.CATEGORY));
+        assertEquals("TAG", lipidAdduct.getLipidString(LipidLevel.CLASS));
+        assertEquals("TAG 58:6", lipidAdduct.getLipidString(LipidLevel.SPECIES));
+        assertEquals("TAG 16:0-20:2(11Z,14Z)-22:4(7Z,10Z,13Z,16Z)", lipidAdduct.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
+        assertEquals("TAG 16:0/20:2(11Z,14Z)/22:4(7Z,10Z,13Z,16Z)", lipidAdduct.getLipidString(LipidLevel.STRUCTURAL_SUBSPECIES));
+        assertEquals("TAG 16:0/20:2(11Z,14Z)/22:4(7Z,10Z,13Z,16Z)", lipidAdduct.getLipidString(LipidLevel.ISOMERIC_SUBSPECIES));
         assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
         assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
         assertEquals(58, lipidAdduct.getLipid().getInfo().getNCarbon());
         assertEquals(6, lipidAdduct.getLipid().getInfo().getNDoubleBonds());
         assertEquals(0, lipidAdduct.getLipid().getInfo().getNHydroxy());
+    }
+
+    @Test
+    public void testDgDgAdduct() throws ParsingException {
+        String ref = "DGDG 16:0-16:1";
+        String refWithAdduct = ref + "[M+NH4]1+";
+        double expectedMass = 908.630498;
+        String expectedSumFormula = "C47H90NO15"; // sum formula of precursor without adduct is C47H86O15
+        System.out.println("Testing lipid name " + refWithAdduct);
+        LipidAdduct lipidAdduct = parseLipidName(refWithAdduct);
+        assertEquals("[M+NH4]1+", lipidAdduct.getAdduct().getLipidString());
+        assertEquals(LipidLevel.MOLECULAR_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
+        assertEquals(LipidCategory.GL, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidClass.DGDG, lipidAdduct.getLipid().getLipidClass());
+        assertEquals(expectedMass, lipidAdduct.getMass(), 1e-6);
+        assertEquals(expectedSumFormula, lipidAdduct.getSumFormula());
+    }
+
+    @Test
+    public void testCholesterolAdduct() throws ParsingException {
+        String ref = "ST 27:1;1[M+NH4]1+";
+        double expectedMass = 404.3886918;
+        String expectedSumFormula = "C27H50NO"; //C27H46O is the original precursor sum formula without adduct
+        System.out.println("Testing lipid name " + ref);
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals("[M+NH4]1+", lipidAdduct.getAdduct().getLipidString());
+        assertEquals(LipidLevel.SPECIES, lipidAdduct.getLipid().getInfo().getLevel());
+        assertEquals(LipidCategory.ST, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidClass.ST_27_1_1, lipidAdduct.getLipid().getLipidClass());
+        assertEquals(expectedSumFormula, lipidAdduct.getSumFormula());
+        assertEquals(expectedMass, lipidAdduct.getMass(), 1e-6);
+    }
+
+    @Test
+    public void testSHexCer() throws ParsingException {
+        String ref = "SHexCer 18:0;3/26:0;1";
+        LipidAdduct lipidAdduct = parseLipidName(ref);
+        assertEquals(LipidLevel.ISOMERIC_SUBSPECIES, lipidAdduct.getLipid().getInfo().getLevel());
+        assertEquals(LipidCategory.SP, lipidAdduct.getLipid().getLipidCategory());
+        assertEquals(LipidClass.SHEXCER, lipidAdduct.getLipid().getLipidClass());
+        assertEquals(2, lipidAdduct.getLipid().getFa().size());
+        assertEquals(1, lipidAdduct.getLipid().getFa().get("LCB").getPosition());
+        assertEquals(2, lipidAdduct.getLipid().getFa().get("FA1").getPosition());
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

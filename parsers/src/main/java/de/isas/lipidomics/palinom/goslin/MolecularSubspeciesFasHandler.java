@@ -30,7 +30,7 @@ import java.util.Optional;
 /**
  * Handler for Molecular FAs.
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 class MolecularSubspeciesFasHandler {
 
@@ -68,7 +68,6 @@ class MolecularSubspeciesFasHandler {
             }
             fa.lipidFaBondType(lfbt);
             return fa.name(faName).build();
-
         } else {
             throw new ParseTreeVisitorException("Uninitialized FaContext!");
         }

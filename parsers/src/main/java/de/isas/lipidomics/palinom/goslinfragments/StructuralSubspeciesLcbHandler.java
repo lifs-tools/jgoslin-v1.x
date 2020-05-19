@@ -20,6 +20,7 @@ import de.isas.lipidomics.domain.LipidIsomericSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
 import de.isas.lipidomics.domain.FattyAcid;
+import de.isas.lipidomics.domain.FattyAcidType;
 import de.isas.lipidomics.domain.HeadGroup;
 import de.isas.lipidomics.palinom.GoslinFragmentsParser;
 import static de.isas.lipidomics.palinom.HandlerUtils.asInt;
@@ -49,20 +50,20 @@ class StructuralSubspeciesLcbHandler {
         FattyAcid lcbA = buildStructuralLcb(lcbContext, "LCB", 1);
         fas.add(lcbA);
         int nIsomericFas = 0;
-        if (lcbA instanceof FattyAcid) {
+        if (lcbA.getType() == FattyAcidType.ISOMERIC) {
             nIsomericFas++;
         }
         for (int i = 0; i < faContexts.size(); i++) {
             FattyAcid fa = ssfh.buildStructuralFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 2);
             fas.add(fa);
-            if (fa instanceof FattyAcid) {
+            if (fa.getType() == FattyAcidType.ISOMERIC) {
                 nIsomericFas++;
             }
         }
         if (nIsomericFas == fas.size()) {
             FattyAcid[] arrs = new FattyAcid[fas.size()];
             fas.stream().map((t) -> {
-                return (FattyAcid) t;
+                return t;
             }).collect(Collectors.toList()).toArray(arrs);
             return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
         } else {
