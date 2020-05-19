@@ -45,34 +45,6 @@ class IsomericSubspeciesLcbHandler {
         this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitIsomericSubspeciesLcb(HeadGroup headGroup, GoslinFragmentsParser.LcbContext lcbContext, List<GoslinFragmentsParser.FaContext> faContexts) {
-        List<FattyAcid> fas = new LinkedList<>();
-        FattyAcid lcbA = buildIsomericLcb(lcbContext, "LCB", 1);
-        fas.add(lcbA);
-        int nIsomericFas = 0;
-        if (lcbA.getType() == FattyAcidType.ISOMERIC) {
-            nIsomericFas++;
-        }
-        for (int i = 0; i < faContexts.size(); i++) {
-            FattyAcid fa = isfh.buildIsomericFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 2);
-            fas.add(fa);
-            if (fa.getType() == FattyAcidType.ISOMERIC) {
-                nIsomericFas++;
-            }
-        }
-        if (nIsomericFas == fas.size()) {
-            FattyAcid[] arrs = new FattyAcid[fas.size()];
-            fas.stream().map((t) -> {
-                return t;
-            }).collect(Collectors.toList()).toArray(arrs);
-            return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
-        } else {
-            FattyAcid[] arrs = new FattyAcid[fas.size()];
-            fas.toArray(arrs);
-            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
-        }
-    }
-
     public FattyAcid buildIsomericLcb(GoslinFragmentsParser.LcbContext ctx, String faName, int position) {
         if (ctx.lcb_pure() != null && ctx.heavy_lcb() != null) {
             throw new RuntimeException("Heavy label in lcb_pure context not implemented yet!");

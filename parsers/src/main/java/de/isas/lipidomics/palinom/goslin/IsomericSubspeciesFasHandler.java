@@ -44,29 +44,6 @@ class IsomericSubspeciesFasHandler {
         this.faHelper = faHelper;
     }
 
-    public Optional<LipidSpecies> visitIsomericSubspeciesFas(HeadGroup headGroup, List<GoslinParser.FaContext> faContexts) {
-        List<FattyAcid> fas = new LinkedList<>();
-        int nIsomericFas = 0;
-        for (int i = 0; i < faContexts.size(); i++) {
-            FattyAcid fa = buildIsomericFa(headGroup, faContexts.get(i), "FA" + (i + 1), i + 1);
-            fas.add(fa);
-            if (fa.getType() == FattyAcidType.ISOMERIC) {
-                nIsomericFas++;
-            }
-        }
-        if (nIsomericFas == fas.size()) {
-            FattyAcid[] arrs = new FattyAcid[fas.size()];
-            fas.stream().map((t) -> {
-                return t;
-            }).collect(Collectors.toList()).toArray(arrs);
-            return Optional.of(new LipidIsomericSubspecies(headGroup, arrs));
-        } else {
-            FattyAcid[] arrs = new FattyAcid[fas.size()];
-            fas.toArray(arrs);
-            return Optional.of(new LipidStructuralSubspecies(headGroup, arrs));
-        }
-    }
-
     public FattyAcid buildIsomericFa(HeadGroup headGroup, GoslinParser.FaContext ctx, String faName, int position) {
         FattyAcid.IsomericFattyAcidBuilder fa = FattyAcid.isomericFattyAcidBuilder();
         LipidFaBondType lfbt = faHelper.getLipidFaBondType(headGroup, ctx);

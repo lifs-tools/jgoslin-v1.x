@@ -15,6 +15,7 @@
  */
 package de.isas.lipidomics.domain;
 
+import de.isas.lipidomics.palinom.exceptions.ParsingException;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
- * @author  nils.hoffmann
+ * @author nils.hoffmann
  */
 public class ElementTableTest {
 
@@ -71,6 +72,24 @@ public class ElementTableTest {
             et.increment(Element.ELEMENT_O);
         });
         assertEquals(testMass, et.getMass(), 1e-10);
+    }
+
+    @Test
+    public void testDecrement() throws ParsingException {
+        ElementTable et = new ElementTable("C5H21PO4");
+        IntStream.range(0, 5).forEach((value) -> {
+            et.decrement(Element.ELEMENT_C);
+        });
+        IntStream.range(0, 21).forEach((value) -> {
+            et.decrement(Element.ELEMENT_H);
+        });
+        IntStream.range(0, 1).forEach((value) -> {
+            et.decrement(Element.ELEMENT_P);
+        });
+        IntStream.range(0, 4).forEach((value) -> {
+            et.decrement(Element.ELEMENT_O);
+        });
+        assertEquals(0.0d, et.getMass(), 1e-10);
     }
 
     @Test
