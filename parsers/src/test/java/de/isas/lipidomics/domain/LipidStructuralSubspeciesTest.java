@@ -26,14 +26,15 @@ public class LipidStructuralSubspeciesTest {
 
     @Test
     public void testGetLipidSpeciesString() {
-
         LipidStructuralSubspecies lss = new LipidStructuralSubspecies(
                 new HeadGroup("PG"),
-                new FattyAcid("FA1", -1, 8, 0, 1, LipidFaBondType.ESTER, false, ModificationsList.NONE),
-                new FattyAcid("FA2", -1, 12, 1, 1, LipidFaBondType.ESTER, false, ModificationsList.NONE)
+                new FattyAcid("FA1", 1, 8, 0, 1, LipidFaBondType.ESTER, false, ModificationsList.NONE),
+                new FattyAcid("FA2", 2, 12, 1, 1, LipidFaBondType.ESTER, false, ModificationsList.NONE)
         );
         String expectedSpecies = "PG 20:2;1";
         assertEquals(expectedSpecies, lss.getLipidString(LipidLevel.SPECIES));
+        assertEquals("FA1", lss.getFa().get("FA1").getName());
+        assertEquals("FA2", lss.getFa().get("FA2").getName());
         String expectedMolSubSpecies = "PG 8:1-12:1;1";
         assertEquals(expectedMolSubSpecies, lss.getLipidString(LipidLevel.MOLECULAR_SUBSPECIES));
         String expectedStructuralSubSpecies = "PG 8:1/12:1;1";

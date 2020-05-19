@@ -26,7 +26,6 @@ public class LipidMolecularSubspeciesTest {
 
     @Test
     public void testGetLipidSpeciesString() {
-
         LipidMolecularSubspecies lss = new LipidMolecularSubspecies(
                 new HeadGroup("PG"),
                 new FattyAcid("FA1", 8, 0, 1, LipidFaBondType.ESTER, false, ModificationsList.NONE),

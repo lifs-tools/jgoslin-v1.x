@@ -19,6 +19,7 @@ import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -206,6 +207,42 @@ public class FattyAcidTest {
         assertEquals(LipidFaBondType.ETHER_PLASMANYL, fa.getLipidFaBondType());
         assertEquals("FA1", fa.getName());
         assertEquals(ModificationsList.NONE, fa.getModifications());
+    }
+
+    @Test
+    public void testGetNDoubleBonds() {
+        FattyAcid instanceZero = new FattyAcid("FA1", 0, 2, 0, 0, LipidFaBondType.UNDEFINED, false, ModificationsList.NONE);
+        assertEquals(0, instanceZero.getNDoubleBonds());
+        FattyAcid instanceOne = new FattyAcid("FA1", 0, 2, 0, 1, LipidFaBondType.UNDEFINED, false, ModificationsList.NONE);
+        assertEquals(1, instanceOne.getNDoubleBonds());
+    }
+
+    @Test
+    public void testGetNDoubleBondsException() {
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+            FattyAcid instanceZero = new FattyAcid("FA1", 0, 2, 0, -1, LipidFaBondType.UNDEFINED, false, ModificationsList.NONE);
+        });
+    }
+
+    @Test
+    public void testGetPositionException() {
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+            FattyAcid instanceZero = new FattyAcid("FA1", -2, 2, 0, 0, LipidFaBondType.UNDEFINED, false, ModificationsList.NONE);
+        });
+    }
+
+    @Test
+    public void testGetNCarbonException() {
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+            FattyAcid instance = new FattyAcid("FAX", 1, -1, 0, 0, LipidFaBondType.UNDEFINED, false, ModificationsList.NONE);
+        });
+    }
+
+    @Test
+    public void testGetNHydroxyException() {
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+            FattyAcid instance = new FattyAcid("FAX", 1, 2, -1, 0, LipidFaBondType.UNDEFINED, false, ModificationsList.NONE);
+        });
     }
 
 }
