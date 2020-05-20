@@ -14,6 +14,7 @@ import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidSpeciesInfo;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import de.isas.lipidomics.palinom.exceptions.ParseTreeVisitorException;
 import de.isas.lipidomics.palinom.hmdb.HmdbVisitorParser;
 import java.util.regex.Matcher;
@@ -548,6 +549,14 @@ public class HmdbVisitorParserTest {
         assertEquals(1, lipidAdduct.getLipid().getFa().get("FA2").getNHydroxy());
         assertEquals(1, lipidAdduct.getLipid().getFa().get("FA2").getModifications().size());
         assertEquals("PC 18:0-20:0;1", lipidAdduct.getLipidString());
+    }
+
+    @Test
+    public void testFailsOnDoubleBondMismatch() throws ParsingException {
+        String ref = "LBPA(18:2(5E,9Z)/18:1(9Z,12Z))";
+        assertThrows(ConstraintViolationException.class, () -> {
+            parseLipidName(ref);
+        });
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

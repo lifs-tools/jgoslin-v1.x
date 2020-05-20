@@ -13,10 +13,12 @@ import de.isas.lipidomics.domain.LipidFaBondType;
 import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -597,6 +599,14 @@ public class LipidMapsVisitorParserTest {
         assertEquals(1, lipidAdduct.getLipid().getFa().get("FA2").getNHydroxy());
         assertEquals(1, lipidAdduct.getLipid().getFa().get("FA2").getModifications().size());
         assertEquals("PC 18:0-20:0;1", lipidAdduct.getLipidString());
+    }
+
+    @Test
+    public void testFailsOnDoubleBondMismatch() throws ParsingException {
+        String ref = "LBPA(18:2(5E,9Z)/18:1(9Z,12Z))";
+        assertThrows(ConstraintViolationException.class, () -> {
+            parseLipidName(ref);
+        });
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {

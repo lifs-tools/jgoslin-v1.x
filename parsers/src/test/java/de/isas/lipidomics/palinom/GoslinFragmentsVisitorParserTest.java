@@ -14,11 +14,13 @@ import de.isas.lipidomics.domain.LipidLevel;
 import de.isas.lipidomics.domain.LipidMolecularSubspecies;
 import de.isas.lipidomics.domain.LipidSpecies;
 import de.isas.lipidomics.domain.LipidStructuralSubspecies;
+import de.isas.lipidomics.palinom.exceptions.ConstraintViolationException;
 import de.isas.lipidomics.palinom.goslinfragments.GoslinFragmentsVisitorParser;
 import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
@@ -597,6 +599,14 @@ public class GoslinFragmentsVisitorParserTest {
         assertEquals(2, lipidAdduct.getLipid().getFa().size());
         assertEquals(1, lipidAdduct.getLipid().getFa().get("LCB").getPosition());
         assertEquals(2, lipidAdduct.getLipid().getFa().get("FA1").getPosition());
+    }
+
+    @Test
+    public void testFailsOnDoubleBondMismatch() throws ParsingException {
+        String ref = "LBPA 18:2(5E,9Z)/18:1(9Z,12Z)";
+        assertThrows(ConstraintViolationException.class, () -> {
+            parseLipidName(ref);
+        });
     }
 
     protected LipidAdduct parseLipidName(String ref) throws ParsingException {
