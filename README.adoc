@@ -23,7 +23,7 @@ jGoslin uses the Goslin grammars and the generated parser to support the followi
 . Provide a structural representation of the shorthand lipid after parsing.
 . Use the structural representation to generate normalized names.
 
-The Maven site with JavaDoc is available https://lifs-tools.github.io/jgoslin[here].
+The Maven site with JavaDoc is available https://lifs-tools.github.io/jgoslin/index.html[here].
 
 The web-based application is available https://github.com/lifs-tools/goslin-webapp[here].
 
