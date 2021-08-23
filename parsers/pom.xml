@@ -35,7 +35,7 @@
                         <configuration>
                             <resources>
                                 <resource>
-                                    <directory>src/main/antlr4/de/isas/lipidomics/palinom</directory>
+                                    <directory>src/main/antlr4/org/lifstools/goslin</directory>
                                     <includes>
                                         <include>lipid-list.csv</include>
                                         <include>**/*.g4</include>
@@ -53,7 +53,7 @@
                         <configuration>
                             <resources>
                                 <resource>
-                                    <directory>src/main/antlr4</directory>
+                                    <directory>src/main/antlr4/org/lifstools/goslin</directory>
                                     <includes>
                                         <include>**/*.txt</include>
                                         <include>**/*.tsv</include>
@@ -142,8 +142,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <listener>false</listener>
+                    <listener>true</listener>
                     <visitor>true</visitor>
+                    <excludes>**/Listing.g4,**/MoleculeFormula.g4,**/Systematic.g4,**/FattyAcids.g4,**/IonFormula.g4</excludes>
                 </configuration>
             </plugin>
         </plugins>
