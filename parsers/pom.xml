@@ -145,7 +145,7 @@
                     <listener>true</listener>
                     <visitor>true</visitor>
                     <!--<excludes>**/Listing.g4,**/MoleculeFormula.g4,**/FattyAcids.g4,**/IonFormula.g4</excludes>-->
-                    <excludes>**/FattyAcids.g4, **/Systematic.g4</excludes>
+                    <excludes>**/Systematic.g4</excludes>
                 </configuration>
             </plugin>
         </plugins>

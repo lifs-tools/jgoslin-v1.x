@@ -54,6 +54,7 @@
         <dockerfile.plugin.version>1.4.10</dockerfile.plugin.version>
         <slf4j.version>1.7.26</slf4j.version>
         <jacoco.version>0.8.5</jacoco.version>
+        <antlr.version>4.9.2</antlr.version>
     </properties>
     <build>
         <pluginManagement>
@@ -317,7 +318,7 @@
             <dependency> 
                 <groupId>org.antlr</groupId> 
                 <artifactId>antlr4</artifactId> 
-                <version>4.7.2</version> 
+                <version>${antlr.version}</version> 
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
