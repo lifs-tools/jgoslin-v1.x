@@ -8,6 +8,9 @@ image:https://zenodo.org/badge/DOI/10.5281/zenodo.3826474.svg["DOI", link="https
 image:https://travis-ci.org/lifs-tools/jgoslin.svg?branch=master["Build Status", link="https://travis-ci.org/lifs-tools/jgoslin"]
 image:https://sonarcloud.io/api/project_badges/measure?branch=master&project=lifs-tools_jgoslin&metric=alert_status["Quality Gate", link=https://sonarcloud.io/dashboard?id=lifs-tools_jgoslin]
 
+NOTE: This repository has been archived. Please use the new https://github.com/lifs-tools/jg[jg repository for jGoslin 2.0]
+
+
 //NOTE: If you use the jGoslin library or the web application, please cite the following paper: +
 //https://pubs.acs.org/doi/10.1021/acs.analchem.9b01987[N. Hoffmann et al., Analytical Chemistry 2019; Oct 15;91(20):12615-12618..] https://www.ncbi.nlm.nih.gov/pubmed/31525911[PubMed record].
 
