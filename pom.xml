@@ -19,15 +19,18 @@
     <developers>
         <developer>
             <name>Dominik Kopczynski</name>
-            <email>dominik.kopczynski@isas.de</email>
-            <organization>Leibniz-Institut für Analytische Wissenschaften – ISAS – e.V.</organization>
-            <organizationUrl>https://www.isas.de</organizationUrl>
+            <email>dominik.kopczynski@univie.ac.at</email>
+            <organization>Department of Analytical Chemistry, University of Vienna, Vienna, Austria</organization>
+            <organizationUrl>https://anchem.univie.ac.at/</organizationUrl>
         </developer>
         <developer>
-            <name>Nils Hoffmann</name>
-            <email>nils.hoffmann@isas.de</email>
-            <organization>Leibniz-Institut für Analytische Wissenschaften – ISAS – e.V.</organization>
-            <organizationUrl>https://www.isas.de</organizationUrl>
+        <name>Nils Hoffmann</name>
+            <email>nils.hoffmann@cebitec.uni-bielefeld.de</email>
+            <organization>Center For Biotechnology, Bielefeld University, Bielefeld, Germany</organization>
+            <organizationUrl>https://cebitec.uni-bielefeld.de</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
         </developer>
     </developers>
     <scm>
